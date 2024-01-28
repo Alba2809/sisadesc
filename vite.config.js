@@ -10,6 +10,9 @@ export default defineConfig({
       '@context': path.resolve(__dirname, 'src/context'),
       '@components': path.resolve(__dirname, 'src/components'),
       '@pages': path.resolve(__dirname, 'src/pages'),
+      '@images-login': path.resolve(__dirname, 'src/assets/login'),
+      '@images-logos': path.resolve(__dirname, 'src/assets/logos'),
+      '@constants': path.resolve(__dirname, 'src/constants'),
       // Añade más alias según tus necesidades
     },
   },

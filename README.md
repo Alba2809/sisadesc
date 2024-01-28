@@ -8,3 +8,6 @@
 
 # Ejecutar
 1. Abrir una terminal y ejecutar el comando: npm run dev
+2. Utilizar las credenciales de algún usuario para iniciar sesión, de manera predeterminada se crea el usuario admin con las siguientes credenciales:
+   correo: administrador@gmail.com
+   contraseña: administrador
