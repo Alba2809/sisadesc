@@ -11,3 +11,5 @@
 2. Utilizar las credenciales de algún usuario para iniciar sesión, de manera predeterminada se crea el usuario admin con las siguientes credenciales:
    correo: administrador@gmail.com
    contraseña: administrador
+
+   Hola Alba, no entiendo los archivos que están en el proyecto. Está todo muy seccionado :()
