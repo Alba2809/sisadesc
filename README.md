@@ -13,3 +13,4 @@
    contraseña: administrador
 
    Hola Alba, no entiendo los archivos que están en el proyecto. Está todo muy seccionado :()
+   Prueba para que tu ahora hagas pull
