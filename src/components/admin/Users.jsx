@@ -5,6 +5,7 @@ import InputSelect from "@components/InputSelect";
 function Users() {
   const { getAllSomething } = useAdmin();
   const [loading, setLoading] = useState(true);
+  const [loadingTable, setLoadingTable] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [users, setUsers] = useState([]);
   const [groupSize, setGroupsSize] = useState(5);
@@ -16,8 +17,12 @@ function Users() {
       async function getUsers() {
         const res = await getAllSomething("user");
         if (res) {
-          setAllUsers(res);
-          setUsers(groupUsers(res));
+          const resWithId = res.map((usuario, index) => ({
+            ...usuario,
+            id_table: index + 1 < 10 ? `0${index + 1}` : `${index + 1}`,
+          }));
+          setAllUsers(resWithId);
+          setUsers(groupUsers(resWithId));
         }
         setLoading(false);
       }
@@ -25,20 +30,30 @@ function Users() {
     }
   }, [loading]);
 
-  const groupUsers = (value) =>{
-    return Array.from(
-        { length: Math.ceil(value.length / groupSize) },
-        (_, index) =>
-          value.slice(index * groupSize, (index + 1) * groupSize)
-      )
-  }
+  useEffect(() => {
+    if (loadingTable) {
+      setUsers(groupUsers(allUsers));
+      setLoadingTable(false);
+    }
+  }, [loadingTable]);
 
-  const onOptionChange = (number) => setGroupsSize(Number.parseInt(number));
+  const groupUsers = (value) => {
+    const organizedValue = Array.from(
+      { length: Math.ceil(value.length / groupSize) },
+      (_, index) => value.slice(index * groupSize, (index + 1) * groupSize)
+    );
+
+    return organizedValue;
+  };
+
+  const onOptionChange = (number) => {
+    setGroupsSize(Number.parseInt(number));
+    setGroupIndex(0)
+    setLoadingTable(true);
+  };
 
   const handleNext = () => {
-    setGroupIndex((prevIndex) =>
-      Math.min(prevIndex + 1, groupedUsers.length - 1)
-    );
+    setGroupIndex((prevIndex) => Math.min(prevIndex + 1, users.length - 1));
   };
 
   const handleBack = () => {
@@ -46,14 +61,22 @@ function Users() {
   };
 
   const startRecord = groupIndex * groupSize + 1;
-  const endRecord = Math.min((groupIndex + 1) * groupSize, users.length);
+  const endRecord = Math.min((groupIndex + 1) * groupSize, allUsers.length);
   const totalRecords = allUsers.length;
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
-      const filteredUsers = users.filter((user) =>
-        Object.values(user).some(
-          (value) =>
+      if (e.target.value === "") setLoading(true);
+
+      const filteredUsers = allUsers.filter((user) =>
+        Object.entries(user).some(
+          ([key, value]) =>
+            key !== "_id" &&
+            key !== "password" &&
+            key !== "imageperfile" &&
+            key !== "createdAt" &&
+            key !== "updatedAt" &&
+            key !== "role" &&
             (typeof value === "string" || typeof value === "number") &&
             value
               .toString()
@@ -108,7 +131,7 @@ function Users() {
               </tr>
             </thead>
             <tbody>
-              {loading ? (
+              {loading || loadingTable ? (
                 <tr className="border border-gray-300">
                   <td className="p-2">Loading...</td>
                 </tr>
@@ -116,27 +139,35 @@ function Users() {
                 <tr className="border border-gray-300">
                   <td className="p-2">No hay usuarios registrados.</td>
                 </tr>
+              ) : users.length < 1 ? (
+                <>
+                  <tr className="border border-gray-300">
+                    <td className="p-2">No se encontraron usuarios.</td>
+                  </tr>
+                </>
               ) : (
-                users.map((group, groupIndex) => (
-                  <Fragment key={groupIndex}>
-                    {group.map((user, userIndex) => (
-                      <tr
-                        key={`${groupIndex}-${userIndex}`}
-                        className="border border-gray-300 h-[60px]"
-                      >
-                        <td className="p-2">{`${groupIndex}${
-                          userIndex + 1
-                        }`}</td>
-                        <td className="p-2">{user.imageperfile}</td>
-                        <td className="p-2">{user.firstname}</td>
-                        <td className="p-2">{user.lastnamepaternal}</td>
-                        <td className="p-2">{user.lastnamematernal}</td>
-                        <td className="p-2">{user.curp}</td>
-                        <td className="p-2">{user.rfc}</td>
-                      </tr>
+                <>
+                  {users
+                    .filter((group, index) => index === groupIndex)
+                    .map((group, groupIndex) => (
+                      <Fragment key={groupIndex}>
+                        {group.map((user, userIndex) => (
+                          <tr
+                            key={`${groupIndex}-${userIndex}`}
+                            className="border border-gray-300 h-[60px]"
+                          >
+                            <td className="p-2">{user.id_table}</td>
+                            <td className="p-2">{user.imageperfile}</td>
+                            <td className="p-2">{user.firstname}</td>
+                            <td className="p-2">{user.lastnamepaternal}</td>
+                            <td className="p-2">{user.lastnamematernal}</td>
+                            <td className="p-2">{user.curp}</td>
+                            <td className="p-2">{user.rfc}</td>
+                          </tr>
+                        ))}
+                      </Fragment>
                     ))}
-                  </Fragment>
-                ))
+                </>
               )}
             </tbody>
           </table>

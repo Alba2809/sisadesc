@@ -1,12 +1,12 @@
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AdminProvider } from "./context/AdminContext";
-import Navbar from "@components/Navbar";
 import Dashboard from "@pages/Dashboard";
 import Login from "@pages/Login";
 import AuthValidator from "@components/auth/AuthValidator";
 import RolValidator from "@components/auth/RolValidator";
-import RegisterUser from "@pages/RegisterUser";
-import Users from "@pages/admin/Users";
+import RegisterUser from "@components/admin/RegisterUser";
+import Users from "@components/admin/Users";
+import WelcomeSection from "@components/WelcomeSection";
 
 function App() {
   const location = useLocation();
@@ -14,8 +14,8 @@ function App() {
   return (
     <Routes location={location} key={location.pathname}>
       <Route element={<AuthValidator />}>
-        <Route element={<Navbar />}>
-          <Route path="/" element={<Dashboard />} />
+        <Route element={<Dashboard />}>
+          <Route path="/" element={<WelcomeSection />} />
 
           <Route element={<RolValidator rolRoute="admin" />}>
             <Route path="/admin/*" element={<AdminProvider />}>

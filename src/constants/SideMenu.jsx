@@ -94,3 +94,24 @@ export const adminOptions = [
     ],
   },
 ];
+
+export const studentOptions = [
+]
+
+export const teacherOptions = [
+]
+
+export const tutorOptions = [
+]
+
+export const secretaryOptions = [
+]
+
+export const principalOptions = [
+]
+
+export const viceprincipalOptions = [
+]
+
+export const academicCoorOptions = [
+]
