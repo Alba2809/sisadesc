@@ -12,4 +12,4 @@
    correo: administrador@gmail.com
    contraseña: administrador
 
-   Hola Alba, no entiendo los archivos que están en el proyecto. Está todo muy seccionado :()
+  # Hola Alba, no entiendo los archivos que están en el proyecto. Está todo muy seccionado
