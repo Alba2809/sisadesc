@@ -69,7 +69,7 @@ function Dashboard() {
   }, []);
 
   return (
-    <div className="w-full h-screen overflow-hidden">
+    <div className="w-full h-full overflow-hidden relative">
       <header className="bg-white h-[70px] flex flex-row p-2 w-full justify-between">
         <img src={Logo} alt="Logo del sistema" className="" />
         <section
@@ -112,11 +112,11 @@ function Dashboard() {
           </AnimatePresence>
         </section>
       </header>
-      <section className="w-full h-full flex flex-row gap-0 overflow-hidden relative bg-[#f7f7f9]">
+      <section className="w-full max-h-[calc(100vh-70px)] h-full flex flex-row gap-0 overflow-hidden bg-[#f7f7f9]">
         <AnimatePresence>
           {showSideBar ? (
             <motion.div
-              className="max-w-[300px] w-full flex flex-col gap-5 font-serif border p-5 relative bg-white"
+              className="max-w-[300px] w-full flex flex-col gap-5 font-serif p-5 relative bg-white"
               animate={{ x: 0 }}
               exit={{ x: -70 }}
               transition={{ type: "tween" }}
@@ -151,7 +151,7 @@ function Dashboard() {
                 <Fragment key={index}>
                   {option.mainOption.to ? (
                     <Link
-                      className={`flex items-center gap-5 text-lg text-gray-600 bg-white rounded-lg p-2 relative ${
+                      className={`flex items-center gap-5 text-lg bg-white rounded-lg p-2 relative ${
                         subMenuSelect === option.mainOption.name
                           ? "text-blue-700"
                           : "text-gray-600"
@@ -233,13 +233,13 @@ function Dashboard() {
                   )}
                 </Fragment>
               ))}
-              <footer className="h-[50px] w-full absolute bottom-11">
+              <footer className="h-[50px] w-full absolute -bottom-5 text-gray-600">
                 COPYRIGHT © 2024 SISADESC.
               </footer>
             </motion.div>
           ) : (
             <motion.button
-              className="bg-white px-2 py-3 absolute top-[20px] left-0 shadow-md rounded-e-lg hover:bg-gray-100"
+              className="bg-white px-2 py-3 absolute top-[80px] left-0 shadow-md rounded-e-lg hover:bg-gray-100"
               onClick={() => setShowSideBar(true)}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -249,12 +249,12 @@ function Dashboard() {
             </motion.button>
           )}
         </AnimatePresence>
-        <section className="w-full h-full overflow-hidden bg-[#f7f7f9]">
+        <section className="w-full max-h-full h-full overflow-hidden bg-[#f7f7f9] p-10">
           <motion.div
             initial={{ x: 100 }}
             animate={{ x: 0 }}
             exit={{ x: 100 }}
-            className="w-full h-full"
+            className="h-full"
           >
             <Outlet />
           </motion.div>

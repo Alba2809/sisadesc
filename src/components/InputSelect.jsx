@@ -44,10 +44,10 @@ function InputSelect({
     };
   }, []);
   return (
-    <div ref={selectRef} className="w-full">
+    <div ref={selectRef} className="w-full z-[500]">
       <div className="relative font-montserrat shadow" onClick={handleToggle}>
         <input
-          className={`border border-gray-300 rounded-md w-full text-start py-1 px-3 cursor-pointer block ${
+          className={`border border-gray-300 rounded-md w-full text-start py-1 px-3 cursor-pointer  ${
             style ? style : null
           }`}
           value={selectedOption}

@@ -27,6 +27,55 @@ function App() {
               <Route path="*" element={<Navigate to="/" />} />
             </Route>
           </Route>
+
+          <Route element={<RolValidator rolRoute="teacher" />}>
+            <Route path="/teacher/*" element={<AdminProvider />}> {/* Cambiar el context */}
+              
+              <Route path="*" element={<Navigate to="/" />} />
+            </Route>
+          </Route>
+
+          <Route element={<RolValidator rolRoute="student" />}>
+            <Route path="/student/*" element={<AdminProvider />}> {/* Cambiar el context */}
+              
+              <Route path="*" element={<Navigate to="/" />} />
+            </Route>
+          </Route>
+
+          <Route element={<RolValidator rolRoute="tutor" />}>
+            <Route path="/tutor/*" element={<AdminProvider />}> {/* Cambiar el context */}
+              
+              <Route path="*" element={<Navigate to="/" />} />
+            </Route>
+          </Route>
+
+          <Route element={<RolValidator rolRoute="secretary" />}>
+            <Route path="/secretary/*" element={<AdminProvider />}> {/* Cambiar el context */}
+              
+              <Route path="*" element={<Navigate to="/" />} />
+            </Route>
+          </Route>
+
+          <Route element={<RolValidator rolRoute="principal" />}>
+            <Route path="/principal/*" element={<AdminProvider />}> {/* Cambiar el context */}
+              
+              <Route path="*" element={<Navigate to="/" />} />
+            </Route>
+          </Route>
+
+          <Route element={<RolValidator rolRoute="viceprincipal" />}>
+            <Route path="/viceprincipal/*" element={<AdminProvider />}> {/* Cambiar el context */}
+              
+              <Route path="*" element={<Navigate to="/" />} />
+            </Route>
+          </Route>
+
+          <Route element={<RolValidator rolRoute="academiccoor" />}>
+            <Route path="/academicoor/*" element={<AdminProvider />}>
+              
+              <Route path="*" element={<Navigate to="/" />} />
+            </Route>
+          </Route>
         </Route>
       </Route>
       <Route path="/login" element={<Login />} />

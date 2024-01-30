@@ -1,30 +1,44 @@
 import { useAdmin } from "@context/AdminContext";
 import { Fragment, useEffect, useState } from "react";
+import { FiEdit2 } from "react-icons/fi";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { AnimatePresence } from "framer-motion";
 import InputSelect from "@components/InputSelect";
+import Dialog from "../Dialog";
 
 function Users() {
-  const { getAllSomething } = useAdmin();
+  const { getAllSomething, deleteSomething } = useAdmin();
   const [loading, setLoading] = useState(true);
   const [loadingTable, setLoadingTable] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [users, setUsers] = useState([]);
   const [groupSize, setGroupsSize] = useState(5);
   const [groupIndex, setGroupIndex] = useState(0);
-  const [searchValue, setSearchValue] = useState("");
+  const [isHoverEdit, setIsHoverEdit] = useState(0);
+  const [isHoverDelete, setIsHoverDelete] = useState(0);
+  const [isHoverRow, setIsHoverRow] = useState(0);
+  const [showDialog, setShowDialog] = useState(false);
+  const [showLoading, setShowLoading] = useState("");
+  const [userToDelete, setUserToDelete] = useState("");
 
   useEffect(() => {
     if (loading) {
       async function getUsers() {
-        const res = await getAllSomething("user");
-        if (res) {
-          const resWithId = res.map((usuario, index) => ({
-            ...usuario,
-            id_table: index + 1 < 10 ? `0${index + 1}` : `${index + 1}`,
-          }));
-          setAllUsers(resWithId);
-          setUsers(groupUsers(resWithId));
+        try {
+          const res = await getAllSomething("user");
+          if (res) {
+            const resWithId = res.map((usuario, index) => ({
+              ...usuario,
+              id_table: index + 1 < 10 ? `0${index + 1}` : `${index + 1}`,
+            }));
+            setAllUsers(resWithId);
+            setUsers(groupUsers(resWithId));
+          }
+          setLoading(false);
+        } catch (error) {
+          console.log(error);
+          setAllUsers([]);
         }
-        setLoading(false);
       }
       getUsers();
     }
@@ -48,7 +62,7 @@ function Users() {
 
   const onOptionChange = (number) => {
     setGroupsSize(Number.parseInt(number));
-    setGroupIndex(0)
+    setGroupIndex(0);
     setLoadingTable(true);
   };
 
@@ -89,12 +103,45 @@ function Users() {
     }
   };
 
+  const formatDate = (dateString) => {
+    if (dateString === "") return "";
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    const formattedDate = new Date(dateString).toLocaleDateString(
+      "es-ES",
+      options
+    );
+    return formattedDate;
+  };
+
+  const handleDeleteUser = () => {
+    try {
+      const res = deleteSomething(userToDelete, "user");
+      handleDialog("");
+      setLoading(true);
+    } catch (error) {
+      handleDialog("");
+      console.log(error);
+    }
+  };
+
+  const handleDialog = (user) => {
+    setUserToDelete(user);
+    setShowLoading("");
+    setShowDialog((prev) => !prev);
+  };
+
+  const handleDelete = (accept) => {
+    if (!accept) return handleDialog("");
+    setShowLoading("true");
+    handleDeleteUser();
+  };
+
   return (
-    <div className="w-full h-full p-10">
+    <div className="w-full h-full flex flex-col">
       <header className="h-[50px]">
         <h1 className="font-medium font-serif text-2xl">Lista de usuarios</h1>
       </header>
-      <section className="p-5 bg-white rounded-lg">
+      <section className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
         <header className="h-[50px] w-full flex items-center justify-between">
           <section className="flex flex-row gap-5 items-center">
             <p>Mostrar</p>
@@ -117,17 +164,37 @@ function Users() {
             />
           </section>
         </header>
-        <div className="w-full overflow-x-auto mt-5">
-          <table className="table-auto border-collapse border border-gray-300 w-full min-w-[1300px]">
+        <div className="flex-1 w-full overflow-x-auto mt-5 border border-gray-300">
+          <table className="table-auto w-full min-w-[1300px] relative">
             <thead className="h-[50px] bg-[#f8f9fb] font-serif font-semibold">
               <tr>
-                <th className="text-start px-2 w-[250px]">ID</th>
-                <th className="text-start px-2">Perfil</th>
-                <th className="text-start px-2">Nombre</th>
-                <th className="text-start px-2">Primer apellido</th>
-                <th className="text-start px-2">Segundo apellido</th>
-                <th className="text-start px-2">CURP</th>
-                <th className="text-start px-2">RFC</th>
+                <th className="text-start px-2 min-w-[80px]">ID</th>
+                <th className="text-start px-2 min-w-[100px]">Perfil</th>
+                <th className="text-start px-2 min-w-[200px]">Nombre</th>
+                <th className="text-start px-2 min-w-[200px]">
+                  Primer apellido
+                </th>
+                <th className="text-start px-2 min-w-[200px]">
+                  Segundo apellido
+                </th>
+                <th className="text-start px-2 min-w-[200px]">CURP</th>
+                <th className="text-start px-2 min-w-[200px]">RFC</th>
+                <th className="text-start px-2">Email</th>
+                <th className="text-start px-2 min-w-[250px]">
+                  Fecha de nacimiento
+                </th>
+                <th className="text-start px-2 min-w-[250px]">Calle</th>
+                <th className="text-start px-2 min-w-[250px]">Colonia</th>
+                <th className="text-start px-2 min-w-[150px]">Código postal</th>
+                <th className="text-start px-2 min-w-[150px]">Teléfono</th>
+                <th className="text-start px-2 min-w-[200px]">
+                  Fecha de registro
+                </th>
+                <th className="text-start px-2 min-w-[130px]">Rol</th>
+                <th className="text-start px-2 min-w-[130px]">Estatus</th>
+                <th className="text-center px-2 min-w-[100px] sticky -right-[1px] bg-[#f8f9fb] z-10">
+                  Acción
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -154,7 +221,9 @@ function Users() {
                         {group.map((user, userIndex) => (
                           <tr
                             key={`${groupIndex}-${userIndex}`}
-                            className="border border-gray-300 h-[60px]"
+                            className="border-y-[1px] border-gray-300 h-[60px] hover:bg-[#f7f7f7]"
+                            onMouseEnter={() => setIsHoverRow(user.id_table)}
+                            onMouseLeave={() => setIsHoverRow(0)}
                           >
                             <td className="p-2">{user.id_table}</td>
                             <td className="p-2">{user.imageperfile}</td>
@@ -163,6 +232,66 @@ function Users() {
                             <td className="p-2">{user.lastnamematernal}</td>
                             <td className="p-2">{user.curp}</td>
                             <td className="p-2">{user.rfc}</td>
+                            <td className="p-2">{user.email}</td>
+                            <td className="p-2">
+                              {user.birthdate && (
+                                <time dateTime={userIndex.birthdate}>
+                                  {formatDate(user.birthdate)}
+                                </time>
+                              )}
+                            </td>
+                            <td className="p-2">{user.direction.street}</td>
+                            <td className="p-2">{user.direction.colony}</td>
+                            <td className="p-2">{user.direction.postalcode}</td>
+                            <td className="p-2">{user.phonenumber}</td>
+                            <td className="p-2">
+                              <time dateTime={userIndex.createdAt}>
+                                {formatDate(user.createdAt)}
+                              </time>
+                            </td>
+                            <td className="p-2">{user.role.name}</td>
+                            <td className="p-2">{user.status}</td>
+                            <td
+                              className={`p-2 sticky -right-[1px] ${
+                                isHoverRow === user.id_table
+                                  ? "bg-[#f7f7f7]"
+                                  : "bg-white"
+                              }`}
+                            >
+                              <div className=" flex gap-3 items-center justify-center">
+                                <button
+                                  className="bg-[#f7f7fa] hover:bg-[#3d5ee1] w-[30px] h-[30px] rounded-full flex justify-center items-center"
+                                  onMouseEnter={() =>
+                                    setIsHoverEdit(user.id_table)
+                                  }
+                                  onMouseLeave={() => setIsHoverEdit(0)}
+                                >
+                                  <FiEdit2
+                                    color={
+                                      isHoverEdit === user.id_table
+                                        ? "white"
+                                        : "black"
+                                    }
+                                  />
+                                </button>
+                                <button
+                                  className="bg-[#f7f7fa] hover:bg-[#3d5ee1] w-[30px] h-[30px] rounded-full flex justify-center items-center"
+                                  onMouseEnter={() =>
+                                    setIsHoverDelete(user.id_table)
+                                  }
+                                  onMouseLeave={() => setIsHoverDelete(0)}
+                                  onClick={() => handleDialog(user._id)}
+                                >
+                                  <RiDeleteBin6Line
+                                    color={
+                                      isHoverDelete === user.id_table
+                                        ? "white"
+                                        : "black"
+                                    }
+                                  />
+                                </button>
+                              </div>
+                            </td>
                           </tr>
                         ))}
                       </Fragment>
@@ -172,7 +301,7 @@ function Users() {
             </tbody>
           </table>
         </div>
-        <footer className="flex flex-row justify-between pt-3 items-center">
+        <footer className="flex flex-row justify-between mt-8 items-center">
           <p>
             Mostrando {startRecord} a {endRecord} de {totalRecords} registro(s)
           </p>
@@ -197,6 +326,18 @@ function Users() {
           </div>
         </footer>
       </section>
+      <AnimatePresence>
+        {showDialog && (
+          <Dialog
+            title="Eliminar usuario"
+            textAccept="Eliminar"
+            message="¿Está seguro de eliminar el usuario?"
+            handleAction={handleDelete}
+            showLoading={showLoading}
+            addCancel
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
