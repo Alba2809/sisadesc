@@ -117,7 +117,6 @@ function Dashboard() {
           {showSideBar ? (
             <motion.div
               className="max-w-[300px] w-full flex flex-col gap-5 font-serif border p-5 relative bg-white"
-              initial={{ x: -70 }}
               animate={{ x: 0 }}
               exit={{ x: -70 }}
               transition={{ type: "tween" }}
