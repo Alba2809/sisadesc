@@ -15,3 +15,4 @@
   # Hola Alba, no entiendo los archivos que están en el proyecto. Está todo muy seccionado
    Hola Alba, no entiendo los archivos que están en el proyecto. Está todo muy seccionado :()
    Prueba para que tu ahora hagas pull
+   Hola Alba, estoy entendiendo poquito, creo que me voy a cambiar de carrera D:
