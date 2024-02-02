@@ -6,7 +6,7 @@ import { AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { formatDateLong } from "@constants/functions";
 import InputSelect from "@components/InputSelect";
-import Dialog from "../Dialog";
+import Dialog from "@components/Dialog";
 
 function Users() {
   const { getAllSomething, deleteSomething } = useAdmin();
@@ -191,17 +191,17 @@ function Users() {
             </thead>
             <tbody>
               {loading || loadingTable ? (
-                <tr className="border border-gray-300">
+                <tr className="border-t text-gray-500">
                   <td className="p-2">Loading...</td>
                 </tr>
               ) : allUsers.length < 1 ? (
-                <tr className="border border-gray-300">
-                  <td className="p-2">No hay usuarios registrados.</td>
+                <tr className="border-t text-gray-500">
+                  <td colSpan="17" className="p-2">No hay usuarios registrados.</td>
                 </tr>
               ) : users.length < 1 ? (
                 <>
-                  <tr className="border border-gray-300">
-                    <td className="p-2">No se encontraron usuarios.</td>
+                  <tr className="border-t text-gray-500">
+                    <td colSpan="17" className="p-2">No se encontraron usuarios.</td>
                   </tr>
                 </>
               ) : (
@@ -309,9 +309,15 @@ function Users() {
           </table>
         </div>
         <footer className="flex flex-row justify-between mt-8 items-center">
-          <p>
-            Mostrando {startRecord} a {endRecord} de {totalRecords} registro(s)
+        {allUsers.length > 0 ? 
+            <p>
+              Mostrando {startRecord} a {endRecord} de {totalRecords}{" "}
+              registro(s)
+            </p> :
+            <p>
+            Mostrando 0 a 0 de 0 registro(s)
           </p>
+          }
           <div>
             <button
               onClick={handleBack}

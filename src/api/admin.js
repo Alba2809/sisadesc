@@ -26,7 +26,7 @@ export const getSubjectRequest = (id) => axios.get(`/admin/getsubject/${id}`);
 
 export const getUsersRequest = () => axios.get("/admin/getusers");
 
-export const getTeachersRequest = () => axios.get("/admin/getteacher");
+export const getTeachersRequest = () => axios.get("/admin/getteachers");
 
 export const getStudentsRequest = () => axios.get("/admin/getstudent");
 

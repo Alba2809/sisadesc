@@ -52,16 +52,37 @@ function Dashboard() {
 
   useEffect(() => {
     const path = location.pathname;
+    const parts = path.split("/").filter(Boolean);
+    const lastPart = parts[parts.length - 2];
+    const withoutLastPart = "/" + parts.slice(0, -2).join("/");
 
-    if (path !== "/") setShowSideBar(true);
+    const matchingOption = adminOptions
+      .map((option) => {
+        if (option.mainOption.to === path) {
+          return { mainOptionName: option.mainOption.name };
+        }
 
-    if (path.startsWith("/admin/control")) {
-      setSubMenuSelect("Panel de control");
-    } else if (path.startsWith("/admin/users")) {
-      setSubMenuSelect("Gestión de usuarios");
-      setSubOptionSelect("Lista de usuarios");
+        if (option.subOptions) {
+          const subOption = option.subOptions.find(
+            (subOption) => subOption.to === (lastPart ? lastPart === "edit" ? withoutLastPart : path : path)
+          );
+
+          return subOption
+            ? { mainOptionName: option.mainOption.name, subOption }
+            : null;
+        }
+
+        return null;
+      })
+      .filter((matchingOption) => matchingOption)[0];
+
+    if (matchingOption) {
+      setSubMenuSelect(matchingOption.mainOptionName);
+      if (matchingOption.subOption)
+        setSubOptionSelect(matchingOption.subOption.name);
     } else {
       setSubMenuSelect("");
+      setSubOptionSelect("");
     }
   }, [location.pathname]);
 
@@ -79,12 +100,12 @@ function Dashboard() {
         >
           {user.imageperfile ? (
             <div className="rounded-full border-2 border-gray-300 p-1">
-            <img
-              src={user.imageperfile}
-              alt="Image del perfil del usuario"
-              className="min-w-10 min-h-10 max-w-10 max-h-10 rounded-full"
-            />
-          </div>
+              <img
+                src={user.imageperfile}
+                alt="Image del perfil del usuario"
+                className="min-w-10 min-h-10 max-w-10 max-h-10 rounded-full"
+              />
+            </div>
           ) : (
             <div className="rounded-full border-2 border-gray-300 p-2">
               <FaUserCircle color="gray" size="1.5em" />

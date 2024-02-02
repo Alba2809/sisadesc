@@ -4,10 +4,13 @@ import Dashboard from "@pages/Dashboard";
 import Login from "@pages/Login";
 import AuthValidator from "@components/auth/AuthValidator";
 import RolValidator from "@components/auth/RolValidator";
-import RegisterUser from "@components/admin/RegisterUser";
-import Users from "@components/admin/Users";
+import RegisterUser from "@components/admin/User/RegisterUser";
+import Users from "@components/admin/User/Users";
 import WelcomeSection from "@components/WelcomeSection";
-import EditUser from "@components/admin/EditUser";
+import EditUser from "@components/admin/User/EditUser";
+import Teachers from "@components/admin/Teacher/Teachers";
+import Settings from "@components/Settings";
+import RegisterTeacher from "./components/admin/Teacher/RegisterTeacher";
 
 function App() {
   const location = useLocation();
@@ -17,6 +20,7 @@ function App() {
       <Route element={<AuthValidator />}>
         <Route element={<Dashboard />}>
           <Route path="/" element={<WelcomeSection />} />
+          <Route path="/settings" element={<Settings />} />
 
           <Route element={<RolValidator rolRoute="admin" />}>
             <Route path="/admin/*" element={<AdminProvider />}>
@@ -26,7 +30,13 @@ function App() {
                 <Route path="register" element={<RegisterUser />} />
                 <Route path="*" element={<Navigate to="/admin/users" />} />
               </Route>
-              <Route path="*" element={<Navigate to="/admin/users" />} />
+              <Route path="teachers/*">
+                <Route path="" element={<Teachers />} />
+                <Route path="edit/:id" element={<EditUser />} />
+                <Route path="register" element={<RegisterTeacher />} />
+                <Route path="*" element={<Navigate to="/admin/teachers" />} />
+              </Route>
+              <Route path="*" element={<Navigate to="/admin/teachers" />} />
             </Route>
           </Route>
 
