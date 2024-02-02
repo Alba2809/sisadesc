@@ -19,7 +19,8 @@ import {
   deleteStudentRequest,
   deleteSubjectRequest,
   deleteTeacherRequest,
-  deleteUserRequest
+  deleteUserRequest,
+  getRolesRequest
 } from "../api/admin";
 import { Outlet } from "react-router-dom";
 
@@ -56,7 +57,11 @@ export const AdminProvider = () => {
       }
       return false;
     } catch (error) {
-      setErrors(error.response.data);
+      if(typeof error.response.data === "object" && error.response.data){
+        const array = Object.values(error.response.data)
+        setErrors(array);
+      }
+      else setErrors(error.response.data);
     }
   };
 
@@ -80,7 +85,11 @@ export const AdminProvider = () => {
       }
       return false;
     } catch (error) {
-      setErrors(error.response.data);
+      if(typeof error.response.data === "object" && error.response.data){
+        const array = Object.values(error.response.data)
+        setErrors(array);
+      }
+      else setErrors(error.response.data);
     }
   };
 
@@ -124,6 +133,10 @@ export const AdminProvider = () => {
         const res = await getSubjectsRequest();
         return res.data;
       }
+      if (type === "role") {
+        const res = await getRolesRequest();
+        return res.data;
+      }
       return false;
     } catch (error) {}
   };
@@ -147,7 +160,9 @@ export const AdminProvider = () => {
         return res.data;
       }
       return false;
-    } catch (error) {}
+    } catch (error) {
+      
+    }
   };
 
   useEffect(() => {

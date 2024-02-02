@@ -45,6 +45,7 @@ export const AuthProvider = ({ children }) => {
   const getUser = async () => {
     try {
       const res = await getUserRequest();
+      setUser(res.data)
       return res.data;
     } catch (error) {}
   };

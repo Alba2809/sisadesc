@@ -32,6 +32,8 @@ export const getStudentsRequest = () => axios.get("/admin/getstudent");
 
 export const getSubjectsRequest = () => axios.get("/admin/getsubject");
 
+export const getRolesRequest = () => axios.get("/admin/getroles");
+
 export const deleteUserRequest = (id) => axios.delete(`/admin/deleteuser/${id}`);
 
 export const deleteTeacherRequest = (id) => axios.delete(`/admin/deleteteacher/${id}`);

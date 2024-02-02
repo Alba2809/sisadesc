@@ -3,6 +3,8 @@ import { Fragment, useEffect, useState } from "react";
 import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
+import { formatDateLong } from "@constants/functions";
 import InputSelect from "@components/InputSelect";
 import Dialog from "../Dialog";
 
@@ -101,16 +103,6 @@ function Users() {
 
       setUsers(groupUsers(filteredUsers));
     }
-  };
-
-  const formatDate = (dateString) => {
-    if (dateString === "") return "";
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    const formattedDate = new Date(dateString).toLocaleDateString(
-      "es-ES",
-      options
-    );
-    return formattedDate;
   };
 
   const handleDeleteUser = () => {
@@ -226,7 +218,21 @@ function Users() {
                             onMouseLeave={() => setIsHoverRow(0)}
                           >
                             <td className="p-2">{user.id_table}</td>
-                            <td className="p-2">{user.imageperfile}</td>
+                            <td className="p-2">
+                              {user.imageperfile ? (
+                                <img
+                                  src={user.imageperfile}
+                                  alt={"Imagen de perfil - " + user._id}
+                                  className="min-w-10 min-h-10 max-w-10 max-h-10 rounded-full"
+                                />
+                              ) : (
+                                <img
+                                  src="https://firebasestorage.googleapis.com/v0/b/sisadesc-ca669.appspot.com/o/avatar%2Favatar_default.jpg?alt=media&token=e4d14e18-f4ae-4777-b35d-d64f0084c0e6"
+                                  alt={"Imagen de perfil default"}
+                                  className="min-w-12 min-h-12 max-w-12 max-h-12 rounded-full"
+                                />
+                              )}
+                            </td>
                             <td className="p-2">{user.firstname}</td>
                             <td className="p-2">{user.lastnamepaternal}</td>
                             <td className="p-2">{user.lastnamematernal}</td>
@@ -236,7 +242,7 @@ function Users() {
                             <td className="p-2">
                               {user.birthdate && (
                                 <time dateTime={userIndex.birthdate}>
-                                  {formatDate(user.birthdate)}
+                                  {formatDateLong(user.birthdate)}
                                 </time>
                               )}
                             </td>
@@ -246,7 +252,7 @@ function Users() {
                             <td className="p-2">{user.phonenumber}</td>
                             <td className="p-2">
                               <time dateTime={userIndex.createdAt}>
-                                {formatDate(user.createdAt)}
+                                {formatDateLong(user.createdAt)}
                               </time>
                             </td>
                             <td className="p-2">{user.role.name}</td>
@@ -259,12 +265,13 @@ function Users() {
                               }`}
                             >
                               <div className=" flex gap-3 items-center justify-center">
-                                <button
+                                <Link
                                   className="bg-[#f7f7fa] hover:bg-[#3d5ee1] w-[30px] h-[30px] rounded-full flex justify-center items-center"
                                   onMouseEnter={() =>
                                     setIsHoverEdit(user.id_table)
                                   }
                                   onMouseLeave={() => setIsHoverEdit(0)}
+                                  to={`/admin/users/edit/${user._id}`}
                                 >
                                   <FiEdit2
                                     color={
@@ -273,7 +280,7 @@ function Users() {
                                         : "black"
                                     }
                                   />
-                                </button>
+                                </Link>
                                 <button
                                   className="bg-[#f7f7fa] hover:bg-[#3d5ee1] w-[30px] h-[30px] rounded-full flex justify-center items-center"
                                   onMouseEnter={() =>

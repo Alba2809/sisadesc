@@ -11,7 +11,7 @@ function Dialog({
 }) {
   const handleClick = (option) => {
     if (showLoading === "true") return;
-    return handleAction(option);
+    if (handleAction) return handleAction(option);
   };
 
   return (

@@ -7,6 +7,7 @@ import RolValidator from "@components/auth/RolValidator";
 import RegisterUser from "@components/admin/RegisterUser";
 import Users from "@components/admin/Users";
 import WelcomeSection from "@components/WelcomeSection";
+import EditUser from "@components/admin/EditUser";
 
 function App() {
   const location = useLocation();
@@ -21,10 +22,11 @@ function App() {
             <Route path="/admin/*" element={<AdminProvider />}>
               <Route path="users/*">
                 <Route path="" element={<Users />} />
+                <Route path="edit/:id" element={<EditUser />} />
                 <Route path="register" element={<RegisterUser />} />
-                <Route path="*" element={<Navigate to="/" />} />
+                <Route path="*" element={<Navigate to="/admin/users" />} />
               </Route>
-              <Route path="*" element={<Navigate to="/" />} />
+              <Route path="*" element={<Navigate to="/admin/users" />} />
             </Route>
           </Route>
 

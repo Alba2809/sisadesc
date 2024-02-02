@@ -2,6 +2,7 @@ import { FaShieldAlt, FaChalkboardTeacher } from "react-icons/fa";
 import { IoMdSettings, IoIosSpeedometer } from "react-icons/io";
 import { BsMortarboardFill } from "react-icons/bs";
 import { BiBookReader } from "react-icons/bi";
+import teacherModel from "../../../api/src/models/teacher.model";
 
 export const adminOptions = [
   {

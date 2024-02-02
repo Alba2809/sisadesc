@@ -26,6 +26,7 @@ function Dashboard() {
   const [showSideBar, setShowSideBar] = useState(true);
   const [subMenuSelect, setSubMenuSelect] = useState("");
   const [subOptionSelect, setSubOptionSelect] = useState("");
+  const [loading, setLoading] = useState(true);
   const menuRef = useRef(null);
   const location = useLocation();
 
@@ -76,9 +77,19 @@ function Dashboard() {
           className="flex flex-row items-center gap-3 relative mr-5"
           ref={menuRef}
         >
-          <div className="rounded-full border-2 border-gray-300 p-2">
-            <FaUserCircle color="gray" size="1.5em" />
+          {user.imageperfile ? (
+            <div className="rounded-full border-2 border-gray-300 p-1">
+            <img
+              src={user.imageperfile}
+              alt="Image del perfil del usuario"
+              className="min-w-10 min-h-10 max-w-10 max-h-10 rounded-full"
+            />
           </div>
+          ) : (
+            <div className="rounded-full border-2 border-gray-300 p-2">
+              <FaUserCircle color="gray" size="1.5em" />
+            </div>
+          )}
           <section className="flex flex-col">
             <h1 className="font-semibold font-sans">{user.firstname}</h1>
             <h2 className="text-[#5855ff] text-sm">{user.role.name}</h2>
@@ -249,7 +260,7 @@ function Dashboard() {
             </motion.button>
           )}
         </AnimatePresence>
-        <section className="w-full max-h-full h-full overflow-hidden bg-[#f7f7f9] p-10">
+        <section className="flex-1 overflow-hidden bg-[#f7f7f9] p-10">
           <motion.div
             initial={{ x: 100 }}
             animate={{ x: 0 }}
