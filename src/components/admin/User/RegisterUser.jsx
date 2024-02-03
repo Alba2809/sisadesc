@@ -12,7 +12,7 @@ function RegisterUser() {
   const {
     getAllSomething,
     registerSomething,
-    errors: updateErrors,
+    errors: registerErrors,
   } = useAdmin();
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -71,7 +71,7 @@ function RegisterUser() {
         ) : (
           <>
             <AnimatePresence mode="sync">
-              {updateErrors.map((error, i) => (
+              {registerErrors.map((error, i) => (
                 <motion.div
                   key={i}
                   initial={{ height: 0, y: -10, opacity: 0 }}
@@ -109,7 +109,7 @@ function RegisterUser() {
                   type="text"
                   maxLength={20}
                   {...register("firstname", {
-                    required: "Se el nombre",
+                    required: "Se requiere el nombre",
                     maxLength: {
                       value: 20,
                       message: "El nombre no debe exceder los 20 caracteres",
@@ -126,7 +126,7 @@ function RegisterUser() {
                   type="text"
                   maxLength={20}
                   {...register("lastnamepaternal", {
-                    required: "Se el primer apellido",
+                    required: "Se requiere el primer apellido",
                     maxLength: {
                       value: 20,
                       message:
@@ -144,7 +144,7 @@ function RegisterUser() {
                   type="text"
                   maxLength={20}
                   {...register("lastnamematernal", {
-                    required: "Se el segundo apellido",
+                    required: "Se requiere el segundo apellido",
                     maxLength: {
                       value: 20,
                       message:

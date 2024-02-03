@@ -100,14 +100,13 @@ function Teachers() {
     }
   };
 
-  const handleDeleteUser = () => {
+  const handleDeleteObject = () => {
     try {
-      const res = deleteSomething(objectToDelete, "teacher");
+      if(objectToDelete) deleteSomething(objectToDelete, "teacher");
       handleDialog("");
       setLoading(true);
     } catch (error) {
       handleDialog("");
-      console.log(error);
     }
   };
 
@@ -120,7 +119,7 @@ function Teachers() {
   const handleDelete = (accept) => {
     if (!accept) return handleDialog("");
     setShowLoading("true");
-    handleDeleteUser();
+    handleDeleteObject();
   };
 
   return (
@@ -155,7 +154,7 @@ function Teachers() {
           <table className="table-auto w-full min-w-[1300px] relative">
             <thead className="h-[50px] bg-[#f8f9fb] font-serif font-semibold">
               <tr>
-                <th className="text-start px-2 min-w-[80px]">ID</th>
+                <th className="text-start px-2 min-w-[160px]">ID</th>
                 <th className="text-start px-2 min-w-[200px]">Nombre</th>
                 <th className="text-start px-2 min-w-[200px]">
                   Primer apellido
@@ -165,7 +164,7 @@ function Teachers() {
                 </th>
                 <th className="text-start px-2 min-w-[200px]">CURP</th>
                 <th className="text-start px-2 min-w-[200px]">RFC</th>
-                <th className="text-start px-2">Género</th>
+                <th className="text-start px-2 min-w-[140px]">Género</th>
                 <th className="text-start px-2 min-w-[150px]">Teléfono</th>
                 <th className="text-start px-2 min-w-[250px]">
                   Fecha de nacimiento
@@ -173,7 +172,6 @@ function Teachers() {
                 <th className="text-start px-2 min-w-[250px]">Calle</th>
                 <th className="text-start px-2 min-w-[250px]">Colonia</th>
                 <th className="text-start px-2 min-w-[150px]">Código postal</th>
-                <th className="text-start px-2 min-w-[130px]">Estatus</th>
                 <th className="text-center px-2 min-w-[100px] sticky -right-[1px] bg-[#f8f9fb] z-10">
                   Acción
                 </th>
@@ -317,9 +315,9 @@ function Teachers() {
       <AnimatePresence>
         {showDialog && (
           <Dialog
-            title="Eliminar usuario"
+            title="Eliminar docente"
             textAccept="Eliminar"
-            message="¿Está seguro de eliminar el usuario?"
+            message="¿Está seguro de eliminar el docente?"
             handleAction={handleDelete}
             showLoading={showLoading}
             addCancel

@@ -107,7 +107,7 @@ function Users() {
 
   const handleDeleteUser = () => {
     try {
-      const res = deleteSomething(userToDelete, "user");
+      if(userToDelete) deleteSomething(userToDelete, "user");
       handleDialog("");
       setLoading(true);
     } catch (error) {

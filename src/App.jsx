@@ -10,7 +10,8 @@ import WelcomeSection from "@components/WelcomeSection";
 import EditUser from "@components/admin/User/EditUser";
 import Teachers from "@components/admin/Teacher/Teachers";
 import Settings from "@components/Settings";
-import RegisterTeacher from "./components/admin/Teacher/RegisterTeacher";
+import RegisterTeacher from "@components/admin/Teacher/RegisterTeacher";
+import EditTeacher from "@components/admin/Teacher/EditTeacher";
 
 function App() {
   const location = useLocation();
@@ -32,7 +33,7 @@ function App() {
               </Route>
               <Route path="teachers/*">
                 <Route path="" element={<Teachers />} />
-                <Route path="edit/:id" element={<EditUser />} />
+                <Route path="edit/:id" element={<EditTeacher />} />
                 <Route path="register" element={<RegisterTeacher />} />
                 <Route path="*" element={<Navigate to="/admin/teachers" />} />
               </Route>
