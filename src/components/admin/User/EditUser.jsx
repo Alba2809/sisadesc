@@ -76,7 +76,7 @@ function EditUser() {
       formData.append("imageperfile", data.imageperfile);
       const res = await updateSomething(user._id, formData, "user");
       handleDialog();
-      if(res.statusText === "OK") navigate("/admin/users")
+      if(res?.statusText === "OK") navigate("/admin/users")
     } catch (error) {
       handleDialog();
       console.log(error);

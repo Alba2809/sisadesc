@@ -41,7 +41,7 @@ export const adminOptions = [
         to: "/admin/users",
       },
       {
-        name: "Registrar nuevo usuario",
+        name: "Agregar usuario",
         to: "/admin/users/register",
       },
     ],
@@ -71,12 +71,12 @@ export const adminOptions = [
     },
     subOptions: [
       {
-        name: "Opción estudiantes 1",
-        to: "#",
+        name: "Lista de estudiantes",
+        to: "/admin/students",
       },
       {
-        name: "Opción estudiantes 2",
-        to: "#",
+        name: "Agregar estudiante",
+        to: "/admin/students/register",
       },
     ],
   },
@@ -88,12 +88,12 @@ export const adminOptions = [
     },
     subOptions: [
       {
-        name: "Opción materias 1",
-        to: "#",
+        name: "Lista de materias",
+        to: "/admin/subjects",
       },
       {
-        name: "Opción materias 2",
-        to: "#",
+        name: "Agregar materia",
+        to: "/admin/subjects/register",
       },
     ],
   },

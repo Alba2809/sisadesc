@@ -12,6 +12,12 @@ import Teachers from "@components/admin/Teacher/Teachers";
 import Settings from "@components/Settings";
 import RegisterTeacher from "@components/admin/Teacher/RegisterTeacher";
 import EditTeacher from "@components/admin/Teacher/EditTeacher";
+import Students from "@components/admin/Student/Students";
+import EditStudent from "@components/admin/Student/EditStudent";
+import RegisterStudent from "@components/admin/Student/RegisterStudent";
+import Subjects from "@components/admin/Subject/Subjects";
+import EditSubject from "@components/admin/Subject/EditSubject";
+import RegisterSubject from "@components/admin/Subject/RegisterSubject";
 
 function App() {
   const location = useLocation();
@@ -36,6 +42,18 @@ function App() {
                 <Route path="edit/:id" element={<EditTeacher />} />
                 <Route path="register" element={<RegisterTeacher />} />
                 <Route path="*" element={<Navigate to="/admin/teachers" />} />
+              </Route>
+              <Route path="students/*">
+                <Route path="" element={<Students />} />
+                <Route path="edit/:id" element={<EditStudent />} />
+                <Route path="register" element={<RegisterStudent />} />
+                <Route path="*" element={<Navigate to="/admin/students" />} />
+              </Route>
+              <Route path="subjects/*">
+                <Route path="" element={<Subjects />} />
+                <Route path="edit/:id" element={<EditSubject />} />
+                <Route path="register" element={<RegisterSubject />} />
+                <Route path="*" element={<Navigate to="/admin/subjects" />} />
               </Route>
               <Route path="*" element={<Navigate to="/admin/teachers" />} />
             </Route>

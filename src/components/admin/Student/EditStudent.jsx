@@ -9,49 +9,65 @@ import InputSelect from "@components/InputSelect";
 import Dialog from "@components/Dialog";
 import AlertMessage from "@components/AlertMessage";
 
-function EditTeacher() {
+const subjectsTest = ["Matemáticas", "Español", "Ciencias", "Inglés", "Ética"];
+
+function EditStudent() {
   const params = useParams();
-  const { getOneSomething, updateSomething, errors: updateErrors } = useAdmin();
+  const {
+    getOneSomething,
+    getAllSomething,
+    updateSomething,
+    errors: updateErrors,
+  } = useAdmin();
   const [object, setObject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [showLoading, setShowLoading] = useState("");
+  const [subjects, setSubjects] = useState(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    getValues,
   } = useForm();
   const navigate = useNavigate();
 
   useEffect(() => {
     async function getObject() {
-      const objectData = await getOneSomething(params.id, "teacher");
+      const objectData = await getOneSomething(params.id, "student");
+      const res = await getAllSomething("subject");
+      if (res) setSubjects(res.map((value) => value.name));
       setObject(objectData);
       setValue("firstname", objectData.firstname);
       setValue("lastnamepaternal", objectData.lastnamepaternal);
       setValue("lastnamematernal", objectData.lastnamematernal);
       setValue("curp", objectData.curp);
-      setValue("rfc", objectData.rfc);
       setValue("gender", objectData.gender);
-      setValue("phonenumber", objectData.phonenumber);
       setValue(
         "birthdate",
         formatDateShort(objectData.birthdate ?? new Date())
       );
       setValue("street", objectData.direction.street);
       setValue("colony", objectData.direction.colony);
-      setValue("postalcode", objectData.direction.postalcode);
+      setValue("postalcode", objectData.direction.postalcode.toString());
+      setValue("email", objectData.email);
+      setValue(
+        "subjects",
+        objectData.subjects.map((value) => value.name)
+      );
+      setValue("group", objectData.group);
+      setValue("phonenumber", objectData.phonenumber);
       setLoading(false);
     }
-    getObject();
-  }, []);
+    if (loading) getObject();
+  }, [loading]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
       handleDialog();
-      const res = await updateSomething(object._id, data, "teacher");
-      if (res?.statusText === "OK") navigate("/admin/teachers");
+      const res = await updateSomething(object._id, data, "student");
+      if (res?.statusText === "OK") navigate("/admin/students");
       handleDialog();
     } catch (error) {
       handleDialog();
@@ -70,6 +86,24 @@ function EditTeacher() {
     setValue("gender", value);
   };
 
+  const handleAddSubject = (value) => {
+    const subjectExists = subjects.includes(value);
+    if (subjectExists) {
+      const repeatSubject = getValues("subjects").includes(value);
+      if (!repeatSubject)
+        setValue("subjects", [...getValues("subjects"), value]);
+    }
+  };
+
+  const handleDeleteSubject = (value) => {
+    const subjectExists = subjects.includes(value);
+    if (subjectExists)
+      setValue(
+        "subjects",
+        getValues("subjects").filter((subject) => subject !== value)
+      );
+  };
+
   const handleChangeInput = (e, name, type) => {
     let value = null;
     if (type === "number") value = e.target.value.replace(/[^0-9]/g, "");
@@ -79,7 +113,7 @@ function EditTeacher() {
   return (
     <div className="w-full h-full flex flex-col">
       <header className="h-[50px]">
-        <h1 className="font-medium font-serif text-2xl">Editar docente</h1>
+        <h1 className="font-medium font-serif text-2xl">Editar estudiante</h1>
       </header>
       <section className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
         {loading ? (
@@ -117,6 +151,9 @@ function EditTeacher() {
               onSubmit={onSubmit}
               className="flex flex-wrap justify-stretch gap-5 gap-y-8 mt-5"
             >
+              <h2 className="w-full font-medium font-serif text-xl">
+                Información del estudiante
+              </h2>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                 <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
                   ID<span className="text-red-500">*</span>
@@ -124,7 +161,7 @@ function EditTeacher() {
                 <input
                   type="text"
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 bg-[#e8ecef]"
-                  defaultValue={object.teacherid}
+                  defaultValue={object.studentid}
                   disabled
                 />
               </div>
@@ -200,23 +237,6 @@ function EditTeacher() {
               </div>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                 <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  RFC<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={13}
-                  {...register("rfc", {
-                    required: "Se requiere el RFC",
-                    maxLength: {
-                      value: 13,
-                      message: "El RFC no debe exceder los 13 caracteres",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
                   Género<span className="text-red-500">*</span>
                 </label>
                 <InputSelect
@@ -224,36 +244,6 @@ function EditTeacher() {
                   onOptionChange={handleChangeGender}
                   style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                   defaultValue={object.gender}
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Teléfono<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={10}
-                  minLength={10}
-                  {...register("phonenumber", {
-                    required: "Se requiere el código postal",
-                    pattern: {
-                      value: /^[0-9]+$/,
-                      message: "Solo se permiten números",
-                    },
-                    maxLength: {
-                      value: 10,
-                      message: "El teléfono debe tener 10 números",
-                    },
-                    minLength: {
-                      value: 10,
-                      message: "El teléfono debe tener 10 números",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                  onChange={(e) =>
-                    handleChangeInput(e, "phonenumber", "number")
-                  }
-                  min={0}
                 />
               </div>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
@@ -271,9 +261,6 @@ function EditTeacher() {
                   defaultValue={formatDateShort(object.birthdate ?? new Date())}
                 />
               </div>
-              <h2 className="w-full font-medium font-serif text-xl">
-                Dirección
-              </h2>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                 <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
                   Calle<span className="text-red-500">*</span>
@@ -336,6 +323,84 @@ function EditTeacher() {
                   min={0}
                 />
               </div>
+              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                  Email<span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  maxLength={30}
+                  {...register("email", {
+                    required: "Se requiere el email",
+                    maxLength: {
+                      value: 30,
+                      message: "El email no debe exceder los 30 caracteres",
+                    },
+                  })}
+                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                />
+              </div>
+              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                  Asignatura<span className="text-red-500">*</span>
+                </label>
+                <InputSelect
+                  options={subjects}
+                  onOptionChange={handleAddSubject}
+                  onOptionDelete={handleDeleteSubject}
+                  style="pl-4 pr-10 py-2 border border-gray-300 min-h-[50px]"
+                  styleArrow="top-[30%]"
+                  defaultValue={getValues("subjects")}
+                  multiOption
+                />
+              </div>
+              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                  Grupo<span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={30}
+                  {...register("group", {
+                    required: "Se requiere la calle",
+                    maxLength: {
+                      value: 30,
+                      message: "La calle no debe exceder los 30 caracteres",
+                    },
+                  })}
+                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                />
+              </div>
+              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                  Teléfono<span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={10}
+                  minLength={10}
+                  {...register("phonenumber", {
+                    required: "Se requiere el código postal",
+                    pattern: {
+                      value: /^[0-9]+$/,
+                      message: "Solo se permiten números",
+                    },
+                    maxLength: {
+                      value: 10,
+                      message: "El teléfono debe tener 10 números",
+                    },
+                    minLength: {
+                      value: 10,
+                      message: "El teléfono debe tener 10 números",
+                    },
+                  })}
+                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  onChange={(e) =>
+                    handleChangeInput(e, "phonenumber", "number")
+                  }
+                  min={0}
+                />
+              </div>
               <section className="w-full">
                 <button
                   type="submit"
@@ -361,4 +426,4 @@ function EditTeacher() {
   );
 }
 
-export default EditTeacher;
+export default EditStudent;
