@@ -12,6 +12,7 @@ export default defineConfig({
       '@pages': path.resolve(__dirname, 'src/pages'),
       '@images-login': path.resolve(__dirname, 'src/assets/login'),
       '@images-logos': path.resolve(__dirname, 'src/assets/logos'),
+      '@images-icons': path.resolve(__dirname, 'src/assets/icons'),
       '@constants': path.resolve(__dirname, 'src/constants'),
       // Añade más alias según tus necesidades
     },

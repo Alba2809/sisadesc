@@ -20,12 +20,8 @@ export const adminOptions = [
     },
     subOptions: [
       {
-        name: "Opción control 1",
-        to: "#",
-      },
-      {
-        name: "Opción control 2",
-        to: "#",
+        name: "Menú Admin",
+        to: "/",
       },
     ],
   },

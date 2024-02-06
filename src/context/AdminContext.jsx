@@ -34,7 +34,7 @@ export const useAdmin = () => {
   return context;
 };
 
-export const AdminProvider = () => {
+export const AdminProvider = ({children}) => {
   const [errors, setErrors] = useState([]);
 
   const registerSomething = async (data, type) => {
@@ -185,7 +185,7 @@ export const AdminProvider = () => {
         errors,
       }}
     >
-      <Outlet />
+      {children ?? <Outlet />}
     </AdminContext.Provider>
   );
 };

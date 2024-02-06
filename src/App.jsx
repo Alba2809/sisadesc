@@ -6,7 +6,7 @@ import AuthValidator from "@components/auth/AuthValidator";
 import RolValidator from "@components/auth/RolValidator";
 import RegisterUser from "@components/admin/User/RegisterUser";
 import Users from "@components/admin/User/Users";
-import WelcomeSection from "@components/WelcomeSection";
+import MainSection from "@components/MainSection";
 import EditUser from "@components/admin/User/EditUser";
 import Teachers from "@components/admin/Teacher/Teachers";
 import Settings from "@components/Settings";
@@ -18,6 +18,7 @@ import RegisterStudent from "@components/admin/Student/RegisterStudent";
 import Subjects from "@components/admin/Subject/Subjects";
 import EditSubject from "@components/admin/Subject/EditSubject";
 import RegisterSubject from "@components/admin/Subject/RegisterSubject";
+import Perfile from "@components/Perfile";
 
 function App() {
   const location = useLocation();
@@ -26,8 +27,9 @@ function App() {
     <Routes location={location} key={location.pathname}>
       <Route element={<AuthValidator />}>
         <Route element={<Dashboard />}>
-          <Route path="/" element={<WelcomeSection />} />
+          <Route path="/" element={<MainSection />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/perfile" element={<Perfile />} />
 
           <Route element={<RolValidator rolRoute="admin" />}>
             <Route path="/admin/*" element={<AdminProvider />}>
