@@ -1,8 +1,8 @@
 export const formatDateLong = (dateString) => {
   if (dateString === "") return "";
-  const options = { year: "numeric", month: "long", day: "numeric" };
+  const options = { year: "numeric", month: "long", day: "numeric", timeZone: "UTC", };
   const formattedDate = new Date(dateString).toLocaleDateString(
-    "es-ES",
+    "es-MX",
     options
   );
   return formattedDate;
@@ -10,9 +10,9 @@ export const formatDateLong = (dateString) => {
 
 export const formatDateShort = (date) => {
     const newDate = new Date(date)
-  const year = newDate.getFullYear();
-  let month = newDate.getMonth() + 1;
-  let day = newDate.getDate();
+  const year = newDate.getUTCFullYear();
+  let month = newDate.getUTCMonth() + 1;
+  let day = newDate.getUTCDate();
 
   if (month < 10) {
     month = `0${month}`;

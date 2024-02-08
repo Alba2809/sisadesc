@@ -245,6 +245,7 @@ function Users() {
                                   {formatDateLong(user.birthdate)}
                                 </time>
                               )}
+                              {user.birthdate}
                             </td>
                             <td className="p-2">{user.direction.street}</td>
                             <td className="p-2">{user.direction.colony}</td>

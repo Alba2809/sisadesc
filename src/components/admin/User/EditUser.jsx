@@ -91,7 +91,8 @@ function EditUser() {
   const dateInputRef = useRef(null);
 
   const handleChange = (e) => {
-    setValue("birthdate", e.target.value);
+    const date = e.target.value
+    setValue("birthdate", date.toString());
   };
 
   const handleChangeStatus = (value) => {
