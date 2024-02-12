@@ -1,6 +1,11 @@
 export const formatDateLong = (dateString) => {
-  if (dateString === "") return "";
-  const options = { year: "numeric", month: "long", day: "numeric", timeZone: "UTC", };
+  if (dateString === "" || !dateString) return "";
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  };
   const formattedDate = new Date(dateString).toLocaleDateString(
     "es-MX",
     options
@@ -9,7 +14,8 @@ export const formatDateLong = (dateString) => {
 };
 
 export const formatDateShort = (date) => {
-    const newDate = new Date(date)
+  if (date === "" || !date) return "";
+  const newDate = new Date(date);
   const year = newDate.getUTCFullYear();
   let month = newDate.getUTCMonth() + 1;
   let day = newDate.getUTCDate();
@@ -34,6 +40,6 @@ export const formatDateTime = (date) => {
     second: "2-digit",
     timeZone: "UTC",
   });
-  
+
   return newDate;
 };

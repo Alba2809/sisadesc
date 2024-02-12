@@ -153,7 +153,7 @@ function Perfile() {
                   Editar
                 </button>
               </header>
-              <form className="flex flex-col gap-5 overflow-y-auto max-h-[400px]">
+              <form className="flex flex-col gap-5 overflow-y-auto max-h-[400px]" style={{ scrollbarWidth: "thin", scrollbarColor: "#f1f1f1 transparent"}}>
                 <span className="flex flex-row gap-5 items-center">
                   <label className="text-gray-400 font-medium min-w-[150px] text-end">
                     Nombre

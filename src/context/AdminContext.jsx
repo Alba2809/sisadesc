@@ -20,7 +20,8 @@ import {
   deleteSubjectRequest,
   deleteTeacherRequest,
   deleteUserRequest,
-  getRolesRequest
+  getRolesRequest,
+  getAddressesRequest
 } from "../api/admin";
 import { Outlet } from "react-router-dom";
 
@@ -135,6 +136,10 @@ export const AdminProvider = ({children}) => {
       }
       if (type === "role") {
         const res = await getRolesRequest();
+        return res.data;
+      }
+      if (type === "address") {
+        const res = await getAddressesRequest();
         return res.data;
       }
       return false;

@@ -32,7 +32,7 @@ function RegisterUser() {
     async function getUser() {
       const rolesData = await getAllSomething("role");
       setRoles(rolesData);
-      setValue("role", rolesData[0]._id);
+      setValue("role", rolesData[0].id);
       setLoading(false);
     }
     getUser();
@@ -56,7 +56,7 @@ function RegisterUser() {
 
   const handleChangeRole = (value) => {
     const rol = roles.find((role) => role.name === value);
-    if (rol) return setValue("role", rol._id);
+    if (rol) return setValue("role", rol.id);
     setValue("role", null);
   };
 
@@ -160,32 +160,41 @@ function RegisterUser() {
                 </label>
                 <input
                   type="text"
-                  maxLength={13}
+                  maxLength={18}
                   {...register("curp", {
                     required: "Se requiere el CURP",
                     maxLength: {
-                      value: 13,
-                      message: "La CURP no debe exceder los 13 caracteres",
+                      value: 18,
+                      message: "La CURP no debe exceder los 18 caracteres",
+                    },
+                    pattern: {
+                      value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
+                      message: 'CURP inválido. Verifique el formato y que las letras sean mayúsculas.',
                     },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  
                 />
               </div>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                 <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  RFC<span className="text-red-500">*</span>
+                  RFC
                 </label>
                 <input
                   type="text"
                   maxLength={13}
                   {...register("rfc", {
-                    required: "Se requiere el RFC",
                     maxLength: {
                       value: 13,
                       message: "El RFC no debe exceder los 13 caracteres",
                     },
+                    pattern: {
+                      value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ0-9]{0,}$/,
+                      message: 'RFC inválido. Verifique el formato y que las letras sean mayúsculas.',
+                    },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  
                 />
               </div>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
@@ -232,9 +241,13 @@ function RegisterUser() {
                           "La contraseña no debe exceder los 25 caracteres",
                       },
                       minLength: {
-                        value: 6,
+                        value: 8,
                         message:
-                          "La contraseña debe tener al menos 6 caracteres",
+                          "La contraseña debe tener al menos 8 caracteres",
+                      },
+                      pattern: {
+                        value: /^(?=.*[a-z])(?=.*[A-Z])/,
+                        message: 'La contraseña debe contener al menos una letra mayúscula y una minúscula',
                       },
                     })}
                     className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"

@@ -19,6 +19,9 @@ function EditUser() {
   } = useAdmin();
   const [user, setUser] = useState(null);
   const [roles, setRoles] = useState([]);
+  const [addresses, setAddresses] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [showLoading, setShowLoading] = useState("");
@@ -35,6 +38,7 @@ function EditUser() {
     async function getUser() {
       const userData = await getOneSomething(params.id, "user");
       const rolesData = await getAllSomething("role");
+      const addressesData = await getAllSomething("address");
       setUser(userData);
       setValue("firstname", userData.firstname);
       setValue("lastnamepaternal", userData.lastnamepaternal);
@@ -42,15 +46,17 @@ function EditUser() {
       setValue("curp", userData.curp);
       setValue("rfc", userData.rfc);
       setValue("email", userData.email);
-      setValue("street", userData.direction.street);
-      setValue("colony", userData.direction.colony);
-      setValue("postalcode", userData.direction.postalcode);
+      setValue("addressid", userData.address.id);
+      setValue("street", userData.address.street);
+      setValue("colony", userData.address.settlement);
+      setValue("postalcode", userData.address.postalcode);
       setValue("phonenumber", userData.phonenumber);
-      setValue("birthdate", formatDateShort(userData.birthdate ?? new Date()));
+      setValue("birthdate", formatDateShort(userData.birthdate));
       setValue("status", userData.status);
-      setValue("role", userData.role);
+      setValue("role", userData.role.id);
       setValue("imageperfile", userData.imageperfile);
       setRoles(rolesData);
+      setAddresses(addressesData);
       setLoading(false);
     }
     getUser();
@@ -65,18 +71,18 @@ function EditUser() {
       formData.append("lastnamematernal", data.lastnamematernal);
       formData.append("curp", data.curp);
       formData.append("rfc", data.rfc);
-      formData.append("email", data.email);
+      formData.append("addressid", data.addressid);
       formData.append("street", data.street);
-      formData.append("colony", data.colony);
-      formData.append("postalcode", data.postalcode);
       formData.append("phonenumber", data.phonenumber);
       formData.append("birthdate", data.birthdate);
       formData.append("status", data.status);
+      formData.append("email", data.email);
       formData.append("role", data.role);
       formData.append("imageperfile", data.imageperfile);
-      const res = await updateSomething(user._id, formData, "user");
+      console.log(data);
+      const res = await updateSomething(user.id, formData, "user");
       handleDialog();
-      if(res?.statusText === "OK") navigate("/admin/users")
+      if (res?.statusText === "OK") navigate("/admin/users");
     } catch (error) {
       handleDialog();
       console.log(error);
@@ -91,7 +97,7 @@ function EditUser() {
   const dateInputRef = useRef(null);
 
   const handleChange = (e) => {
-    const date = e.target.value
+    const date = e.target.value;
     setValue("birthdate", date.toString());
   };
 
@@ -101,7 +107,7 @@ function EditUser() {
 
   const handleChangeRole = (value) => {
     const rol = roles.find((role) => role.name === value);
-    if (rol) return setValue("role", rol._id);
+    if (rol) return setValue("role", rol.id);
     setValue("role", null);
   };
 
@@ -112,6 +118,20 @@ function EditUser() {
   const handleChangeCP = (e) => {
     const postalcode = e.target.value.replace(/[^0-9]/g, "");
     setValue("postalcode", postalcode);
+    if (postalcode.length === 5) {
+      const matchingAddresses = addresses.filter((address) =>
+        address.CP.includes(postalcode)
+      );
+      setSuggestions(matchingAddresses);
+    }
+  };
+
+  const handleSelectAddress = (address) => {
+    setSelectedAddress(address);
+    setValue("colony", address.asentamiento);
+    setValue("postalcode", address.CP);
+    setValue("addressid", address.id);
+    setSuggestions([]);
   };
 
   return (
@@ -214,12 +234,17 @@ function EditUser() {
                 </label>
                 <input
                   type="text"
-                  maxLength={13}
+                  maxLength={18}
                   {...register("curp", {
                     required: "Se requiere el CURP",
                     maxLength: {
-                      value: 13,
-                      message: "La CURP no debe exceder los 13 caracteres",
+                      value: 18,
+                      message: "La CURP no debe exceder los 18 caracteres",
+                    },
+                    pattern: {
+                      value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
+                      message:
+                        "CURP inválido. Verifique el formato y que las letras sean mayúsculas.",
                     },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
@@ -227,16 +252,20 @@ function EditUser() {
               </div>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                 <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  RFC<span className="text-red-500">*</span>
+                  RFC
                 </label>
                 <input
                   type="text"
                   maxLength={13}
                   {...register("rfc", {
-                    required: "Se requiere el RFC",
                     maxLength: {
                       value: 13,
                       message: "El RFC no debe exceder los 13 caracteres",
+                    },
+                    pattern: {
+                      value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ0-9]{0,}$/,
+                      message:
+                        "RFC inválido. Verifique el formato y que las letras sean mayúsculas.",
                     },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
@@ -254,40 +283,6 @@ function EditUser() {
                     maxLength: {
                       value: 30,
                       message: "El email no debe exceder los 30 caracteres",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Calle<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={30}
-                  {...register("street", {
-                    required: "Se requiere la calle",
-                    maxLength: {
-                      value: 30,
-                      message: "La calle no debe exceder los 30 caracteres",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Colonia<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={30}
-                  {...register("colony", {
-                    required: "Se requiere la colonia",
-                    maxLength: {
-                      value: 30,
-                      message: "La colonia no debe exceder los 30 caracteres",
                     },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
@@ -319,6 +314,53 @@ function EditUser() {
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                   onChange={handleChangeCP}
                   min={0}
+                />
+                {suggestions.length > 0 && (
+                  <ul className="absolute z-50 left-0 mt-1 p-2 bg-white border rounded-md shadow-md">
+                    {suggestions.map((address) => (
+                      <li
+                        key={address.id}
+                        onClick={() => handleSelectAddress(address)}
+                        className="cursor-pointer hover:bg-blue-100 p-1 rounded-md"
+                      >
+                        {`${address.CP} - ${address.asentamiento}`}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                  Colonia<span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={30}
+                  {...register("colony", {
+                    maxLength: {
+                      value: 30,
+                      message: "La colonia no debe exceder los 30 caracteres",
+                    },
+                  })}
+                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  disabled
+                />
+              </div>
+              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                  Calle<span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={30}
+                  {...register("street", {
+                    required: "Se requiere la calle",
+                    maxLength: {
+                      value: 30,
+                      message: "La calle no debe exceder los 30 caracteres",
+                    },
+                  })}
+                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                 />
               </div>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
@@ -355,7 +397,7 @@ function EditUser() {
                   onChange={handleChange}
                   ref={dateInputRef}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                  defaultValue={formatDateShort(user.birthdate ?? new Date())}
+                  defaultValue={formatDateShort(user.birthdate)}
                 />
               </div>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
@@ -376,7 +418,9 @@ function EditUser() {
                 <InputSelect
                   options={roles.map((rol) => rol.name)}
                   onOptionChange={handleChangeRole}
-                  defaultValue={roles.find((rol) => rol._id === user.role).name}
+                  defaultValue={
+                    roles.find((rol) => rol.id === user.role.id).name ?? ""
+                  }
                   style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                 />
               </div>

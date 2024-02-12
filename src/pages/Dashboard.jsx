@@ -148,7 +148,7 @@ function Dashboard() {
         <AnimatePresence>
           {showSideBar ? (
             <motion.div
-              className="max-w-[300px] w-full flex flex-col gap-5 font-serif p-5 relative bg-white"
+              className="max-w-[300px] w-full flex flex-col gap-5 font-serif px-5 pt-5 relative bg-white overflow-y-auto overflow-x-hidden"
               animate={{ x: 0 }}
               exit={{ x: -70 }}
               transition={{ type: "tween" }}
@@ -162,21 +162,21 @@ function Dashboard() {
                   X
                 </button>
               </section>
-              {(user.role.name === "admin"
+              {(user.role_name === "admin"
                 ? adminOptions
-                : user.role.name === "student"
+                : user.role_name === "student"
                 ? studentOptions
-                : user.role.name === "teacher"
+                : user.role_name === "teacher"
                 ? teacherOptions
-                : user.role.name === "tutor"
+                : user.role_name === "tutor"
                 ? tutorOptions
-                : user.role.name === "secretary"
+                : user.role_name === "secretary"
                 ? secretaryOptions
-                : user.role.name === "principal"
+                : user.role_name === "principal"
                 ? principalOptions
-                : user.role.name === "viceprincipal"
+                : user.role_name === "viceprincipal"
                 ? viceprincipalOptions
-                : user.role.name === "academiccoor"
+                : user.role_name === "academiccoor"
                 ? academicCoorOptions
                 : []
               ).map((option, index) => (
@@ -265,8 +265,8 @@ function Dashboard() {
                   )}
                 </Fragment>
               ))}
-              <footer className="h-[50px] w-full absolute -bottom-5 text-gray-600">
-                COPYRIGHT © 2024 SISADESC.
+              <footer className="h-[50px] w-fit absolute bottom-0 text-gray-600 flex justify-center items-end">
+                <p>COPYRIGHT © 2024 SISADESC.</p>
               </footer>
             </motion.div>
           ) : (
@@ -286,7 +286,8 @@ function Dashboard() {
             initial={{ x: 100 }}
             animate={{ x: 0 }}
             exit={{ x: 100 }}
-            className="h-full"
+            className="h-full overflow-y-auto flex-1"
+            style={{ scrollbarWidth: "thin", scrollbarColor: "#a5a5a5 transparent"}}
           >
             <Outlet />
           </motion.div>

@@ -28,14 +28,8 @@ function Users() {
       async function getUsers() {
         try {
           const res = await getAllSomething("user");
-          if (res) {
-            const resWithId = res.map((usuario, index) => ({
-              ...usuario,
-              id_table: index + 1 < 10 ? `0${index + 1}` : `${index + 1}`,
-            }));
-            setAllUsers(resWithId);
-            setUsers(groupUsers(resWithId));
-          }
+          setAllUsers(res);
+          setUsers(groupUsers(res));
           setLoading(false);
         } catch (error) {
           console.log(error);
@@ -87,12 +81,12 @@ function Users() {
       const filteredUsers = allUsers.filter((user) =>
         Object.entries(user).some(
           ([key, value]) =>
-            key !== "_id" &&
-            key !== "password" &&
+            key !== "id" &&
             key !== "imageperfile" &&
             key !== "createdAt" &&
             key !== "updatedAt" &&
             key !== "role" &&
+            key !== "address" &&
             (typeof value === "string" || typeof value === "number") &&
             value
               .toString()
@@ -240,19 +234,16 @@ function Users() {
                             <td className="p-2">{user.rfc}</td>
                             <td className="p-2">{user.email}</td>
                             <td className="p-2">
-                              {user.birthdate && (
-                                <time dateTime={userIndex.birthdate}>
+                            <time dateTime={user.birthdate}>
                                   {formatDateLong(user.birthdate)}
                                 </time>
-                              )}
-                              {user.birthdate}
                             </td>
-                            <td className="p-2">{user.direction.street}</td>
-                            <td className="p-2">{user.direction.colony}</td>
-                            <td className="p-2">{user.direction.postalcode}</td>
+                            <td className="p-2">{user.address.street}</td>
+                            <td className="p-2">{user.address.settlement}</td>
+                            <td className="p-2">{user.address.postalcode}</td>
                             <td className="p-2">{user.phonenumber}</td>
                             <td className="p-2">
-                              <time dateTime={userIndex.createdAt}>
+                              <time dateTime={user.createdAt}>
                                 {formatDateLong(user.createdAt)}
                               </time>
                             </td>
@@ -260,7 +251,7 @@ function Users() {
                             <td className="p-2">{user.status}</td>
                             <td
                               className={`p-2 sticky -right-[1px] ${
-                                isHoverRow === user.id_table
+                                isHoverRow === user.id
                                   ? "bg-[#f7f7f7]"
                                   : "bg-white"
                               }`}
@@ -269,14 +260,14 @@ function Users() {
                                 <Link
                                   className="bg-[#f7f7fa] hover:bg-[#3d5ee1] w-[30px] h-[30px] rounded-full flex justify-center items-center"
                                   onMouseEnter={() =>
-                                    setIsHoverEdit(user.id_table)
+                                    setIsHoverEdit(user.id)
                                   }
                                   onMouseLeave={() => setIsHoverEdit(0)}
-                                  to={`/admin/users/edit/${user._id}`}
+                                  to={`/admin/users/edit/${user.id}`}
                                 >
                                   <FiEdit2
                                     color={
-                                      isHoverEdit === user.id_table
+                                      isHoverEdit === user.id
                                         ? "white"
                                         : "black"
                                     }
@@ -285,14 +276,14 @@ function Users() {
                                 <button
                                   className="bg-[#f7f7fa] hover:bg-[#3d5ee1] w-[30px] h-[30px] rounded-full flex justify-center items-center"
                                   onMouseEnter={() =>
-                                    setIsHoverDelete(user.id_table)
+                                    setIsHoverDelete(user.id)
                                   }
                                   onMouseLeave={() => setIsHoverDelete(0)}
-                                  onClick={() => handleDialog(user._id)}
+                                  onClick={() => handleDialog(user.id)}
                                 >
                                   <RiDeleteBin6Line
                                     color={
-                                      isHoverDelete === user.id_table
+                                      isHoverDelete === user.id
                                         ? "white"
                                         : "black"
                                     }
