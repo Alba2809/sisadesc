@@ -208,15 +208,15 @@ function Users() {
                           <tr
                             key={`${groupIndex}-${userIndex}`}
                             className="border-y-[1px] border-gray-300 h-[60px] hover:bg-[#f7f7f7]"
-                            onMouseEnter={() => setIsHoverRow(user.id_table)}
+                            onMouseEnter={() => setIsHoverRow(user.id)}
                             onMouseLeave={() => setIsHoverRow(0)}
                           >
-                            <td className="p-2">{user.id_table}</td>
+                            <td className="p-2">{user.id}</td>
                             <td className="p-2">
                               {user.imageperfile ? (
                                 <img
                                   src={user.imageperfile}
-                                  alt={"Imagen de perfil - " + user._id}
+                                  alt={"Imagen de perfil - " + user.id}
                                   className="min-w-10 min-h-10 max-w-10 max-h-10 rounded-full"
                                 />
                               ) : (

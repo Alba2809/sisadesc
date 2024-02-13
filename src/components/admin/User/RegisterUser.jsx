@@ -169,11 +169,11 @@ function RegisterUser() {
                     },
                     pattern: {
                       value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
-                      message: 'CURP inválido. Verifique el formato y que las letras sean mayúsculas.',
+                      message:
+                        "CURP inválido. Verifique el formato y que las letras sean mayúsculas.",
                     },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                  
                 />
               </div>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
@@ -190,11 +190,11 @@ function RegisterUser() {
                     },
                     pattern: {
                       value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ0-9]{0,}$/,
-                      message: 'RFC inválido. Verifique el formato y que las letras sean mayúsculas.',
+                      message:
+                        "RFC inválido. Verifique el formato y que las letras sean mayúsculas.",
                     },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                  
                 />
               </div>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
@@ -247,7 +247,8 @@ function RegisterUser() {
                       },
                       pattern: {
                         value: /^(?=.*[a-z])(?=.*[A-Z])/,
-                        message: 'La contraseña debe contener al menos una letra mayúscula y una minúscula',
+                        message:
+                          "La contraseña debe contener al menos una letra mayúscula y una minúscula",
                       },
                     })}
                     className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"

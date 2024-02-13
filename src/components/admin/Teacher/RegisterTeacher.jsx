@@ -10,9 +10,12 @@ import Dialog from "@components/Dialog";
 import AlertMessage from "@components/AlertMessage";
 
 function RegisterTeacher() {
-  const { registerSomething, errors: registerErrors } = useAdmin();
+  const { registerSomething, getAllSomething, errors: registerErrors } = useAdmin();
   const dateInputRef = useRef(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [showLoading, setShowLoading] = useState("");
   const {
     register,
@@ -24,6 +27,11 @@ function RegisterTeacher() {
 
   useEffect(() => {
     setValue("gender", genders[0]);
+    async function getAddresses() {
+      const addressesData = await getAllSomething("address");
+      setAddresses(addressesData);
+    }
+    getAddresses();
   }, []);
 
   const onSubmit = handleSubmit(async (data) => {
@@ -50,8 +58,24 @@ function RegisterTeacher() {
     let value = null;
     if (type === "number") value = e.target.value.replace(/[^0-9]/g, "");
     setValue(name, value ?? e.target.value);
+    if (name === "postalcode") {
+      if (value.length === 5) {
+        const matchingAddresses = addresses.filter((address) =>
+          address.CP.includes(value)
+        );
+        setSuggestions(matchingAddresses);
+      }
+    }
   };
 
+  const handleSelectAddress = (address) => {
+    setSelectedAddress(address);
+    setValue("colony", address.asentamiento);
+    setValue("postalcode", address.CP);
+    setValue("addressid", address.id);
+    setSuggestions([]);
+  };
+  
   return (
     <div className="w-full h-full flex flex-col">
       <header className="h-[50px]">
@@ -151,12 +175,17 @@ function RegisterTeacher() {
             </label>
             <input
               type="text"
-              maxLength={13}
+              maxLength={18}
               {...register("curp", {
                 required: "Se requiere el CURP",
                 maxLength: {
-                  value: 13,
-                  message: "La CURP no debe exceder los 13 caracteres",
+                  value: 18,
+                  message: "La CURP no debe exceder los 18 caracteres",
+                },
+                pattern: {
+                  value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
+                  message:
+                    "CURP inválido. Verifique el formato y que las letras sean mayúsculas.",
                 },
               })}
               className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
@@ -174,6 +203,11 @@ function RegisterTeacher() {
                 maxLength: {
                   value: 13,
                   message: "El RFC no debe exceder los 13 caracteres",
+                },
+                pattern: {
+                  value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ0-9]{0,}$/,
+                  message:
+                    "RFC inválido. Verifique el formato y que las letras sean mayúsculas.",
                 },
               })}
               className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
@@ -234,40 +268,6 @@ function RegisterTeacher() {
           <h2 className="w-full font-medium font-serif text-xl">Dirección</h2>
           <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
             <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-              Calle<span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              maxLength={30}
-              {...register("street", {
-                required: "Se requiere la calle",
-                maxLength: {
-                  value: 30,
-                  message: "La calle no debe exceder los 30 caracteres",
-                },
-              })}
-              className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-            />
-          </div>
-          <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-            <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-              Colonia<span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              maxLength={30}
-              {...register("colony", {
-                required: "Se requiere la colonia",
-                maxLength: {
-                  value: 30,
-                  message: "La colonia no debe exceder los 30 caracteres",
-                },
-              })}
-              className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-            />
-          </div>
-          <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-            <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
               Código postal<span className="text-red-500">*</span>
             </label>
             <input
@@ -291,6 +291,55 @@ function RegisterTeacher() {
               className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
               onChange={(e) => handleChangeInput(e, "postalcode", "number")}
               min={0}
+            />
+            {suggestions.length > 0 && (
+              <ul className="absolute z-50 left-0 mt-1 p-2 bg-white border rounded-md shadow-md">
+                {suggestions.map((address) => (
+                  <li
+                    key={address.id}
+                    onClick={() => handleSelectAddress(address)}
+                    className="cursor-pointer hover:bg-blue-100 p-1 rounded-md"
+                  >
+                    {`${address.CP} - ${address.asentamiento}`}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+            <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+              Colonia<span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              maxLength={30}
+              {...register("colony", {
+                required: "Se requiere la colonia",
+                maxLength: {
+                  value: 30,
+                  message: "La colonia no debe exceder los 30 caracteres",
+                },
+              })}
+              className="w-full text-gray-500 px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+              disabled
+            />
+          </div>
+          <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+            <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+              Calle<span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              maxLength={30}
+              {...register("street", {
+                required: "Se requiere la calle",
+                maxLength: {
+                  value: 30,
+                  message: "La calle no debe exceder los 30 caracteres",
+                },
+              })}
+              className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
             />
           </div>
           <section className="w-full">

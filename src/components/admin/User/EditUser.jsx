@@ -342,7 +342,7 @@ function EditUser() {
                       message: "La colonia no debe exceder los 30 caracteres",
                     },
                   })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  className="w-full text-gray-500 px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                   disabled
                 />
               </div>
