@@ -335,12 +335,8 @@ function EditUser() {
                 </label>
                 <input
                   type="text"
-                  maxLength={30}
                   {...register("colony", {
-                    maxLength: {
-                      value: 30,
-                      message: "La colonia no debe exceder los 30 caracteres",
-                    },
+                    required: "Se requiere la colonia",
                   })}
                   className="w-full text-gray-500 px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                   disabled

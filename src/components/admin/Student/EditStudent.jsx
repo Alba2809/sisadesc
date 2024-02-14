@@ -284,13 +284,8 @@ function EditStudent() {
                 </label>
                 <input
                   type="text"
-                  maxLength={30}
                   {...register("colony", {
                     required: "Se requiere la colonia",
-                    maxLength: {
-                      value: 30,
-                      message: "La colonia no debe exceder los 30 caracteres",
-                    },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                 />

@@ -83,7 +83,7 @@ function Students() {
       const filteredObjects = allObjects.filter((user) =>
         Object.entries(user).some(
           ([key, value]) =>
-            key !== "_id" &&
+            key !== "id" &&
             key !== "createdAt" &&
             key !== "updatedAt" &&
             (typeof value === "string" || typeof value === "number") &&
@@ -171,9 +171,11 @@ function Students() {
                 <th className="text-start px-2 min-w-[250px]">Colonia</th>
                 <th className="text-start px-2 min-w-[150px]">Código postal</th>
                 <th className="text-start px-2 min-w-[200px]">Email</th>
-                <th className="text-start px-2 min-w-[200px]">Asignaturas</th>
                 <th className="text-start px-2 min-w-[100px]">Grupo</th>
                 <th className="text-start px-2 min-w-[150px]">Teléfono</th>
+                <th className="text-start px-2 min-w-[200px]">Padre</th>
+                <th className="text-start px-2 min-w-[200px]">Madre</th>
+                <th className="text-start px-2 min-w-[200px]">Tutor</th>
                 <th className="text-center px-2 min-w-[100px] sticky -right-[1px] bg-[#f8f9fb] z-10">
                   Acción
                 </th>
@@ -208,10 +210,10 @@ function Students() {
                           <tr
                             key={`${groupIndex}-${objectIndex}`}
                             className="border-y-[1px] border-gray-300 h-[60px] hover:bg-[#f7f7f7]"
-                            onMouseEnter={() => setIsHoverRow(object.studentid)}
+                            onMouseEnter={() => setIsHoverRow(object.id)}
                             onMouseLeave={() => setIsHoverRow(0)}
                           >
-                            <td className="p-2">{object.studentid}</td>
+                            <td className="p-2">{"STD"+ object.id}</td>
                             <td className="p-2">{object.firstname}</td>
                             <td className="p-2">{object.lastnamepaternal}</td>
                             <td className="p-2">{object.lastnamematernal}</td>
@@ -224,24 +226,20 @@ function Students() {
                                 </time>
                               )}
                             </td>
-                            <td className="p-2">{object.direction.street}</td>
-                            <td className="p-2">{object.direction.colony}</td>
+                            <td className="p-2">{object.address.street}</td>
+                            <td className="p-2">{object.address.settlement}</td>
                             <td className="p-2">
-                              {object.direction.postalcode}
+                              {object.address.postalcode}
                             </td>
                             <td className="p-2">{object.email}</td>
-                            <td className="p-2">
-                              <div className="flex flex-col justify-center gap-x-2 gap-y-1">
-                                {object.subjects.map((subject, i) => (
-                                  <p key={i}>{subject.name}</p>
-                                ))}
-                              </div>
-                            </td>
                             <td className="p-2">{object.group}</td>
                             <td className="p-2">{object.phonenumber}</td>
+                            <td className="p-2">{object.father_curp}</td>
+                            <td className="p-2">{object.mother_curp}</td>
+                            <td className="p-2">{object.tutor_curp}</td>
                             <td
                               className={`p-2 sticky -right-[1px] ${
-                                isHoverRow === object.studentid
+                                isHoverRow === object.id
                                   ? "bg-[#f7f7f7]"
                                   : "bg-white"
                               }`}
@@ -250,14 +248,14 @@ function Students() {
                                 <Link
                                   className="bg-[#f7f7fa] hover:bg-[#3d5ee1] w-[30px] h-[30px] rounded-full flex justify-center items-center"
                                   onMouseEnter={() =>
-                                    setIsHoverEdit(object.studentid)
+                                    setIsHoverEdit(object.id)
                                   }
                                   onMouseLeave={() => setIsHoverEdit(0)}
-                                  to={`/admin/students/edit/${object._id}`}
+                                  to={`/admin/students/edit/${object.id}`}
                                 >
                                   <FiEdit2
                                     color={
-                                      isHoverEdit === object.studentid
+                                      isHoverEdit === object.id
                                         ? "white"
                                         : "black"
                                     }
@@ -266,14 +264,14 @@ function Students() {
                                 <button
                                   className="bg-[#f7f7fa] hover:bg-[#3d5ee1] w-[30px] h-[30px] rounded-full flex justify-center items-center"
                                   onMouseEnter={() =>
-                                    setIsHoverDelete(object.studentid)
+                                    setIsHoverDelete(object.id)
                                   }
                                   onMouseLeave={() => setIsHoverDelete(0)}
-                                  onClick={() => handleDialog(object._id)}
+                                  onClick={() => handleDialog(object.id)}
                                 >
                                   <RiDeleteBin6Line
                                     color={
-                                      isHoverDelete === object.studentid
+                                      isHoverDelete === object.id
                                         ? "white"
                                         : "black"
                                     }

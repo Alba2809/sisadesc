@@ -21,7 +21,16 @@ import {
   deleteTeacherRequest,
   deleteUserRequest,
   getRolesRequest,
-  getAddressesRequest
+  getAddressesRequest,
+  registerFatherRequest,
+  registerMotherRequest,
+  registerTutorRequest,
+  updateFatherRequest,
+  updateMotherRequest,
+  updateTutorRequest,
+  getParentRequest,
+  getParentsRequest,
+  deleteParentRequest
 } from "../api/admin";
 import { Outlet } from "react-router-dom";
 
@@ -56,6 +65,18 @@ export const AdminProvider = ({children}) => {
         const res = await registerSubjectRequest(data);
         return res;
       }
+      if (type === "father") {
+        const res = await registerFatherRequest(data);
+        return res;
+      }
+      if (type === "mother") {
+        const res = await registerMotherRequest(data);
+        return res;
+      }
+      if (type === "tutor") {
+        const res = await registerTutorRequest(data);
+        return res;
+      }
       return false;
     } catch (error) {
       if(typeof error.response.data === "object" && error.response.data){
@@ -84,6 +105,18 @@ export const AdminProvider = ({children}) => {
         const res = await updateSubjectRequest(id, data);
         return res;
       }
+      if (type === "father") {
+        const res = await updateFatherRequest(id, data);
+        return res;
+      }
+      if (type === "mother") {
+        const res = await updateMotherRequest(id, data);
+        return res;
+      }
+      if (type === "tutor") {
+        const res = await updateTutorRequest(id, data);
+        return res;
+      }
       return false;
     } catch (error) {
       if(typeof error.response.data === "object" && error.response.data){
@@ -110,6 +143,10 @@ export const AdminProvider = ({children}) => {
       }
       if (type === "subject") {
         const res = await getSubjectRequest(id);
+        return res.data;
+      }
+      if (type === "parent") {
+        const res = await getParentRequest(id);
         return res.data;
       }
       return false;
@@ -142,6 +179,10 @@ export const AdminProvider = ({children}) => {
         const res = await getAddressesRequest();
         return res.data;
       }
+      if (type === "parent") {
+        const res = await getParentsRequest();
+        return res.data;
+      }
       return false;
     } catch (error) {}
   };
@@ -162,6 +203,10 @@ export const AdminProvider = ({children}) => {
       }
       if (type === "subject") {
         const res = await deleteSubjectRequest(id);
+        return res.data;
+      }
+      if (type === "parent") {
+        const res = await deleteParentRequest(id);
         return res.data;
       }
       return false;

@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { genders } from "@constants/constants";
-import { formatDateShort } from "@constants/functions";
 import InputSelect from "@components/InputSelect";
 import Dialog from "@components/Dialog";
 import AlertMessage from "@components/AlertMessage";
@@ -15,7 +14,6 @@ function RegisterTeacher() {
   const [showDialog, setShowDialog] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [addresses, setAddresses] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(null);
   const [showLoading, setShowLoading] = useState("");
   const {
     register,
@@ -69,7 +67,6 @@ function RegisterTeacher() {
   };
 
   const handleSelectAddress = (address) => {
-    setSelectedAddress(address);
     setValue("colony", address.asentamiento);
     setValue("postalcode", address.CP);
     setValue("addressid", address.id);
@@ -232,7 +229,7 @@ function RegisterTeacher() {
               maxLength={10}
               minLength={10}
               {...register("phonenumber", {
-                required: "Se requiere el código postal",
+                required: "Se requiere el teléfono",	
                 pattern: {
                   value: /^[0-9]+$/,
                   message: "Solo se permiten números",
@@ -313,13 +310,8 @@ function RegisterTeacher() {
             </label>
             <input
               type="text"
-              maxLength={30}
               {...register("colony", {
                 required: "Se requiere la colonia",
-                maxLength: {
-                  value: 30,
-                  message: "La colonia no debe exceder los 30 caracteres",
-                },
               })}
               className="w-full text-gray-500 px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
               disabled

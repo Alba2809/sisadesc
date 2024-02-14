@@ -20,7 +20,7 @@ function ControlAdmin() {
   }, [loading]);
 
   return (
-    <div div className="overflow-y-auto h-full">
+    <div className="overflow-y-auto">
       <article className="flex flex-row items-center gap-5 bg-white rounded-md p-5 w-fit">
         <section>
           <h2 className="font-medium text-gray-400 text-base">Estudiantes</h2>

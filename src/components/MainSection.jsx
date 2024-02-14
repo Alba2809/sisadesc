@@ -22,12 +22,16 @@ function WelcomeSection() {
           Bienvenido {user?.firstname}!
         </h1>
       </header>
-      {user?.role.name === "admin" ? (
-        <AdminProvider>
-          <ControlAdmin />
-        </AdminProvider>
-      ) : (
-        user?.role.name
+      {!loading && (
+        <>
+          {user.role_name === "admin" ? (
+            <AdminProvider>
+              <ControlAdmin />
+            </AdminProvider>
+          ) : (
+            console.log("No es un administrador:", user.role)
+          )}
+        </>
       )}
     </>
   );
