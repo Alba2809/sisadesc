@@ -3,13 +3,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { formatDateShort } from "@constants/functions";
+import { formatDateShort, scrollToTop } from "@constants/functions";
 import { genders } from "@constants/constants";
 import InputSelect from "@components/InputSelect";
 import Dialog from "@components/Dialog";
 import AlertMessage from "@components/AlertMessage";
-
-const subjectsTest = ["Matemáticas", "Español", "Ciencias", "Inglés", "Ética"];
 
 function EditStudent() {
   const params = useParams();
@@ -21,43 +19,41 @@ function EditStudent() {
   } = useAdmin();
   const [object, setObject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [addresses, setAddresses] = useState([]);
+  const [studentSuggestions, setStudentSuggestions] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [showLoading, setShowLoading] = useState("");
-  const [subjects, setSubjects] = useState(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
-    getValues,
   } = useForm();
   const navigate = useNavigate();
 
   useEffect(() => {
     async function getObject() {
       const objectData = await getOneSomething(params.id, "student");
-      const res = await getAllSomething("subject");
-      if (res) setSubjects(res.map((value) => value.name));
+      const addressesData = await getAllSomething("address");
+      setAddresses(addressesData);
       setObject(objectData);
-      setValue("firstname", objectData.firstname);
-      setValue("lastnamepaternal", objectData.lastnamepaternal);
-      setValue("lastnamematernal", objectData.lastnamematernal);
-      setValue("curp", objectData.curp);
-      setValue("gender", objectData.gender);
-      setValue(
-        "birthdate",
-        formatDateShort(objectData.birthdate ?? new Date())
-      );
-      setValue("street", objectData.direction.street);
-      setValue("colony", objectData.direction.colony);
-      setValue("postalcode", objectData.direction.postalcode.toString());
-      setValue("email", objectData.email);
-      setValue(
-        "subjects",
-        objectData.subjects.map((value) => value.name)
-      );
-      setValue("group", objectData.group);
-      setValue("phonenumber", objectData.phonenumber);
+      setValue("student_firstname", objectData.firstname);
+      setValue("student_lastnamepaternal", objectData.lastnamepaternal);
+      setValue("student_lastnamematernal", objectData.lastnamematernal);
+      setValue("student_curp", objectData.curp);
+      setValue("student_gender", objectData.gender);
+      setValue("student_birthdate", formatDateShort(objectData.birthdate));
+      setValue("student_street", objectData.address.street);
+      setValue("student_colony", objectData.address.settlement);
+      setValue("student_addressid", objectData.address.id);
+      setValue("student_postalcode", objectData.address.postalcode);
+      setValue("student_group", objectData.group);
+      setValue("student_phonenumber", objectData.phonenumber);
+      setValue("student_email", objectData.email);
+      setValue("father_curp", objectData.father_curp);
+      setValue("mother_curp", objectData.mother_curp);
+      setValue("tutor_curp", objectData.tutor_curp);
       setLoading(false);
     }
     if (loading) getObject();
@@ -66,12 +62,12 @@ function EditStudent() {
   const onSubmit = handleSubmit(async (data) => {
     try {
       handleDialog();
-      const res = await updateSomething(object._id, data, "student");
+      const res = await updateSomething(object.id, data, "student");
       if (res?.statusText === "OK") navigate("/admin/students");
+      else scrollToTop();
       handleDialog();
     } catch (error) {
       handleDialog();
-      console.log(error);
     }
   });
 
@@ -82,32 +78,31 @@ function EditStudent() {
 
   const dateInputRef = useRef(null);
 
-  const handleChangeGender = (value) => {
-    setValue("gender", value);
+  const handleChangeSelect = (value, name) => {
+    setValue(name, value);
   };
 
-  const handleAddSubject = (value) => {
-    const subjectExists = subjects.includes(value);
-    if (subjectExists) {
-      const repeatSubject = getValues("subjects").includes(value);
-      if (!repeatSubject)
-        setValue("subjects", [...getValues("subjects"), value]);
+  const handleChangeInput = (e, name, type, person) => {
+    let value = null;
+    if (type === "number") value = e.target.value.replace(/[^0-9]/g, "");
+    setValue(name, value ?? e.target.value);
+    if (name.includes("postalcode")) {
+      if (value.length === 5) {
+        const matchingAddresses = addresses.filter((address) =>
+          address.CP.includes(value)
+        );
+        if (person === "student") setStudentSuggestions(matchingAddresses);
+      }
     }
   };
 
-  const handleDeleteSubject = (value) => {
-    const subjectExists = subjects.includes(value);
-    if (subjectExists)
-      setValue(
-        "subjects",
-        getValues("subjects").filter((subject) => subject !== value)
-      );
-  };
-
-  const handleChangeInput = (e, name, type) => {
-    let value = null;
-    if (type === "number") value = e.target.value.replace(/[^0-9]/g, "");
-    setValue(name, value.toString() ?? e.target.value);
+  
+  const handleSelectAddress = (address) => {
+    setSelectedAddress(address);
+    setValue("student_colony", address.asentamiento);
+    setValue("student_postalcode", address.CP);
+    setValue("student_addressid", address.id);
+    setStudentSuggestions([]);
   };
 
   return (
@@ -115,7 +110,7 @@ function EditStudent() {
       <header className="h-[50px]">
         <h1 className="font-medium font-serif text-2xl">Editar estudiante</h1>
       </header>
-      <section className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
+      <section id="container" className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
         {loading ? (
           <p>Loading...</p>
         ) : (
@@ -151,251 +146,345 @@ function EditStudent() {
               onSubmit={onSubmit}
               className="flex flex-wrap justify-stretch gap-5 gap-y-8 mt-5"
             >
-              <h2 className="w-full font-medium font-serif text-xl">
-                Información del estudiante
-              </h2>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  ID<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 bg-[#e8ecef]"
-                  defaultValue={object.studentid}
-                  disabled
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Nombre<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={20}
-                  {...register("firstname", {
-                    required: "Se requiere el nombre",
-                    maxLength: {
-                      value: 20,
-                      message: "El nombre no debe exceder los 20 caracteres",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Primer apellido<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={20}
-                  {...register("lastnamepaternal", {
-                    required: "Se requiere el primer apellido",
-                    maxLength: {
-                      value: 20,
-                      message:
-                        "El primer apellido no debe exceder los 20 caracteres",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Segundo apellido<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={20}
-                  {...register("lastnamematernal", {
-                    required: "Se requiere el segundo apellido",
-                    maxLength: {
-                      value: 20,
-                      message:
-                        "El segundo apellido no debe exceder los 20 caracteres",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  CURP<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={13}
-                  {...register("curp", {
-                    required: "Se requiere el CURP",
-                    maxLength: {
-                      value: 13,
-                      message: "La CURP no debe exceder los 13 caracteres",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Género<span className="text-red-500">*</span>
-                </label>
-                <InputSelect
-                  options={genders}
-                  onOptionChange={handleChangeGender}
-                  style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                  defaultValue={object.gender}
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Fecha de nacimiento<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  ref={dateInputRef}
-                  {...register("birthdate", {
-                    required: "Se requiere la fecha de nacimiento",
-                  })}
-                  onChange={(e) => handleChangeInput(e, "birthdate")}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                  defaultValue={formatDateShort(object.birthdate ?? new Date())}
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Calle<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={30}
-                  {...register("street", {
-                    required: "Se requiere la calle",
-                    maxLength: {
-                      value: 30,
-                      message: "La calle no debe exceder los 30 caracteres",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Colonia<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  {...register("colony", {
-                    required: "Se requiere la colonia",
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Código postal<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={5}
-                  {...register("postalcode", {
-                    required: "Se requiere el código postal",
-                    pattern: {
-                      value: /^[0-9]+$/,
-                      message: "Solo se permiten números",
-                    },
-                    maxLength: {
-                      value: 5,
-                      message:
-                        "El código postal no debe exceder los 5 caracteres",
-                    },
-                    min: {
-                      value: 1,
-                      message: "Código postal inválido",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                  onChange={(e) => handleChangeInput(e, "postalcode", "number")}
-                  min={0}
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Email<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  maxLength={30}
-                  {...register("email", {
-                    required: "Se requiere el email",
-                    maxLength: {
-                      value: 30,
-                      message: "El email no debe exceder los 30 caracteres",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Asignatura<span className="text-red-500">*</span>
-                </label>
-                <InputSelect
-                  options={subjects}
-                  onOptionChange={handleAddSubject}
-                  onOptionDelete={handleDeleteSubject}
-                  style="pl-4 pr-10 py-2 border border-gray-300 min-h-[50px]"
-                  styleArrow="top-[30%]"
-                  defaultValue={getValues("subjects")}
-                  multiOption
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Grupo<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={30}
-                  {...register("group", {
-                    required: "Se requiere la calle",
-                    maxLength: {
-                      value: 30,
-                      message: "La calle no debe exceder los 30 caracteres",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Teléfono<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={10}
-                  minLength={10}
-                  {...register("phonenumber", {
-                    required: "Se requiere el código postal",
-                    pattern: {
-                      value: /^[0-9]+$/,
-                      message: "Solo se permiten números",
-                    },
-                    maxLength: {
-                      value: 10,
-                      message: "El teléfono debe tener 10 números",
-                    },
-                    minLength: {
-                      value: 10,
-                      message: "El teléfono debe tener 10 números",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                  onChange={(e) =>
-                    handleChangeInput(e, "phonenumber", "number")
-                  }
-                  min={0}
-                />
-              </div>
+              <>
+                <h2 className="w-full font-medium font-serif text-2xl">
+                  Datos del estudiante
+                </h2>
+                <h2 className="w-full font-medium font-serif text-xl">
+                  Detalles básicos
+                </h2>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Nombre<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={20}
+                    {...register("student_firstname", {
+                      required: "Se requiere el nombre del estudiante",
+                      maxLength: {
+                        value: 20,
+                        message:
+                          "El nombre del estudiante no debe exceder los 20 caracteres",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                </div>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Primer apellido<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={20}
+                    {...register("student_lastnamepaternal", {
+                      required: "Se requiere el primer apellido del estudiante",
+                      maxLength: {
+                        value: 20,
+                        message:
+                          "El primer apellido del estudiante no debe exceder los 20 caracteres",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                </div>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Segundo apellido<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={20}
+                    {...register("student_lastnamematernal", {
+                      required:
+                        "Se requiere el segundo apellido del estudiante",
+                      maxLength: {
+                        value: 20,
+                        message:
+                          "El segundo apellido del estudiante no debe exceder los 20 caracteres",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                </div>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    CURP<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={18}
+                    {...register("student_curp", {
+                      required: "Se requiere el CURP del estudiante",
+                      maxLength: {
+                        value: 18,
+                        message:
+                          "La CURP del estudiante no debe exceder los 18 caracteres",
+                      },
+                      pattern: {
+                        value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
+                        message:
+                          "CURP del estudiante es inválido. Verifique el formato y que las letras sean mayúsculas.",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                </div>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Género<span className="text-red-500">*</span>
+                  </label>
+                  <InputSelect
+                    options={genders}
+                    onOptionChange={handleChangeSelect}
+                    object="student_gender"
+                    style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                </div>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Fecha de nacimiento<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    {...register("student_birthdate", {
+                      required:
+                        "Se requiere la fecha de nacimiento del estudiante",
+                    })}
+                    onChange={(e) => handleChangeInput(e, "student_birthdate")}
+                    ref={dateInputRef}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                    defaultValue={formatDateShort(object.birthdate)}
+                  />
+                </div>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Email<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    maxLength={30}
+                    {...register("student_email", {
+                      required: "Se requiere el email del estudiante",
+                      maxLength: {
+                        value: 30,
+                        message:
+                          "El email del estudiante no debe exceder los 30 caracteres",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                </div>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Grupo<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={30}
+                    {...register("student_group", {
+                      required: "Se requiere la calle del estudiante",
+                      maxLength: {
+                        value: 30,
+                        message:
+                          "La calle del estudiante no debe exceder los 30 caracteres",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                </div>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Teléfono<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={10}
+                    minLength={10}
+                    {...register("student_phonenumber", {
+                      required: "Se requiere el código postal del estudiante",
+                      pattern: {
+                        value: /^[0-9]+$/,
+                        message: "Solo se permiten números del estudiante",
+                      },
+                      maxLength: {
+                        value: 10,
+                        message:
+                          "El teléfono del estudiante debe tener 10 números",
+                      },
+                      minLength: {
+                        value: 10,
+                        message:
+                          "El teléfono del estudiante debe tener 10 números",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                    onChange={(e) =>
+                      handleChangeInput(e, "student_phonenumber", "number")
+                    }
+                    min={0}
+                  />
+                </div>
+                <h2 className="w-full font-medium font-serif text-xl">
+                  Dirección
+                </h2>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Código postal<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={5}
+                    {...register("student_postalcode", {
+                      required: "Se requiere el código postal del estudiante",
+                      pattern: {
+                        value: /^[0-9]+$/,
+                        message:
+                          "Solo se permiten números en el código postal del estudiante",
+                      },
+                      maxLength: {
+                        value: 5,
+                        message:
+                          "El código postal del estudiante no debe exceder los 5 caracteres",
+                      },
+                      min: {
+                        value: 1,
+                        message: "Código postal del estudiante es inválido",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                    onChange={(e) =>
+                      handleChangeInput(
+                        e,
+                        "student_postalcode",
+                        "number",
+                        "student"
+                      )
+                    }
+                    min={0}
+                  />
+                  {studentSuggestions.length > 0 && (
+                    <ul className="absolute z-50 left-0 mt-1 p-2 bg-white border rounded-md shadow-md">
+                      {studentSuggestions.map((address) => (
+                        <li
+                          key={address.id}
+                          onClick={() =>
+                            handleSelectAddress(address, "student")
+                          }
+                          className="cursor-pointer hover:bg-blue-100 p-1 rounded-md"
+                        >
+                          {`${address.CP} - ${address.asentamiento}`}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Colonia<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    {...register("student_colony", {
+                      required: "Se requiere la colonia del estudiante",
+                    })}
+                    className="w-full text-gray-500 px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                    disabled
+                  />
+                </div>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Calle<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={30}
+                    {...register("student_street", {
+                      required: "Se requiere la calle del estudiante",
+                      maxLength: {
+                        value: 30,
+                        message:
+                          "La calle del estudiante no debe exceder los 30 caracteres",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                </div>
+                <h2 className="w-full font-medium font-serif text-xl">
+                  Padres/Tutor
+                </h2>
+                <p className="w-full font-serif text-lg">
+                  En caso de que el tutor sea uno de los padres, deje el campo
+                  vacío.
+                </p>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    CURP del padre
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={18}
+                    {...register("father_curp", {
+                      maxLength: {
+                        value: 18,
+                        message:
+                          "La CURP del padre no debe exceder los 18 caracteres",
+                      },
+                      pattern: {
+                        value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
+                        message:
+                          "CURP del padre es inválido. Verifique el formato y que las letras sean mayúsculas.",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                </div>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    CURP de la madre
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={18}
+                    {...register("mother_curp", {
+                      maxLength: {
+                        value: 18,
+                        message:
+                          "La CURP de la madre no debe exceder los 18 caracteres",
+                      },
+                      pattern: {
+                        value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
+                        message:
+                          "CURP de la madre es inválido. Verifique el formato y que las letras sean mayúsculas.",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                </div>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    CURP del tutor
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={18}
+                    {...register("tutor_curp", {
+                      maxLength: {
+                        value: 18,
+                        message:
+                          "La CURP del tutor no debe exceder los 18 caracteres",
+                      },
+                      pattern: {
+                        value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
+                        message:
+                          "CURP del tutor es inválido. Verifique el formato y que las letras sean mayúsculas.",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                </div>
+              </>
               <section className="w-full">
                 <button
                   type="submit"

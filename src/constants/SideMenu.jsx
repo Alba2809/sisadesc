@@ -2,6 +2,7 @@ import { FaShieldAlt, FaChalkboardTeacher } from "react-icons/fa";
 import { IoMdSettings, IoIosSpeedometer } from "react-icons/io";
 import { BsMortarboardFill } from "react-icons/bs";
 import { BiBookReader } from "react-icons/bi";
+import { RiParentLine } from "react-icons/ri";
 
 export const adminOptions = [
   {
@@ -73,6 +74,23 @@ export const adminOptions = [
       {
         name: "Agregar estudiante",
         to: "/admin/students/register",
+      },
+    ],
+  },
+  {
+    mainOption: {
+      name: "Padres/Tutores",
+      icon: <RiParentLine color="gray" size="1.5em" />,
+      iconS: <RiParentLine color="blue" size="1.5em" />,
+    },
+    subOptions: [
+      {
+        name: "Lista de padres",
+        to: "/admin/parents",
+      },
+      {
+        name: "Agregar padre",
+        to: "/admin/parents/register",
       },
     ],
   },

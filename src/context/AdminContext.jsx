@@ -25,12 +25,10 @@ import {
   registerFatherRequest,
   registerMotherRequest,
   registerTutorRequest,
-  updateFatherRequest,
-  updateMotherRequest,
-  updateTutorRequest,
+  updateParentRequest,
   getParentRequest,
   getParentsRequest,
-  deleteParentRequest
+  deleteParentRequest,
 } from "../api/admin";
 import { Outlet } from "react-router-dom";
 
@@ -105,16 +103,8 @@ export const AdminProvider = ({children}) => {
         const res = await updateSubjectRequest(id, data);
         return res;
       }
-      if (type === "father") {
-        const res = await updateFatherRequest(id, data);
-        return res;
-      }
-      if (type === "mother") {
-        const res = await updateMotherRequest(id, data);
-        return res;
-      }
-      if (type === "tutor") {
-        const res = await updateTutorRequest(id, data);
+      if (type === "parent") {
+        const res = await updateParentRequest(id, data);
         return res;
       }
       return false;
@@ -210,9 +200,7 @@ export const AdminProvider = ({children}) => {
         return res.data;
       }
       return false;
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {

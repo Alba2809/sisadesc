@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { genders, vitalStatus } from "@constants/constants";
+import { scrollToTop } from "@constants/functions";
 import { FaCheck } from "react-icons/fa";
 import InputSelect from "@components/InputSelect";
 import Dialog from "@components/Dialog";
@@ -13,6 +14,7 @@ function RegisterStudent() {
   const {
     registerSomething,
     getAllSomething,
+    deleteSomething,
     errors: registerErrors,
   } = useAdmin();
   const dateInputRef = useRef(null);
@@ -32,8 +34,7 @@ function RegisterStudent() {
     handleSubmit,
     formState: { errors },
     setValue,
-    getValues,
-    unregister
+    unregister,
   } = useForm();
   const navigate = useNavigate();
 
@@ -57,37 +58,51 @@ function RegisterStudent() {
       handleDialog();
 
       let totalQueries = 0;
+      let queriesRealized = [];
+      console.log(data)
       if (showFormNewParent === "No") {
         if (showFormFather) {
-          console.log("register father");
+          totalQueries++;
           const resFather = await registerSomething(data, "father");
-          if (resFather?.statusText === "OK") totalQueries++;
+          if (resFather?.statusText === "OK"){
+            queriesRealized.push(resFather);
+            data.father_firstname = null
+          }
+          else scrollToTop();
         }
         if (showFormMother) {
-          console.log("register mother");
+          totalQueries++;
           const resMother = await registerSomething(data, "mother");
-          if (resMother?.statusText === "OK") totalQueries++;
+          if (resMother?.statusText === "OK"){
+            queriesRealized.push(resMother);
+            data.mother_firstname = null
+          }
+          else scrollToTop();
         }
         if (showFormTutor) {
-          console.log("register tutor");
+          totalQueries++;
           const resTutor = await registerSomething(data, "tutor");
-          if (resTutor?.statusText === "OK") totalQueries++;
+          if (resTutor?.statusText === "OK"){
+            queriesRealized.push(resTutor);
+            data.tutor_firstname = null
+          }
+          else scrollToTop();
         }
       }
 
-      if (
-        totalQueries === 0 &&
-        getValues("father_curp") === "" &&
-        getValues("mother_curp") === "" &&
-        getValues("tutor_curp") === ""
-      ) {
-        return window.alert(
-          "Debe ingresar al menos un padre para poder registrar al estudiante."
-        );
+      if(queriesRealized.length !== totalQueries) {
+        queriesRealized.map(async (query) => {
+          console.log(query)
+          await deleteSomething(query.data, "parent");
+        });
+        handleDialog();
+        return
       }
 
       const res = await registerSomething(data, "student");
       if (res?.statusText === "OK") navigate("/admin/students");
+      else scrollToTop();
+
       handleDialog();
     } catch (error) {
       handleDialog();
@@ -151,10 +166,10 @@ function RegisterStudent() {
   const handleClickRegister = (e) => {
     if (showFormNewParent !== e.target.value) {
       setShowFormNewParent(e.target.value);
-      if(e.target.value === "Yes") {
-        setShowFormFather(false)
-        setShowFormMother(false)
-        setShowFormTutor(false)
+      if (e.target.value === "Yes") {
+        setShowFormFather(false);
+        setShowFormMother(false);
+        setShowFormTutor(false);
       }
     }
   };
@@ -173,22 +188,68 @@ function RegisterStudent() {
 
   useEffect(() => {
     if (!showFormFather) {
-      unregister(["father_firstname", "father_lastnamepaternal", "father_lastnamematernal", "father_curp", "father_rfc", "father_birthdate", "father_email", "father_phonenumber", "father_colony", "father_postalcode", "father_addressid", "father_status", "father_street"]);
+      unregister([
+        "father_firstname",
+        "father_lastnamepaternal",
+        "father_lastnamematernal",
+        "father_curp",
+        "father_rfc",
+        "father_birthdate",
+        "father_email",
+        "father_phonenumber",
+        "father_colony",
+        "father_postalcode",
+        "father_addressid",
+        "father_status",
+        "father_street",
+      ]);
     }
     if (!showFormMother) {
-      unregister(["mother_firstname", "mother_lastnamepaternal", "mother_lastnamematernal", "mother_curp", "mother_rfc", "mother_birthdate", "mother_email", "mother_phonenumber", "mother_colony", "mother_postalcode", "mother_addressid", "mother_status", "mother_street"]);
+      unregister([
+        "mother_firstname",
+        "mother_lastnamepaternal",
+        "mother_lastnamematernal",
+        "mother_curp",
+        "mother_rfc",
+        "mother_birthdate",
+        "mother_email",
+        "mother_phonenumber",
+        "mother_colony",
+        "mother_postalcode",
+        "mother_addressid",
+        "mother_status",
+        "mother_street",
+      ]);
     }
     if (!showFormTutor) {
-      unregister(["tutor_firstname", "tutor_lastnamepaternal", "tutor_lastnamematernal", "tutor_curp", "tutor_rfc", "tutor_birthdate", "tutor_email", "tutor_phonenumber", "tutor_colony", "tutor_postalcode", "tutor_addressid", "tutor_status", "tutor_street"]);
+      unregister([
+        "tutor_firstname",
+        "tutor_lastnamepaternal",
+        "tutor_lastnamematernal",
+        "tutor_curp",
+        "tutor_rfc",
+        "tutor_birthdate",
+        "tutor_email",
+        "tutor_phonenumber",
+        "tutor_colony",
+        "tutor_postalcode",
+        "tutor_addressid",
+        "tutor_status",
+        "tutor_street",
+      ]);
     }
   }, [showFormFather, showFormMother, showFormTutor]);
+
+  useEffect(() => {
+    if(errors.length > 0) scrollToTop();
+  }, [errors])
 
   return (
     <div className="w-full h-full flex flex-col">
       <header className="h-[50px]">
         <h1 className="font-medium font-serif text-2xl">Agregar estudiante</h1>
       </header>
-      <section className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
+      <section id="container" className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
         <AnimatePresence mode="sync">
           {registerErrors.map((error, i) => (
             <motion.div
@@ -700,16 +761,12 @@ function RegisterStudent() {
                   </div>
                   <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                     <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                      Email<span className="text-red-500">*</span>
+                      Email
                     </label>
                     <input
                       type="email"
                       maxLength={30}
                       {...register("father_email", {
-                        required:
-                          showFormFather && showFormNewParent === "No"
-                            ? "Se requiere el email del padre"
-                            : false,
                         maxLength: {
                           value: 30,
                           message:
@@ -721,17 +778,13 @@ function RegisterStudent() {
                   </div>
                   <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                     <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                      Teléfono<span className="text-red-500">*</span>
+                      Teléfono
                     </label>
                     <input
                       type="text"
                       maxLength={10}
                       minLength={10}
                       {...register("father_phonenumber", {
-                        required:
-                          showFormFather && showFormNewParent === "No"
-                            ? "Se requiere el teléfono del padre"
-                            : false,
                         pattern: {
                           value: /^[0-9]+$/,
                           message:
@@ -1001,16 +1054,12 @@ function RegisterStudent() {
                   </div>
                   <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                     <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                      Email<span className="text-red-500">*</span>
+                      Email
                     </label>
                     <input
                       type="email"
                       maxLength={30}
                       {...register("mother_email", {
-                        required:
-                          showFormMother && showFormNewParent === "No"
-                            ? "Se requiere el email de la madre"
-                            : false,
                         maxLength: {
                           value: 30,
                           message:
@@ -1022,17 +1071,13 @@ function RegisterStudent() {
                   </div>
                   <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                     <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                      Teléfono<span className="text-red-500">*</span>
+                      Teléfono
                     </label>
                     <input
                       type="text"
                       maxLength={10}
                       minLength={10}
                       {...register("mother_phonenumber", {
-                        required:
-                          showFormMother && showFormNewParent === "No"
-                            ? "Se requiere el teléfono de la madre"
-                            : false,
                         pattern: {
                           value: /^[0-9]+$/,
                           message:
@@ -1302,16 +1347,12 @@ function RegisterStudent() {
                   </div>
                   <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                     <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                      Email<span className="text-red-500">*</span>
+                      Email
                     </label>
                     <input
                       type="email"
                       maxLength={30}
                       {...register("tutor_email", {
-                        required:
-                          showFormTutor && showFormNewParent === "No"
-                            ? "Se requiere el email del tutor"
-                            : false,
                         maxLength: {
                           value: 30,
                           message:
@@ -1323,17 +1364,13 @@ function RegisterStudent() {
                   </div>
                   <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                     <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                      Teléfono<span className="text-red-500">*</span>
+                      Teléfono
                     </label>
                     <input
                       type="text"
                       maxLength={10}
                       minLength={10}
                       {...register("tutor_phonenumber", {
-                        required:
-                          showFormTutor && showFormNewParent === "No"
-                            ? "Se requiere el teléfono del tutor"
-                            : false,
                         pattern: {
                           value: /^[0-9]+$/,
                           message:
@@ -1365,6 +1402,17 @@ function RegisterStudent() {
                       options={vitalStatus}
                       onOptionChange={handleChangeSelect}
                       object="tutor_status"
+                      style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                    />
+                  </div>
+                  <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                    <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                      Género<span className="text-red-500">*</span>
+                    </label>
+                    <InputSelect
+                      options={genders}
+                      onOptionChange={handleChangeSelect}
+                      object="tutor_gender"
                       style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                     />
                   </div>
@@ -1468,6 +1516,10 @@ function RegisterStudent() {
           )}
           {showFormNewParent === "Yes" && (
             <>
+              <p className="w-full font-serif text-lg">
+                En caso de que el tutor sea uno de los padres, deje el campo
+                vacío.
+              </p>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                 <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
                   CURP del padre
@@ -1485,14 +1537,6 @@ function RegisterStudent() {
                       value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
                       message:
                         "CURP del padre es inválido. Verifique el formato y que las letras sean mayúsculas.",
-                    },
-                    validate: (value) => {
-                      const motherCurpValue = getValues("mother_curp");
-                      return (
-                        value === "" ||
-                        motherCurpValue === "" ||
-                        "CURP del padre requerido"
-                      );
                     },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
@@ -1515,14 +1559,6 @@ function RegisterStudent() {
                       value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
                       message:
                         "CURP de la madre es inválido. Verifique el formato y que las letras sean mayúsculas.",
-                    },
-                    validate: (value) => {
-                      const fatherCurpValue = getValues("father_curp");
-                      return (
-                        value === "" ||
-                        fatherCurpValue === "" ||
-                        "CURP de la madre requerido"
-                      ); // Hace que este campo sea opcional si el otro tiene valor
                     },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"

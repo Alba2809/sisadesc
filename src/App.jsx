@@ -18,6 +18,9 @@ import RegisterStudent from "@components/admin/Student/RegisterStudent";
 import Subjects from "@components/admin/Subject/Subjects";
 import EditSubject from "@components/admin/Subject/EditSubject";
 import RegisterSubject from "@components/admin/Subject/RegisterSubject";
+import Parents from "@components/admin/Parent/Parents";
+import EditParent from "@components/admin/Parent/EditParent";
+import RegisterParent from "@components/admin/Parent/RegisterParent";
 import Perfile from "@components/Perfile";
 
 function App() {
@@ -50,6 +53,12 @@ function App() {
                 <Route path="edit/:id" element={<EditStudent />} />
                 <Route path="register" element={<RegisterStudent />} />
                 <Route path="*" element={<Navigate to="/admin/students" />} />
+              </Route>
+              <Route path="parents/*">
+                <Route path="" element={<Parents />} />
+                <Route path="edit/:id" element={<EditParent />} />
+                <Route path="register" element={<RegisterParent />} />
+                <Route path="*" element={<Navigate to="/admin/parents" />} />
               </Route>
               <Route path="subjects/*">
                 <Route path="" element={<Subjects />} />

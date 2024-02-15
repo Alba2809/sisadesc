@@ -20,11 +20,7 @@ export const updateTeacherRequest = (id, data) => axios.put(`/admin/updateteache
 
 export const updateStudentRequest = (id, data) => axios.put(`/admin/updatestudent/${id}`, data);
 
-export const updateFatherRequest = (id, data) => axios.put(`/admin/updatefather/${id}`, data);
-
-export const updateMotherRequest = (id, data) => axios.put(`/admin/updatemother/${id}`, data);
-
-export const updateTutorRequest = (id, data) => axios.put(`/admin/updatetutor/${id}`, data);
+export const updateParentRequest = (id, data) => axios.put(`/admin/updateparent/${id}`, data);
 
 export const updateSubjectRequest = (id, data) => axios.put(`/admin/updatesubject/${id}`, data);
 

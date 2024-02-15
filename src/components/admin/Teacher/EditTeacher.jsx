@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { formatDateShort } from "@constants/functions";
+import { formatDateShort, scrollToTop } from "@constants/functions";
 import { genders } from "@constants/constants";
 import InputSelect from "@components/InputSelect";
 import Dialog from "@components/Dialog";
@@ -46,7 +46,7 @@ function EditTeacher() {
       setValue("gender", objectData.gender);
       setValue("phonenumber", objectData.phonenumber);
       setValue("birthdate", formatDateShort(objectData.birthdate));
-      setValue("addressid", objectData.address.id);
+      setValue("addressid", +objectData.address.id);
       setValue("street", objectData.address.street);
       setValue("colony", objectData.address.settlement);
       setValue("postalcode", objectData.address.postalcode);
@@ -58,8 +58,10 @@ function EditTeacher() {
   const onSubmit = handleSubmit(async (data) => {
     try {
       handleDialog();
+      console.log(data)
       const res = await updateSomething(object.id, data, "teacher");
       if (res?.statusText === "OK") navigate("/admin/teachers");
+      else scrollToTop()
       handleDialog();
     } catch (error) {
       handleDialog();
@@ -105,7 +107,7 @@ function EditTeacher() {
       <header className="h-[50px]">
         <h1 className="font-medium font-serif text-2xl">Editar docente</h1>
       </header>
-      <section className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
+      <section id="contianer" className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
         {loading ? (
           <p>Loading...</p>
         ) : (

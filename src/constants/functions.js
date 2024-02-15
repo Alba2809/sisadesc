@@ -26,7 +26,6 @@ export const formatDateShort = (date) => {
   if (day < 10) {
     day = `0${day}`;
   }
-
   return `${year}-${month}-${day}`;
 };
 
@@ -42,4 +41,8 @@ export const formatDateTime = (date) => {
   });
 
   return newDate;
+};
+
+export const scrollToTop = () => {
+  document.getElementById("container").scrollTo({ top: 0, behavior: "smooth" });
 };
