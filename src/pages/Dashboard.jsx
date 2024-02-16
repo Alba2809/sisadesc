@@ -112,7 +112,7 @@ function Dashboard() {
           )}
           <section className="flex flex-col">
             <h1 className="font-semibold font-sans">{user.firstname}</h1>
-            <h2 className="text-[#5855ff] text-sm">{user.role_name}</h2>
+            <h2 className="text-[#5855ff] text-sm">{user.role.name}</h2>
           </section>
           <IoIosArrowDown
             onClick={() => setShowMenuUser((prev) => !prev)}
@@ -161,7 +161,7 @@ function Dashboard() {
                   X
                 </button>
               </section>
-              {(user.role_name === "admin"
+              {(user.role.name === "admin"
                 ? adminOptions
                 : user.role_name === "student"
                 ? studentOptions

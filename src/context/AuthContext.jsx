@@ -3,6 +3,7 @@ import {
   loginRequest,
   verifyTokenRequest,
   getUserRequest,
+  updatePasswordRequest,
 } from "../api/auth";
 import Cookies from "js-cookie";
 
@@ -39,7 +40,11 @@ export const AuthProvider = ({ children }) => {
 
       setIsAuthenticated(true);
     } catch (error) {
-      setErrors(error.response.data);
+      if(typeof error.response.data === "object" && error.response.data){
+        const array = Object.values(error.response.data)
+        setErrors(array);
+      }
+      else setErrors(error.response.data);
     }
   };
 
@@ -55,6 +60,20 @@ export const AuthProvider = ({ children }) => {
     Cookies.remove("token");
     setIsAuthenticated(false);
     setUser(null);
+  };
+
+  const updatePassword = async (data) => {
+    try {
+      const res = await updatePasswordRequest(data);
+      setUser(res.data)
+      return res;
+    } catch (error) {
+      if(typeof error.response.data === "object" && error.response.data){
+        const array = Object.values(error.response.data)
+        setErrors(array);
+      }
+      else setErrors(error.response.data);
+    }
   };
 
   useEffect(() => {
@@ -102,6 +121,7 @@ export const AuthProvider = ({ children }) => {
         signin,
         logout,
         getUser,
+        updatePassword,
         loading,
         user,
         isAuthenticated,

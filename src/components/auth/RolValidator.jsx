@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 function RolValidator({ rolRoute }) {
     const {user} = useAuth();
 
-    if (user.role_name !== rolRoute) return <Navigate to="/" replace />;
+    if (user.role.name !== rolRoute) return <Navigate to="/" replace />;
 
     return <Outlet />;
 }

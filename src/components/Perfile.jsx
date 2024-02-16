@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaUserCircle, FaMapMarkerAlt, FaRegEdit } from "react-icons/fa";
 import { formatDateShort } from "@constants/functions";
+import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import AlertMessage from "@components/AlertMessage"
+import Dialog from "@components/Dialog"
 
 const skills = [
   "Html5",
@@ -17,33 +20,32 @@ const skills = [
 ];
 
 function Perfile() {
-  const { getUser, user } = useAuth();
+  const { getUser, updatePassword, user, errors: updateErrors } = useAuth();
+  const [loading, setLoading] = useState(true)
   const [menuSelected, setMenuSelected] = useState("About me");
+  const [success, setSuccess] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [showLoading, setShowLoading] = useState("");
+  const [seeOldPassword, setSeeOldPassword] = useState(false);
+  const [seeNewPassword, setSeeNewPassword] = useState(false);
+  const [seeConfirmPassword, setSeeConfirmPassword] = useState(false);
   const dateInputRef = useRef(null);
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors },
     setValue,
     getValues,
+    unregister
   } = useForm();
 
   useEffect(() => {
     async function getUserData() {
-      const res = await getUser();
-      setValue("firstname", res.firstname);
-      setValue("lastnamepaternal", res.lastnamepaternal);
-      setValue("lastnamematernal", res.lastnamematernal);
-      setValue("birthdate", res.birthdate);
-      setValue("email", res.email);
-      setValue("phonenumber", res.phonenumber);
-      setValue("street", res.direction.street);
-      setValue("colony", res.direction.colony);
-      setValue("postalcode", res.direction.postalcode);
+      await getUser();
+      setLoading(false)
     }
-    getUserData();
-  }, []);
+    if(loading) getUserData();
+  }, [loading]);
 
   const handleMenuOption = (option) => {
     if (option !== menuSelected) setMenuSelected(option);
@@ -58,6 +60,37 @@ function Perfile() {
     if (type === "number") value = e.target.value.replace(/[^0-9]/g, "");
     setValue(name, value ?? e.target.value);
   };
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      handleDialog();
+      const res = await updatePassword(data);
+      if (res?.statusText === "OK"){
+        setSuccess(true);
+        setValue("oldPassword", "")
+        setValue("newPassword", "")
+        setValue("confirmPassword", "")
+        unregister(["oldPassword", "newPassword", "confirmPassword"])
+      }
+      handleDialog();
+    } catch (error) {
+      handleDialog();
+    }
+  });
+
+  const handleDialog = () => {
+    setShowLoading((prev) => (prev === "" ? "true" : ""));
+    setShowDialog((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
 
   return (
     <>
@@ -89,8 +122,8 @@ function Perfile() {
             <div className="flex flex-wrap gap-2 items-center mt-2">
               <FaMapMarkerAlt />
               <p className="font-normal text-base">
-                {user?.direction?.street}, {user?.direction?.colony},{" "}
-                {user?.direction?.postalcode}
+                {user?.address?.street}, {user?.address?.settlement},{" "}
+                {user?.address?.postalcode}
               </p>
             </div>
           </div>
@@ -148,10 +181,10 @@ function Perfile() {
                 <h1 className="text-black font-medium text-xl">
                   Detalles personales
                 </h1>
-                <button className="flex flex-row items-center justify-center text-gray-500">
+                {/* <button className="flex flex-row items-center justify-center text-gray-500">
                   <FaRegEdit color="gray" />
                   Editar
-                </button>
+                </button> */}
               </header>
               <form className="flex flex-col gap-5 overflow-y-auto max-h-[400px]" style={{ scrollbarWidth: "thin", scrollbarColor: "#f1f1f1 transparent"}}>
                 <span className="flex flex-row gap-5 items-center">
@@ -162,41 +195,23 @@ function Perfile() {
                     <input
                       type="text"
                       maxLength={20}
-                      {...register("firstname", {
-                        required: "Se requiere el nombre",
-                        maxLength: {
-                          value: 20,
-                          message:
-                            "El nombre no debe exceder los 20 caracteres",
-                        },
-                      })}
+                      defaultValue={user?.firstname}
                       className="flex-1 px-4 py-3 text-gray-700 bg-transparent border-b border-transparent focus:border-blue-400 focus:border-b focus:outline-none"
+                      readOnly
                     />
                     <input
                       type="text"
                       maxLength={20}
-                      {...register("lastnamepaternal", {
-                        required: "Se requiere el primer apellido",
-                        maxLength: {
-                          value: 20,
-                          message:
-                            "El primer apellido no debe exceder los 20 caracteres",
-                        },
-                      })}
+                      defaultValue={user?.lastnamepaternal}
                       className="flex-1 text-gray-700 px-4 py-3 bg-transparent border-b border-transparent focus:border-blue-400 focus:border-b focus:outline-none"
+                      readOnly
                     />
                     <input
                       type="text"
                       maxLength={20}
-                      {...register("lastnamematernal", {
-                        required: "Se requiere el segundo apellido",
-                        maxLength: {
-                          value: 20,
-                          message:
-                            "El segundo apellido no debe exceder los 20 caracteres",
-                        },
-                      })}
+                      defaultValue={user?.lastnamematernal}
                       className="flex-1 text-gray-700 px-4 py-3 bg-transparent border-b border-transparent focus:border-blue-400 focus:border-b focus:outline-none"
+                      readOnly
                     />
                   </div>
                 </span>
@@ -206,13 +221,11 @@ function Perfile() {
                   </label>
                   <input
                     type="date"
-                    {...register("birthdate", {
-                      required: "Se requiere la fecha de nacimiento",
-                    })}
                     onChange={handleDateInput}
                     ref={dateInputRef}
                     className="flex-1 text-gray-700 px-4 py-3 bg-transparent border-b border-transparent focus:border-blue-400 focus:border-b focus:outline-none"
-                    defaultValue={formatDateShort(user.birthdate ?? new Date())}
+                    defaultValue={formatDateShort(user?.birthdate)}
+                    readOnly
                   />
                 </span>
                 <span className="flex flex-row gap-5 items-center">
@@ -222,14 +235,9 @@ function Perfile() {
                   <input
                     type="email"
                     maxLength={30}
-                    {...register("email", {
-                      required: "Se requiere el email",
-                      maxLength: {
-                        value: 30,
-                        message: "El email no debe exceder los 30 caracteres",
-                      },
-                    })}
+                    defaultValue={user?.email}
                     className="flex-1 text-blue-500 px-4 py-3 bg-transparent border-b border-transparent focus:border-blue-400 focus:border-b focus:outline-none"
+                    readOnly
                   />
                 </span>
                 <span className="flex flex-row gap-5 items-center">
@@ -240,26 +248,13 @@ function Perfile() {
                     type="text"
                     maxLength={10}
                     minLength={10}
-                    {...register("phonenumber", {
-                      required: "Se requiere el código postal",
-                      pattern: {
-                        value: /^[0-9]+$/,
-                        message: "Solo se permiten números",
-                      },
-                      maxLength: {
-                        value: 10,
-                        message: "El teléfono debe tener 10 números",
-                      },
-                      minLength: {
-                        value: 10,
-                        message: "El teléfono debe tener 10 números",
-                      },
-                    })}
+                    defaultValue={user?.phonenumber}
                     className="flex-1 text-gray-700 px-4 py-3 bg-transparent border-b border-transparent focus:border-blue-400 focus:border-b focus:outline-none"
                     onChange={(e) =>
                       handleChangeInput(e, "phonenumber", "number")
                     }
                     min={0}
+                    readOnly
                   />
                 </span>
                 <span className="flex flex-row gap-5 items-center">
@@ -270,52 +265,27 @@ function Perfile() {
                     <input
                       type="text"
                       maxLength={30}
-                      {...register("street", {
-                        required: "Se requiere la calle",
-                        maxLength: {
-                          value: 30,
-                          message: "La calle no debe exceder los 30 caracteres",
-                        },
-                      })}
+                      defaultValue={user?.address?.street}
                       className="flex-1 text-gray-700 px-4 py-3 bg-transparent border-b border-transparent focus:border-blue-400 focus:border-b focus:outline-none"
+                      readOnly
                     />
                     <input
                       type="text"
                       maxLength={30}
-                      {...register("colony", {
-                        required: "Se requiere la colonia",
-                        maxLength: {
-                          value: 30,
-                          message:
-                            "La colonia no debe exceder los 30 caracteres",
-                        },
-                      })}
+                      defaultValue={user?.address?.settlement}
                       className="flex-1 text-gray-700 px-4 py-3 bg-transparent border-b border-transparent focus:border-blue-400 focus:border-b focus:outline-none"
+                      readOnly
                     />
                     <input
                       type="text"
                       maxLength={5}
-                      {...register("postalcode", {
-                        required: "Se requiere el código postal",
-                        pattern: {
-                          value: /^[0-9]+$/,
-                          message: "Solo se permiten números",
-                        },
-                        maxLength: {
-                          value: 5,
-                          message:
-                            "El código postal no debe exceder los 5 caracteres",
-                        },
-                        min: {
-                          value: 1,
-                          message: "Código postal inválido",
-                        },
-                      })}
+                      defaultValue={user?.address?.postalcode}
                       className="flex-1 text-gray-700 px-4 py-3 bg-transparent border-b border-transparent focus:border-blue-400 focus:border-b focus:outline-none"
                       onChange={(e) =>
                         handleChangeInput(e, "postalcode", "number")
                       }
                       min={0}
+                      readOnly
                     />
                   </div>
                 </span>
@@ -358,58 +328,156 @@ function Perfile() {
             <h1 className="text-black font-medium text-xl">
               Cambiar contraseña
             </h1>
-            <form className="flex flex-col gap-y-4 overflow-y-auto max-h-full">
+            <AnimatePresence mode="sync">
+              {updateErrors.map((error, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ height: 0, y: -10, opacity: 0 }}
+                  animate={{ height: 48, y: 0, opacity: 1 }}
+                  exit={{ height: 0, y: -10, opacity: 0 }}
+                  transition={{ type: "spring", delay: i * 0.2 }}
+                >
+                  <AlertMessage key={i} message={error} />
+                </motion.div>
+              ))}
+              {Object.keys(errors).map((fieldName, i) => (
+                <motion.div
+                  key={fieldName}
+                  initial={{ height: 0, y: -10, opacity: 0 }}
+                  animate={{ height: 48, y: 0, opacity: 1 }}
+                  exit={{ height: 0, y: -10, opacity: 0 }}
+                  transition={{ type: "spring", delay: i * 0.2 }}
+                >
+                  <AlertMessage
+                    key={fieldName}
+                    message={errors[fieldName].message}
+                  />
+                </motion.div>
+              ))}
+              {success && (
+                <motion.div
+                  initial={{ height: 0, y: -10, opacity: 0 }}
+                  animate={{ height: 48, y: 0, opacity: 1 }}
+                  exit={{ height: 0, y: -10, opacity: 0 }}
+                  transition={{ type: "spring" }}
+                >
+                  <AlertMessage
+                    message="Se ha actualizado la contraseña exitosamente."
+                    colorIcon="green"
+                    colorBg="bg-green-600/10"
+                    colorLeftBorder="border-green-600"
+                    colorText="text-green-600"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <form onSubmit={onSubmit} className="flex flex-col gap-y-4 overflow-y-auto max-h-full">
               <span className="flex flex-col">
-                <label>Contraseña anterior</label>
-                <input
-                  type="password"
-                  maxLength={25}
-                  {...register("passwordOld", {
-                    required: "Se requiere la contraseña",
-                    maxLength: {
-                      value: 25,
-                      message: "No debe exceder los 25 caracteres",
-                    },
-                    minLength: {
-                      value: 6,
-                      message: "Debe tener al menos 6 caracteres",
-                    },
-                  })}
-                  className="w-full max-w-[400px] text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
+                <label>Contraseña actual</label>
+                <div className="relative max-w-[400px]">
+                  <input
+                    type={seeOldPassword ? "text" : "password"}
+                    placeholder="Contraseña"
+                    maxLength={25}
+                    {...register("oldPassword", {
+                      required: "Se requiere la contraseña actual",
+                      maxLength: {
+                        value: 25,
+                        message: "No debe exceder los 25 caracteres",
+                      },
+                      minLength: {
+                        value: 8,
+                        message: "Debe tener al menos 8 caracteres",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                  {seeOldPassword ? (
+                    <IoEyeOffOutline
+                      className="absolute top-[25%] right-3 cursor-pointer"
+                      size="1.5em"
+                      onClick={() => setSeeOldPassword(prev => !prev)}
+                    />
+                  ) : (
+                    <IoEyeOutline
+                      className="absolute top-[25%] right-3 cursor-pointer"
+                      size="1.5em"
+                      onClick={() => setSeeOldPassword(prev => !prev)}
+                    />
+                  )}
+                </div>
               </span>
               <span className="flex flex-col">
                 <label>Nueva contraseña</label>
-                <input
-                  type="password"
-                  maxLength={25}
-                  {...register("passwordNew", {
-                    required: "Se requiere la contraseña",
-                    maxLength: {
-                      value: 25,
-                      message: "No debe exceder los 25 caracteres",
-                    },
-                    minLength: {
-                      value: 6,
-                      message: "Debe tener al menos 6 caracteres",
-                    },
-                  })}
-                  className="w-full max-w-[400px] text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
+                <div className="relative max-w-[400px]">
+                  <input
+                    type={seeNewPassword ? "text" : "password"}
+                    placeholder="Contraseña"
+                    maxLength={25}
+                    {...register("newPassword", {
+                      required: "Se requiere la contraseña nueva",
+                      maxLength: {
+                        value: 25,
+                        message:
+                          "La contraseña no debe exceder los 25 caracteres",
+                      },
+                      minLength: {
+                        value: 8,
+                        message:
+                          "La contraseña debe tener al menos 8 caracteres",
+                      },
+                      pattern: {
+                        value: /^(?=.*[a-z])(?=.*[A-Z])/,
+                        message:
+                          "La contraseña debe contener al menos una letra mayúscula y una minúscula",
+                      },
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                  {seeNewPassword ? (
+                    <IoEyeOffOutline
+                      className="absolute top-[25%] right-3 cursor-pointer"
+                      size="1.5em"
+                      onClick={() => setSeeNewPassword(prev => !prev)}
+                    />
+                  ) : (
+                    <IoEyeOutline
+                      className="absolute top-[25%] right-3 cursor-pointer"
+                      size="1.5em"
+                      onClick={() => setSeeNewPassword(prev => !prev)}
+                    />
+                  )}
+                </div>
               </span>
               <span className="flex flex-col">
                 <label>Confirmar la contraseña</label>
-                <input
-                  type="password"
-                  maxLength={25}
-                  {...register("passwordConfirm", {
-                    required: "Se requiere que confirme la contraseña",
-                    validate: (value) =>
-                      value === getValues("passwordNew") ||
-                      "Las contraseñas no coinciden",
-                  })}
-                  className="w-full max-w-[400px] text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
+                <div className="relative max-w-[400px]">
+                  <input
+                    type={seeConfirmPassword ? "text" : "password"}
+                    placeholder="Contraseña"
+                    maxLength={25}
+                    {...register("confirmPassword", {
+                      required: "Se requiere que confirme la contraseña",
+                      validate: (value) =>
+                        value === getValues("newPassword") ||
+                        "Las contraseñas no coinciden",
+                    })}
+                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                  {seeConfirmPassword ? (
+                    <IoEyeOffOutline
+                      className="absolute top-[25%] right-3 cursor-pointer"
+                      size="1.5em"
+                      onClick={() => setSeeConfirmPassword(prev => !prev)}
+                    />
+                  ) : (
+                    <IoEyeOutline
+                      className="absolute top-[25%] right-3 cursor-pointer"
+                      size="1.5em"
+                      onClick={() => setSeeConfirmPassword(prev => !prev)}
+                    />
+                  )}
+                </div>
               </span>
               <button
                 type="submit"
@@ -420,6 +488,16 @@ function Perfile() {
             </form>
           </article>
         )}
+        <AnimatePresence>
+        {showDialog && (
+          <Dialog
+            title="Actualizando contraseña"
+            textAccept="Actualizando"
+            message=""
+            showLoading={showLoading}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }

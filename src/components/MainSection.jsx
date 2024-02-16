@@ -24,12 +24,12 @@ function WelcomeSection() {
       </header>
       {!loading && (
         <>
-          {user.role_name === "admin" ? (
+          {user.role.name === "admin" ? (
             <AdminProvider>
               <ControlAdmin />
             </AdminProvider>
           ) : (
-            console.log("No es un administrador:", user.role)
+            console.log("No es un administrador:", user.role.name)
           )}
         </>
       )}
