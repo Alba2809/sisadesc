@@ -34,6 +34,7 @@ export const AuthProvider = ({ children }) => {
         expires: expirationDate,
         secure: true,
         sameSite: "None",
+        httpOnly: true
       });
 
       setIsAuthenticated(true);

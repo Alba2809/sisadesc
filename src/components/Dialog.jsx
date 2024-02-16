@@ -8,6 +8,7 @@ function Dialog({
   addCancel,
   textAccept,
   showLoading,
+  contentComponent
 }) {
   const handleClick = (option) => {
     if (showLoading === "true") return;
@@ -44,6 +45,10 @@ function Dialog({
               {title}
             </h1>
           </header>
+          {contentComponent ? <>
+          {contentComponent}
+          </> : 
+          <>
           <p className="text-center text-gray-400 mb-5">{message}</p>
           <footer className="flex flex-row justify-around gap-5">
             <button
@@ -61,6 +66,9 @@ function Dialog({
               </button>
             )}
           </footer>
+          </>
+          }
+          
         </motion.section>
       )}
     </div>

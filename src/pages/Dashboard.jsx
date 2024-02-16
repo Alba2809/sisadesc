@@ -26,7 +26,6 @@ function Dashboard() {
   const [showSideBar, setShowSideBar] = useState(true);
   const [subMenuSelect, setSubMenuSelect] = useState("");
   const [subOptionSelect, setSubOptionSelect] = useState("");
-  const [loading, setLoading] = useState(true);
   const menuRef = useRef(null);
   const location = useLocation();
 
@@ -113,7 +112,7 @@ function Dashboard() {
           )}
           <section className="flex flex-col">
             <h1 className="font-semibold font-sans">{user.firstname}</h1>
-            <h2 className="text-[#5855ff] text-sm">{user.role.name}</h2>
+            <h2 className="text-[#5855ff] text-sm">{user.role_name}</h2>
           </section>
           <IoIosArrowDown
             onClick={() => setShowMenuUser((prev) => !prev)}

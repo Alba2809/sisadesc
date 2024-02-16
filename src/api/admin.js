@@ -34,6 +34,8 @@ export const getParentRequest = (id) => axios.get(`/admin/getparent/${id}`);
 
 export const getSubjectRequest = (id) => axios.get(`/admin/getsubject/${id}`);
 
+export const getSubjectStudentsRequest = (id) => axios.get(`/admin/getsubjectstudents/${id}`);
+
 export const getUsersRequest = () => axios.get("/admin/getusers");
 
 export const getTeachersRequest = () => axios.get("/admin/getteachers");
