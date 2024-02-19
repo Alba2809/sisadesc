@@ -361,9 +361,9 @@ function Subjects() {
                       </tr>
                     </thead>
                     <tbody>
-                      {students.map((student) => (
+                      {students.map((student, index) => (
                         <tr
-                          key={student.id}
+                          key={index}
                           className="border-y-[1px] border-gray-300 h-[60px] hover:bg-[#f7f7f7]"
                         >
                           <td className="p-2">{`${student.firstname} ${student.lastnamepaternal} ${student.lastnamematernal}`}</td>

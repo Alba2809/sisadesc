@@ -1,4 +1,4 @@
-import { FaShieldAlt, FaChalkboardTeacher } from "react-icons/fa";
+import { FaShieldAlt, FaChalkboardTeacher, FaUserCheck } from "react-icons/fa";
 import { IoMdSettings, IoIosSpeedometer } from "react-icons/io";
 import { BsMortarboardFill } from "react-icons/bs";
 import { BiBookReader } from "react-icons/bi";
@@ -113,9 +113,29 @@ export const adminOptions = [
   },
 ];
 
-export const studentOptions = [];
+export const studentOptions = [
+  
+];
 
-export const teacherOptions = [];
+export const teacherOptions = [
+  {
+    mainOption: {
+      name: "Asistencias",
+      icon: <FaUserCheck color="gray" size="1.5em" />,
+      iconS: <FaUserCheck color="blue" size="1.5em" />,
+    },
+    subOptions: [
+      {
+        name: "Lista de asistencia",
+        to: "/teacher/assists",
+      },
+      {
+        name: "Registrar asistencia",
+        to: "/teacher/assists/register",
+      },
+    ],
+  },
+];
 
 export const tutorOptions = [];
 

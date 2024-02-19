@@ -1,7 +1,7 @@
 import { useAuth } from "@context/AuthContext";
 import { useEffect, useState } from "react";
-import ControlAdmin from "@components/admin/ControlAdmin";
-import { AdminProvider } from "../context/AdminContext";
+import { AdminProvider } from "@context/AdminContext";
+import ControlAdmin from "@pages/admin/ControlAdmin";
 
 function WelcomeSection() {
   const { getUser, user } = useAuth();

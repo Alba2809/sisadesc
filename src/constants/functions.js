@@ -1,10 +1,16 @@
+function isUTCDate(date) {
+  const localDateString = new Date(date).toString();
+  const utcDateString = new Date(date.toUTCString()).toString();
+  
+  return localDateString === utcDateString;
+}
+
 export const formatDateLong = (dateString) => {
   if (dateString === "" || !dateString) return "";
   const options = {
     year: "numeric",
     month: "long",
     day: "numeric",
-    timeZone: "UTC",
   };
   const formattedDate = new Date(dateString).toLocaleDateString(
     "es-MX",
@@ -16,9 +22,9 @@ export const formatDateLong = (dateString) => {
 export const formatDateShort = (date) => {
   if (date === "" || !date) return "";
   const newDate = new Date(date);
-  const year = newDate.getUTCFullYear();
-  let month = newDate.getUTCMonth() + 1;
-  let day = newDate.getUTCDate();
+  const year = newDate.getFullYear();
+  let month = newDate.getMonth() + 1;
+  let day = newDate.getDate();
 
   if (month < 10) {
     month = `0${month}`;
@@ -37,7 +43,6 @@ export const formatDateTime = (date) => {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    timeZone: "UTC",
   });
 
   return newDate;

@@ -55,7 +55,25 @@ function Dashboard() {
     const lastPart = parts[parts.length - 2];
     const withoutLastPart = "/" + parts.slice(0, -2).join("/");
 
-    const matchingOption = adminOptions
+    const matchingOption = (
+      user.role.name === "admin"
+        ? adminOptions
+        : user.role.name === "student"
+        ? studentOptions
+        : user.role.name === "teacher"
+        ? teacherOptions
+        : user.role.name === "tutor"
+        ? tutorOptions
+        : user.role.name === "secretary"
+        ? secretaryOptions
+        : user.role.name === "principal"
+        ? principalOptions
+        : user.role.name === "viceprincipal"
+        ? viceprincipalOptions
+        : user.role.name === "academiccoor"
+        ? academicCoorOptions
+        : []
+    )
       .map((option) => {
         if (option.mainOption.to === path) {
           return { mainOptionName: option.mainOption.name };
@@ -63,7 +81,9 @@ function Dashboard() {
 
         if (option.subOptions) {
           const subOption = option.subOptions.find(
-            (subOption) => subOption.to === (lastPart ? lastPart === "edit" ? withoutLastPart : path : path)
+            (subOption) =>
+              subOption.to ===
+              (lastPart ? (lastPart === "edit" ? withoutLastPart : path) : path)
           );
 
           return subOption
@@ -128,7 +148,12 @@ function Dashboard() {
                 exit={{ x: 50, opacity: 0 }}
               >
                 <li className="flex">
-                  <Link to="/perfile" className="p-1 w-full hover:bg-blue-300 hover:text-white cursor-pointer rounded-md">Perfil</Link>
+                  <Link
+                    to="/perfile"
+                    className="p-1 w-full hover:bg-blue-300 hover:text-white cursor-pointer rounded-md"
+                  >
+                    Perfil
+                  </Link>
                 </li>
                 <li className="hover:bg-blue-300 hover:text-white cursor-pointer p-1 rounded-md">
                   <button
@@ -163,19 +188,19 @@ function Dashboard() {
               </section>
               {(user.role.name === "admin"
                 ? adminOptions
-                : user.role_name === "student"
+                : user.role.name === "student"
                 ? studentOptions
-                : user.role_name === "teacher"
+                : user.role.name === "teacher"
                 ? teacherOptions
-                : user.role_name === "tutor"
+                : user.role.name === "tutor"
                 ? tutorOptions
-                : user.role_name === "secretary"
+                : user.role.name === "secretary"
                 ? secretaryOptions
-                : user.role_name === "principal"
+                : user.role.name === "principal"
                 ? principalOptions
-                : user.role_name === "viceprincipal"
+                : user.role.name === "viceprincipal"
                 ? viceprincipalOptions
-                : user.role_name === "academiccoor"
+                : user.role.name === "academiccoor"
                 ? academicCoorOptions
                 : []
               ).map((option, index) => (
@@ -286,7 +311,10 @@ function Dashboard() {
             animate={{ x: 0 }}
             exit={{ x: 100 }}
             className="h-full overflow-y-auto flex-1"
-            style={{ scrollbarWidth: "thin", scrollbarColor: "#a5a5a5 transparent"}}
+            style={{
+              scrollbarWidth: "thin",
+              scrollbarColor: "#a5a5a5 transparent",
+            }}
           >
             <Outlet />
           </motion.div>
