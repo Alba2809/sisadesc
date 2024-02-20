@@ -1,5 +1,5 @@
 import { useTeacher } from "@context/TeacherContext";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { formatDateShort, formatDateLong } from "@constants/functions";
 import { useForm } from "react-hook-form";
@@ -39,7 +39,9 @@ function RegisterAssists() {
       const studentsAdded = students.map((student) => {
         return {
           sub_stud_id: student.subject_student_id,
-          assist: studentsAssisted.includes(student.subject_student_id) ? 1 : null,
+          assist: studentsAssisted.includes(student.subject_student_id)
+            ? 1
+            : null,
         };
       });
       data.students = studentsAdded;
@@ -50,7 +52,7 @@ function RegisterAssists() {
       handleDialog();
     }
   });
-  
+
   const handleDialog = () => {
     setShowLoading((prev) => (prev === "" ? "true" : ""));
     setShowDialog((prev) => !prev);
@@ -111,13 +113,11 @@ function RegisterAssists() {
     const foundStudent = studentsAssisted.find(
       (student) => student === studentID
     );
-    
+
     if (!foundStudent) {
-      console.log("add")
       setStudentsAssisted([...studentsAssisted, studentID]);
       setValue("students", studentsAssisted);
     } else {
-      console.log("remove")
       const newStudents = studentsAssisted.filter(
         (student) => student !== studentID
       );
@@ -167,7 +167,14 @@ function RegisterAssists() {
             </motion.div>
           ))}
         </AnimatePresence>
-        <form onSubmit={onSubmit} className={`flex-1 flex flex-col ${Object.keys(errors).length > 0 || registerErrors.length > 0 ? "mt-3" : ""}`}>
+        <form
+          onSubmit={onSubmit}
+          className={`flex-1 flex flex-col ${
+            Object.keys(errors).length > 0 || registerErrors.length > 0
+              ? "mt-3"
+              : ""
+          }`}
+        >
           <header className="min-h-[50px] w-full flex gap-10 items-center">
             <section className="flex flex-wrap gap-10 items-center">
               <div className="relative flex-1 min-w-[200px]">

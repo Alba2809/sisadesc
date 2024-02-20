@@ -1,18 +1,27 @@
 import { FaShieldAlt, FaChalkboardTeacher, FaUserCheck } from "react-icons/fa";
-import { IoMdSettings, IoIosSpeedometer } from "react-icons/io";
+import { IoMdSettings, IoIosSpeedometer, IoIosChatbubbles } from "react-icons/io";
 import { BsMortarboardFill } from "react-icons/bs";
 import { BiBookReader } from "react-icons/bi";
 import { RiParentLine } from "react-icons/ri";
+import { MdOutlineFilter9Plus } from "react-icons/md";
 
 export const adminOptions = [
   {
+    mainOption: {
+      name: "Mensajes",
+      icon: <IoIosChatbubbles color="gray" size="1.5em" />,
+      iconS: <IoIosChatbubbles color="blue" size="1.5em" />,
+      to: "/chats",
+    },
+  },
+  /* {
     mainOption: {
       name: "Ajustes",
       icon: <IoMdSettings color="gray" size="1.5em" />,
       iconS: <IoMdSettings color="blue" size="1.5em" />,
       to: "/settings",
     },
-  },
+  }, */
   {
     mainOption: {
       name: "Panel de control",
@@ -120,6 +129,14 @@ export const studentOptions = [
 export const teacherOptions = [
   {
     mainOption: {
+      name: "Mensajes",
+      icon: <IoIosChatbubbles color="gray" size="1.5em" />,
+      iconS: <IoIosChatbubbles color="blue" size="1.5em" />,
+      to: "/chats",
+    },
+  },
+  {
+    mainOption: {
       name: "Asistencias",
       icon: <FaUserCheck color="gray" size="1.5em" />,
       iconS: <FaUserCheck color="blue" size="1.5em" />,
@@ -132,6 +149,23 @@ export const teacherOptions = [
       {
         name: "Registrar asistencia",
         to: "/teacher/assists/register",
+      },
+    ],
+  },
+  {
+    mainOption: {
+      name: "Calificaciones",
+      icon: <MdOutlineFilter9Plus color="gray" size="1.5em" />,
+      iconS: <MdOutlineFilter9Plus color="blue" size="1.5em" />,
+    },
+    subOptions: [
+      {
+        name: "Lista de calificaciones",
+        to: "/teacher/grades",
+      },
+      {
+        name: "Registrar calificación",
+        to: "/teacher/grades/register",
       },
     ],
   },

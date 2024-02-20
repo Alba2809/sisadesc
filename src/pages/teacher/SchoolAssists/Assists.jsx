@@ -43,7 +43,6 @@ function Assists() {
             );
             if (resAssists) {
               setStudents(resAssists);
-              console.log(resAssists);
             }
           }
           setLoading(false);
@@ -61,8 +60,6 @@ function Assists() {
       setSubjectSelected(foundSubject);
       setLoadingChanges(true);
     } else if (type === "dates") {
-      console.log(rangesDates[value]);
-
       if (rangesDates[value] === null) {
         setStartDate(null);
         setEndDate(null);

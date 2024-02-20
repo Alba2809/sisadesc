@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AdminProvider } from "./context/AdminContext";
 import { TeacherProvider } from "@context/TeacherContext";
+import { ChatProvider } from "@context/ChatContext";
 import Dashboard from "@pages/Dashboard";
 import Login from "@pages/Login";
 import AuthValidator from "@components/auth/AuthValidator";
@@ -23,8 +24,11 @@ import Parents from "@pages/admin/Parent/Parents";
 import EditParent from "@pages/admin/Parent/EditParent";
 import RegisterParent from "@pages/admin/Parent/RegisterParent";
 import Perfile from "@pages/Perfile";
+import Chats from "@pages/Chat/Chats";
 import Assists from "@pages/teacher/SchoolAssists/Assists";
-import RegisterAssists from "./pages/teacher/SchoolAssists/RegisterAssists";
+import RegisterAssists from "@pages/teacher/SchoolAssists/RegisterAssists";
+import Grades from "@pages/teacher/SchoolGrades/Grades";
+import RegisterGrades from "@pages/teacher/SchoolGrades/RegisterGrades";
 
 function App() {
   const location = useLocation();
@@ -36,6 +40,10 @@ function App() {
           <Route path="/" element={<MainSection />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/perfile" element={<Perfile />} />
+          <Route element={<ChatProvider />}>
+
+          <Route path="/chats" element={<Chats />} />
+          </Route>
 
           <Route element={<RolValidator rolRoute="admin" />}>
             <Route path="/admin/*" element={<AdminProvider />}>
@@ -79,6 +87,11 @@ function App() {
                 <Route path="" element={<Assists />} />
                 <Route path="register" element={<RegisterAssists />} />
                 <Route path="*" element={<Navigate to="/teacher/assists" />} />
+              </Route>
+              <Route path="grades/*">
+                <Route path="" element={<Grades />} />
+                <Route path="register" element={<RegisterGrades />} />
+                <Route path="*" element={<Navigate to="/teacher/grades" />} />
               </Route>
               <Route path="*" element={<Navigate to="/" />} />
             </Route>

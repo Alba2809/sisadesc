@@ -1,8 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import {
   getAssistsSubjectRequest,
+  getGradesSubjectRequest,
   getSubjectsRequest,
   registerAssistsRequest,
+  registerGradesRequest,
 } from "../api/teacher";
 import { Outlet } from "react-router-dom";
 
@@ -25,10 +27,6 @@ export const TeacherProvider = ({ children }) => {
         const res = await getSubjectsRequest();
         return res.data;
       }
-      if (type === "assists") {
-        const res = await getSubjectsRequest();
-        return res.data;
-      }
       return false;
     } catch (error) {}
   };
@@ -39,6 +37,10 @@ export const TeacherProvider = ({ children }) => {
         const res = await getAssistsSubjectRequest(id);
         return res.data;
       }
+      if(type === "grades") {
+        const res = await getGradesSubjectRequest(id);
+        return res.data;
+      }
       return false;
     } catch (error) {}
   };
@@ -47,7 +49,11 @@ export const TeacherProvider = ({ children }) => {
     try {
       if (type === "assists") {
         const res = await registerAssistsRequest(data);
-        return res.data;
+        return res;
+      }
+      if(type === "grades") {
+        const res = await registerGradesRequest(data);
+        return res;
       }
     } catch (error) {
       if (typeof error.response.data === "object" && error.response.data) {
