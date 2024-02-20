@@ -128,7 +128,7 @@ function RegisterAssists() {
 
   const handleChangeInput = (e, name) => {
     setValue(name, e.target.value);
-    setDateSelected(e.target.value);
+    setDateSelected(e.target.value.toString());
   };
 
   return (
@@ -231,7 +231,7 @@ function RegisterAssists() {
                 <tr>
                   <th className="text-start px-2 min-w-[150px]">Estudiante</th>
                   <th className="text-center px-2 min-w-[100px]">
-                    {formatDateLong(dateSelected)}
+                    {formatDateLong(dateSelected, "utc")}
                   </th>
                 </tr>
               </thead>

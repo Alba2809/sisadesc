@@ -9,13 +9,14 @@ function padZero(number) {
   return number.toString().padStart(2, "0");;
 }
 
-export const formatDateLong = (dateString) => {
+export const formatDateLong = (dateString, utc) => {
   if (dateString === "" || !dateString) return "";
   const options = {
     year: "numeric",
     month: "long",
     day: "numeric",
   };
+  if(utc) options.timeZone = "UTC";
   const formattedDate = new Date(dateString).toLocaleDateString(
     "es-MX",
     options
