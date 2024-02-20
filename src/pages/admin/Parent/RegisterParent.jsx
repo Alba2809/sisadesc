@@ -511,6 +511,7 @@ function RegisterParent() {
                     Código postal<span className="text-red-500">*</span>
                   </label>
                   <input
+                    autoComplete="off"
                     type="text"
                     maxLength={5}
                     {...register("father_postalcode", {
@@ -794,6 +795,7 @@ function RegisterParent() {
                     Código postal<span className="text-red-500">*</span>
                   </label>
                   <input
+                    autoComplete="off"
                     type="text"
                     maxLength={5}
                     {...register("mother_postalcode", {
@@ -1086,6 +1088,7 @@ function RegisterParent() {
                     Código postal<span className="text-red-500">*</span>
                   </label>
                   <input
+                    autoComplete="off"
                     type="text"
                     maxLength={5}
                     {...register("tutor_postalcode", {

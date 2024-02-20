@@ -171,6 +171,7 @@ function RegisterTeacher() {
               CURP<span className="text-red-500">*</span>
             </label>
             <input
+              autoComplete="off"
               type="text"
               maxLength={18}
               {...register("curp", {

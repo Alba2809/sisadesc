@@ -23,6 +23,7 @@ export const ChatProvider = ({ children }) => {
   const { socket } = useSocket();
   const [errors, setErrors] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [userSelected, setUserSelected] = useState(null);
 
   const sendMessage = async (data, receiver_id) => {
     try {
@@ -52,6 +53,7 @@ export const ChatProvider = ({ children }) => {
     try {
       const res = await getMessagesRequest(id);
       setMessages(res.data);
+      setUserSelected(id)
       return res.data;
     } catch (error) {
       if (typeof error.response.data === "object" && error.response.data) {
@@ -62,10 +64,10 @@ export const ChatProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    socket?.on("message", (newMessage) => {
+    socket?.on("message", ({ newMessage, receiver, sender }) => {
       /* alert with message icon */
-      toast.success("New message", { icon: <IoIosChatbubbles color="green" /> });
-      setMessages([...messages, newMessage]);
+      toast.success(`Nuevo mensaje de ${sender.firstname} ${sender.lastnamepaternal} ${sender.lastnamematernal}`, { icon: <IoIosChatbubbles color="green" /> });
+      if(+receiver === userSelected || +sender.id === userSelected) setMessages([...messages, newMessage]);
     });
 
     return () => {
