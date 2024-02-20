@@ -1,8 +1,12 @@
-function isUTCDate(date) {
-  const localDateString = new Date(date).toString();
-  const utcDateString = new Date(date.toUTCString()).toString();
-  
-  return localDateString === utcDateString;
+export function extractTime(date) {
+  const newDate = new Date(date);
+  const hours = padZero(newDate.getHours());;
+  const minutes = padZero(newDate.getMinutes());;
+  return `${hours}:${minutes}`;
+}
+
+function padZero(number) {
+  return number.toString().padStart(2, "0");;
 }
 
 export const formatDateLong = (dateString) => {

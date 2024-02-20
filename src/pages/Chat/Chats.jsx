@@ -1,24 +1,28 @@
 import { useChat } from "@context/ChatContext";
 import { useAuth } from "@context/AuthContext";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoIosSend } from "react-icons/io";
 import { useForm } from "react-hook-form";
 import Conversation from "@components/Chat/Conversation";
 import Message from "@components/Chat/Message";
 
 function Chats() {
-  const { getConversations, getMessages, sendMessage } = useChat();
+  const { getConversations, getMessages, sendMessage, messages, setMessages } =
+    useChat();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [conversationsView, setConversationsView] = useState([]);
   const [conversations, setConversations] = useState([]);
-  const [messages, setMessages] = useState([]);
   const [userSelected, setUserSelected] = useState(null);
-  const {
-    register,
-    handleSubmit,
-    setValue
-  } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
+  const lastMessageRef = useRef(null);
+
+  useEffect(() => {
+    const time = setTimeout(() => {
+      lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+    return () => clearTimeout(time);
+  }, [messages]);
 
   useEffect(() => {
     async function getConversationsData() {
@@ -35,8 +39,7 @@ function Chats() {
   useEffect(() => {
     if (userSelected) {
       async function getMessagesData() {
-        const res = await getMessages(userSelected.id);
-        setMessages(res);
+        await getMessages(userSelected.id);
       }
       getMessagesData();
     }
@@ -46,8 +49,8 @@ function Chats() {
     try {
       const res = await sendMessage(data, userSelected.id);
       if (res?.statusText === "OK") {
-        setMessages([...messages, res.data]);
         setValue("message", "");
+        setMessages([...messages, res.data]);
       }
     } catch (error) {
       console.log(error);
@@ -115,30 +118,42 @@ function Chats() {
               <h2>Para:</h2>
               <h1 className="text-lg">{`${userSelected.firstname} ${userSelected.lastnamepaternal} ${userSelected.lastnamematernal} `}</h1>
             </header>
-            <section className="flex-1">
-              {messages.length <= 0 && <p className="text-gray-400">Sin mensajes.</p>}
-              {messages.map((message, i) => (
-                <Message key={i} message={message} image={userSelected.imageperfile} userLogged={user.id} />
+            <section
+              className="max-h-full overflow-y-auto overflow-x-hidden flex flex-col gap-3"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "#a5a5a5 transparent",
+              }}
+            >
+              {messages?.length <= 0 && (
+                <p className="text-gray-400">Sin mensajes.</p>
+              )}
+              {messages?.map((message, i) => (
+                <div key={i} ref={lastMessageRef}>
+                  <Message message={message} userLogged={user.id} />
+                </div>
               ))}
             </section>
-            <footer>
-              <form
-                onSubmit={onSubmit}
-                className="flex flex-row gap-2"
-              >
-                <input
-                  type="text"
-                  {...register("message", {
-                    required: "Se requiere el mensaje",
-                  })}
-                  placeholder="Escriba su mensaje"
-                  className="flex-1 text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
-                <button type="submit" className="w-[50px] flex justify-center items-center hover:bg-slate-200 rounded-md">
-                  <IoIosSend size="2em" />
-                </button>
-              </form>
-            </footer>
+            {messages?.length > 0 && (
+              <footer>
+                <form onSubmit={onSubmit} className="flex flex-row gap-2">
+                  <input
+                    type="text"
+                    {...register("message", {
+                      required: "Se requiere el mensaje",
+                    })}
+                    placeholder="Escriba su mensaje"
+                    className="flex-1 text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  />
+                  <button
+                    type="submit"
+                    className="w-[50px] flex justify-center items-center hover:bg-slate-200 rounded-md"
+                  >
+                    <IoIosSend size="2em" />
+                  </button>
+                </form>
+              </footer>
+            )}
           </div>
         ) : (
           <p>Seleccione un usuario para ver sus mensajes</p>

@@ -5,6 +5,9 @@ import {
   sendMessageRequest,
 } from "../api/chat";
 import { Outlet } from "react-router-dom";
+import { useSocket } from "../context/SocketContext";
+import { IoIosChatbubbles } from "react-icons/io";
+import toast, { Toaster } from "react-hot-toast";
 
 export const ChatContext = createContext();
 
@@ -17,7 +20,9 @@ export const useChat = () => {
 };
 
 export const ChatProvider = ({ children }) => {
+  const { socket } = useSocket();
   const [errors, setErrors] = useState([]);
+  const [messages, setMessages] = useState([]);
 
   const sendMessage = async (data, receiver_id) => {
     try {
@@ -46,6 +51,7 @@ export const ChatProvider = ({ children }) => {
   const getMessages = async (id) => {
     try {
       const res = await getMessagesRequest(id);
+      setMessages(res.data);
       return res.data;
     } catch (error) {
       if (typeof error.response.data === "object" && error.response.data) {
@@ -54,6 +60,18 @@ export const ChatProvider = ({ children }) => {
       } else setErrors(error.response.data);
     }
   };
+
+  useEffect(() => {
+    socket?.on("message", (newMessage) => {
+      /* alert with message icon */
+      toast.success("New message", { icon: <IoIosChatbubbles color="green" /> });
+      setMessages([...messages, newMessage]);
+    });
+
+    return () => {
+      socket?.off("message");
+    };
+  }, [socket, setMessages, messages]);
 
   useEffect(() => {
     if (errors.length > 0) {
@@ -70,9 +88,12 @@ export const ChatProvider = ({ children }) => {
         getConversations,
         getMessages,
         sendMessage,
+        setMessages,
+        messages,
         errors,
       }}
     >
+      <Toaster position="top-right" reverseOrder={false} />
       {children ?? <Outlet />}
     </ChatContext.Provider>
   );
