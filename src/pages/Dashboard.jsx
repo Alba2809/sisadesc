@@ -53,7 +53,9 @@ function Dashboard() {
     const path = location.pathname;
     const parts = path.split("/").filter(Boolean);
     const lastPart = parts[parts.length - 2];
+    const preLastPart = parts[parts.length - 3];
     const withoutLastPart = "/" + parts.slice(0, -2).join("/");
+    const withoutPreLastPart = "/" + parts.slice(0, -3).join("/");
 
     const matchingOption = (
       user.role.name === "admin"
@@ -83,9 +85,8 @@ function Dashboard() {
           const subOption = option.subOptions.find(
             (subOption) =>
               subOption.to ===
-              (lastPart ? (lastPart === "edit" ? withoutLastPart : path) : path)
+              (lastPart ? (lastPart === "edit" ? withoutLastPart : preLastPart === "edit" ? withoutPreLastPart : path) : path)
           );
-
           return subOption
             ? { mainOptionName: option.mainOption.name, subOption }
             : null;

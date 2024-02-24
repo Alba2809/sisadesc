@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { genders, vitalStatus } from "@constants/constants";
+import { genders, vitalStatus, grades, groups } from "@constants/constants";
 import { scrollToTop } from "@constants/functions";
 import { FaCheck } from "react-icons/fa";
 import InputSelect from "@components/InputSelect";
@@ -34,6 +34,7 @@ function RegisterStudent() {
     handleSubmit,
     formState: { errors },
     setValue,
+    getValues,
     unregister,
   } = useForm();
   const navigate = useNavigate();
@@ -44,12 +45,15 @@ function RegisterStudent() {
       setAddresses(addressesData);
     }
     setValue("student_gender", genders[0]);
+    setValue("student_grade", grades[0]);
+    setValue("student_group", groups[0]);
     setValue("father_gender", genders[0]);
     setValue("mother_gender", genders[1]);
     setValue("tutor_gender", genders[0]);
     setValue("father_status", vitalStatus[0]);
     setValue("mother_status", vitalStatus[0]);
     setValue("tutor_status", vitalStatus[0]);
+    setValue("isTutor", "Madre");
     getData();
   }, []);
 
@@ -59,46 +63,48 @@ function RegisterStudent() {
 
       let totalQueries = 0;
       let queriesRealized = [];
-      console.log(data)
+      console.log("Antes del delete", data);
+      for (const key in data) {
+        if (data[key] === "" || data[key] === null) {
+          delete data[key];
+        }
+      }
+      console.log("Despues del delete", data);
       if (showFormNewParent === "No") {
         if (showFormFather) {
           totalQueries++;
           const resFather = await registerSomething(data, "father");
-          if (resFather?.statusText === "OK"){
+          if (resFather?.statusText === "OK") {
             queriesRealized.push(resFather);
-            data.father_firstname = null
-          }
-          else scrollToTop();
+            data.father_firstname = null;
+          } else scrollToTop();
         }
         if (showFormMother) {
           totalQueries++;
           const resMother = await registerSomething(data, "mother");
-          if (resMother?.statusText === "OK"){
+          if (resMother?.statusText === "OK") {
             queriesRealized.push(resMother);
-            data.mother_firstname = null
-          }
-          else scrollToTop();
+            data.mother_firstname = null;
+          } else scrollToTop();
         }
         if (showFormTutor) {
           totalQueries++;
           const resTutor = await registerSomething(data, "tutor");
-          if (resTutor?.statusText === "OK"){
+          if (resTutor?.statusText === "OK") {
             queriesRealized.push(resTutor);
-            data.tutor_firstname = null
-          }
-          else scrollToTop();
+            data.tutor_firstname = null;
+          } else scrollToTop();
         }
       }
 
-      if(queriesRealized.length !== totalQueries) {
+      if (queriesRealized.length !== totalQueries) {
         queriesRealized.map(async (query) => {
-          console.log(query)
+          console.log(query);
           await deleteSomething(query.data, "parent");
         });
         handleDialog();
-        return
+        return;
       }
-
       const res = await registerSomething(data, "student");
       if (res?.statusText === "OK") navigate("/admin/students");
       else scrollToTop();
@@ -114,9 +120,7 @@ function RegisterStudent() {
     setShowDialog((prev) => !prev);
   };
 
-  const handleChangeSelect = (value, name) => {
-    setValue(name, value);
-  };
+  const handleChangeSelect = (value, name) => setValue(name, value);
 
   const handleChangeInput = (e, name, type, person) => {
     let value = null;
@@ -238,18 +242,33 @@ function RegisterStudent() {
         "tutor_street",
       ]);
     }
+    if (showFormFather && !showFormMother && !showFormTutor)
+      setValue("isTutor", "Padre");
+    else if (showFormMother && !showFormFather && !showFormTutor)
+      setValue("isTutor", "Madre");
+    else if(showFormFather && showFormMother && !showFormTutor)
+      setValue("isTutor", "Madre");
+    else if (!showFormTutor && !showFormFather && !showFormMother)
+      unregister(["isTutor"]);
   }, [showFormFather, showFormMother, showFormTutor]);
 
   useEffect(() => {
-    if(errors.length > 0) scrollToTop();
-  }, [errors])
+    if (errors.length > 0) scrollToTop();
+  }, [errors]);
 
   return (
     <div className="w-full h-full flex flex-col">
       <header className="h-[50px]">
         <h1 className="font-medium font-serif text-2xl">Agregar estudiante</h1>
       </header>
-      <section id="container" className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
+      <section
+        id="container"
+        className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto"
+        style={{
+          scrollbarWidth: "thin",
+          scrollbarColor: "#a5a5a5 transparent",
+        }}
+      >
         <AnimatePresence mode="sync">
           {registerErrors.map((error, i) => (
             <motion.div
@@ -393,13 +412,13 @@ function RegisterStudent() {
             </div>
             <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
               <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                Email<span className="text-red-500">*</span>
+                Email
               </label>
               <input
                 type="email"
                 maxLength={30}
                 {...register("student_email", {
-                  required: "Se requiere el email del estudiante",
+                  required: false,
                   maxLength: {
                     value: 30,
                     message:
@@ -411,32 +430,36 @@ function RegisterStudent() {
             </div>
             <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
               <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                Grupo<span className="text-red-500">*</span>
+                Grado<span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                maxLength={30}
-                {...register("student_group", {
-                  required: "Se requiere la calle del estudiante",
-                  maxLength: {
-                    value: 30,
-                    message:
-                      "La calle del estudiante no debe exceder los 30 caracteres",
-                  },
-                })}
-                className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+              <InputSelect
+                options={grades}
+                onOptionChange={handleChangeSelect}
+                object="student_grade"
+                style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
               />
             </div>
             <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
               <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                Teléfono<span className="text-red-500">*</span>
+                Grupo<span className="text-red-500">*</span>
+              </label>
+              <InputSelect
+                options={groups}
+                onOptionChange={handleChangeSelect}
+                object="student_group"
+                style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+              />
+            </div>
+            <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+              <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                Teléfono
               </label>
               <input
                 type="text"
                 maxLength={10}
                 minLength={10}
                 {...register("student_phonenumber", {
-                  required: "Se requiere el código postal del estudiante",
+                  required: false,
                   pattern: {
                     value: /^[0-9]+$/,
                     message: "Solo se permiten números del estudiante",
@@ -574,10 +597,10 @@ function RegisterStudent() {
           {showFormNewParent === "No" && (
             <>
               <section>
-                <span className="w-full font-medium font-serif text-lg">
+                <p className="w-full font-medium font-serif text-lg">
                   Seleccione los padres/tutor a registrar (Solo en caso de que
                   el tutor sea diferente a los padres seleccionelo)
-                </span>
+                </p>
                 <div className="flex flex-col items-start">
                   <button
                     onClick={() => handleShowForm("father")}
@@ -915,6 +938,12 @@ function RegisterStudent() {
                       className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                     />
                   </div>
+                  {!showFormMother && !showFormTutor && (
+                    <p className="w-full font-medium font-serif text-lg">
+                      Nota: Debido a que sólo se registrará el padre, el padre
+                      será agregado como el tutor del estudiante.
+                    </p>
+                  )}
                 </>
               )}
               {/* Formulario de la madre */}
@@ -1207,6 +1236,30 @@ function RegisterStudent() {
                         },
                       })}
                       className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                    />
+                  </div>
+                  {!showFormFather && !showFormTutor && (
+                    <p className="w-full font-medium font-serif text-lg">
+                      Nota: Debido a que sólo se registrará la madre, la madre
+                      será agregado como el tutor del estudiante.
+                    </p>
+                  )}
+                </>
+              )}
+              {showFormFather && showFormMother && !showFormTutor && (
+                <>
+                  <p className="w-full font-medium font-serif text-lg">
+                    Seleccione quien será el tutor del estudiante:
+                  </p>
+                  <div className="relative flex-1 max-w-[200px]">
+                    <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                      Tutor:<span className="text-red-500">*</span>
+                    </label>
+                    <InputSelect
+                      options={["Madre", "Padre"]}
+                      onOptionChange={handleChangeSelect}
+                      object="isTutor"
+                      style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                     />
                   </div>
                 </>

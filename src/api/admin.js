@@ -24,6 +24,8 @@ export const updateParentRequest = (id, data) => axios.put(`/admin/updateparent/
 
 export const updateSubjectRequest = (id, data) => axios.put(`/admin/updatesubject/${id}`, data);
 
+export const updateStatusSubjectRequest = (id) => axios.put(`/admin/updatestatussubject/${id}`);
+
 export const getUserRequest = (id) => axios.get(`/admin/getuser/${id}`);
 
 export const getTeacherRequest = (id) => axios.get(`/admin/getteacher/${id}`);

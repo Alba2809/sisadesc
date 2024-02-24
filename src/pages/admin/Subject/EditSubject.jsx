@@ -8,7 +8,7 @@ import Dialog from "@components/Dialog";
 import AlertMessage from "@components/AlertMessage";
 import InputSelect from "@components/InputSelect";
 
-function EditSubject() {
+function EditSubject({ type }) {
   const params = useParams();
   const {
     getOneSomething,
@@ -217,7 +217,8 @@ function EditSubject() {
                       message: "El nombre no debe exceder los 20 caracteres",
                     },
                   })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 bg-[#e8ecef]"
+                  disabled
                 />
               </div>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
@@ -234,27 +235,12 @@ function EditSubject() {
                       message: "El código no debe exceder los 10 caracteres",
                     },
                   })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 bg-[#e8ecef]"
+                  disabled
                 />
               </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Grupo<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={10}
-                  {...register("group", {
-                    required: "Se requiere el grupo",
-                    maxLength: {
-                      value: 10,
-                      message: "El grupo no debe exceder los 10 caracteres",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                />
-              </div>
-              <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+              {type === "teacher" && (
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                 <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
                   CURP del docente
                 </label>
@@ -276,12 +262,16 @@ function EditSubject() {
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                 />
               </div>
+              )}
+              {type === "student" && (
+
               <input
                 type="text"
                 {...register("students", { required: false })}
                 className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none hidden"
                 hidden
               />
+              )}
               <section className="w-full">
                 <button
                   type="submit"
@@ -291,6 +281,8 @@ function EditSubject() {
                 </button>
               </section>
             </form>
+            {type === "student" && (
+
             <section className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
               <header className="h-[50px] w-full flex items-center justify-between">
                 <section className="flex flex-row gap-5 items-center">
@@ -428,6 +420,7 @@ function EditSubject() {
                 </div>
               </footer>
             </section>
+            )}
           </>
         )}
       </section>

@@ -30,6 +30,7 @@ import {
   getParentsRequest,
   deleteParentRequest,
   getSubjectStudentsRequest,
+  updateStatusSubjectRequest,
 } from "../api/admin";
 import { Outlet } from "react-router-dom";
 
@@ -102,6 +103,10 @@ export const AdminProvider = ({children}) => {
       }
       if (type === "subject") {
         const res = await updateSubjectRequest(id, data);
+        return res;
+      }
+      if (type === "statusSubject") {
+        const res = await updateStatusSubjectRequest(id);
         return res;
       }
       if (type === "parent") {

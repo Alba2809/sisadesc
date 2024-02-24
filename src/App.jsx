@@ -41,8 +41,7 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/perfile" element={<Perfile />} />
           <Route element={<ChatProvider />}>
-
-          <Route path="/chats" element={<Chats />} />
+            <Route path="/chats" element={<Chats />} />
           </Route>
 
           <Route element={<RolValidator rolRoute="admin" />}>
@@ -73,7 +72,8 @@ function App() {
               </Route>
               <Route path="subjects/*">
                 <Route path="" element={<Subjects />} />
-                <Route path="edit/:id" element={<EditSubject />} />
+                <Route path="edit/students/:id" element={<EditSubject type="student" />} />
+                <Route path="edit/teacher/:id" element={<EditSubject type="teacher" />} />
                 <Route path="register" element={<RegisterSubject />} />
                 <Route path="*" element={<Navigate to="/admin/subjects" />} />
               </Route>

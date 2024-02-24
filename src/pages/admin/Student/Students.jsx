@@ -170,7 +170,7 @@ function Students() {
                 <th className="text-start px-2 min-w-[250px]">Colonia</th>
                 <th className="text-start px-2 min-w-[150px]">Código postal</th>
                 <th className="text-start px-2 min-w-[200px]">Email</th>
-                <th className="text-start px-2 min-w-[100px]">Grupo</th>
+                <th className="text-center px-2 min-w-[100px]">Grado y grupo</th>
                 <th className="text-start px-2 min-w-[150px]">Teléfono</th>
                 <th className="text-start px-2 min-w-[200px]">Padre</th>
                 <th className="text-start px-2 min-w-[200px]">Madre</th>
@@ -231,7 +231,7 @@ function Students() {
                               {object.address.postalcode}
                             </td>
                             <td className="p-2">{object.email}</td>
-                            <td className="p-2">{object.group}</td>
+                            <td className="p-2">{`${object.grade}${object.group}`}</td>
                             <td className="p-2">{object.phonenumber}</td>
                             <td className="p-2">{object.father_curp}</td>
                             <td className="p-2">{object.mother_curp}</td>

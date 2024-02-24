@@ -134,26 +134,24 @@ function Chats() {
                 </div>
               ))}
             </section>
-            {messages?.length > 0 && (
-              <footer>
-                <form onSubmit={onSubmit} className="flex flex-row gap-2">
-                  <input
-                    type="text"
-                    {...register("message", {
-                      required: "Se requiere el mensaje",
-                    })}
-                    placeholder="Escriba su mensaje"
-                    className="flex-1 text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    className="w-[50px] flex justify-center items-center hover:bg-slate-200 rounded-md"
-                  >
-                    <IoIosSend size="2em" />
-                  </button>
-                </form>
-              </footer>
-            )}
+            <footer>
+              <form onSubmit={onSubmit} className="flex flex-row gap-2">
+                <input
+                  type="text"
+                  {...register("message", {
+                    required: "Se requiere el mensaje",
+                  })}
+                  placeholder="Escriba su mensaje"
+                  className="flex-1 text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  className="w-[50px] flex justify-center items-center hover:bg-slate-200 rounded-md"
+                >
+                  <IoIosSend size="2em" />
+                </button>
+              </form>
+            </footer>
           </div>
         ) : (
           <p>Seleccione un usuario para ver sus mensajes</p>

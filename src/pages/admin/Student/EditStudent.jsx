@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { formatDateShort, scrollToTop } from "@constants/functions";
-import { genders } from "@constants/constants";
+import { genders, grades, groups } from "@constants/constants";
 import InputSelect from "@components/InputSelect";
 import Dialog from "@components/Dialog";
 import AlertMessage from "@components/AlertMessage";
@@ -49,6 +49,7 @@ function EditStudent() {
       setValue("student_addressid", objectData.address.id);
       setValue("student_postalcode", objectData.address.postalcode);
       setValue("student_group", objectData.group);
+      setValue("student_grade", objectData.grade?.toString());
       setValue("student_phonenumber", objectData.phonenumber);
       setValue("student_email", objectData.email);
       setValue("father_curp", objectData.father_curp);
@@ -96,7 +97,6 @@ function EditStudent() {
     }
   };
 
-  
   const handleSelectAddress = (address) => {
     setSelectedAddress(address);
     setValue("student_colony", address.asentamiento);
@@ -110,7 +110,10 @@ function EditStudent() {
       <header className="h-[50px]">
         <h1 className="font-medium font-serif text-2xl">Editar estudiante</h1>
       </header>
-      <section id="container" className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
+      <section
+        id="container"
+        className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto"
+      >
         {loading ? (
           <p>Loading...</p>
         ) : (
@@ -278,20 +281,26 @@ function EditStudent() {
                 </div>
                 <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                   <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Grado<span className="text-red-500">*</span>
+                  </label>
+                  <InputSelect
+                    options={grades}
+                    onOptionChange={handleChangeSelect}
+                    object="student_grade"
+                    style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                    defaultValue={object.grade}
+                  />
+                </div>
+                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
                     Grupo<span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    maxLength={30}
-                    {...register("student_group", {
-                      required: "Se requiere la calle del estudiante",
-                      maxLength: {
-                        value: 30,
-                        message:
-                          "La calle del estudiante no debe exceder los 30 caracteres",
-                      },
-                    })}
-                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  <InputSelect
+                    options={groups}
+                    onOptionChange={handleChangeSelect}
+                    object="student_group"
+                    style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                    defaultValue={object.group}
                   />
                 </div>
                 <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
@@ -415,8 +424,8 @@ function EditStudent() {
                   Padres/Tutor
                 </h2>
                 <p className="w-full font-serif text-lg">
-                  En caso de que el tutor sea uno de los padres, deje el campo
-                  vacío.
+                  En caso de que el tutor sea uno de los padres, escriba la CURP
+                  del padre.
                 </p>
                 <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                   <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">

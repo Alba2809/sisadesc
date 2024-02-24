@@ -122,7 +122,11 @@ function InputSelect({
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="border font-montserrat bg-white absolute w-full"
+              className="border font-montserrat bg-white absolute w-full max-h-[300px] overflow-y-auto"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "#a5a5a5 transparent",
+              }}
             >
               {(filterOptions ?? options).map((option, i) => (
                 <motion.li
