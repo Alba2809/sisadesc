@@ -140,13 +140,8 @@ export const teacherOptions = [
       name: "Asistencias",
       icon: <FaUserCheck color="gray" size="1.5em" />,
       iconS: <FaUserCheck color="blue" size="1.5em" />,
+      to: "/teacher/assists",
     },
-    subOptions: [
-      {
-        name: "Lista de asistencia",
-        to: "/teacher/assists",
-      },
-    ],
   },
   {
     mainOption: {
