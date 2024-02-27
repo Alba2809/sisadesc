@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 #root {
-    overflow-y: hidden;
-    height: 100vh;
+  overflow-y: hidden;
+  height: 100vh;
+}
+
+@media print {
+  @page {
+    size: landscape;
+  }
 }

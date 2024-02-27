@@ -19,6 +19,7 @@ import {
   viceprincipalOptions,
   academicCoorOptions,
 } from "@constants/SideMenu";
+import { Toaster } from "react-hot-toast";
 
 function Dashboard() {
   const { user, logout, getUser } = useAuth();
@@ -112,6 +113,7 @@ function Dashboard() {
 
   return (
     <div className="w-full h-full overflow-hidden relative">
+      <Toaster position="top-right" reverseOrder={false} />
       <header className="bg-white h-[70px] flex flex-row p-2 w-full justify-between">
         <img src={Logo} alt="Logo del sistema" className="" />
         <section

@@ -85,7 +85,6 @@ function App() {
             <Route path="/teacher/*" element={<TeacherProvider />}>
               <Route path="assists/*">
                 <Route path="" element={<Assists />} />
-                <Route path="register" element={<RegisterAssists />} />
                 <Route path="*" element={<Navigate to="/teacher/assists" />} />
               </Route>
               <Route path="grades/*">

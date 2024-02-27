@@ -146,10 +146,6 @@ export const teacherOptions = [
         name: "Lista de asistencia",
         to: "/teacher/assists",
       },
-      {
-        name: "Registrar asistencia",
-        to: "/teacher/assists/register",
-      },
     ],
   },
   {

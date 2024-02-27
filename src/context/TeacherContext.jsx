@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import {
-  getAssistsSubjectRequest,
   getGradesSubjectRequest,
+  getSubjectStudentsRequest,
   getSubjectsRequest,
   registerAssistsRequest,
   registerGradesRequest,
@@ -26,19 +26,19 @@ export const TeacherProvider = ({ children }) => {
       if (type === "subject") {
         const res = await getSubjectsRequest();
         return res.data;
-      }
+      }      
       return false;
     } catch (error) {}
   };
 
   const getOneSomething = async (id, type) => {
     try {
-      if (type === "assists") {
-        const res = await getAssistsSubjectRequest(id);
-        return res.data;
-      }
       if(type === "grades") {
         const res = await getGradesSubjectRequest(id);
+        return res.data;
+      }
+      if (type === "student") {
+        const res = await getSubjectStudentsRequest(id);
         return res.data;
       }
       return false;

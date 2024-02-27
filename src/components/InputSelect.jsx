@@ -75,7 +75,7 @@ function InputSelect({
       <div className="relative font-montserrat">
         {multiOption ? (
           <article
-            className={`flex flex-wrap gap-x-2 gap-y-1 border border-gray-300 rounded-md w-full text-start cursor-pointer  ${
+            className={`flex flex-wrap gap-x-2 gap-y-1 border border-gray-300 rounded-md w-full text-start cursor-pointer focus:border-blue-400 focus:border focus:outline-none  ${
               style ? style : null
             }`}
           >
@@ -97,7 +97,7 @@ function InputSelect({
           </article>
         ) : (
           <input
-            className={`border border-gray-300 rounded-md w-full text-start py-1 px-3 cursor-pointer  ${
+            className={`focus:border-blue-400 focus:border focus:outline-none border border-gray-300 rounded-md w-full text-start py-1 px-3 cursor-pointer  ${
               style ? style : null
             }`}
             value={selectedOption}

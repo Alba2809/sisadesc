@@ -1,6 +1,8 @@
 import { useTeacher } from "@context/TeacherContext";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
 import InputSelect from "@components/InputSelect";
+import PrintGrades from "@components/Pdf/PrintGrades";
 
 function Grades() {
   const { getAllSomething, getOneSomething } = useTeacher();
@@ -9,21 +11,21 @@ function Grades() {
   const [students, setStudents] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [subjectSelected, setSubjectSelected] = useState(null);
+  const printRef = useRef();
 
   useEffect(() => {
     if (loading) {
       async function getData() {
         try {
           const resSubjects = await getAllSomething("subject");
-          if (resSubjects) {
+          if (resSubjects?.length > 0) {
             setSubjects(resSubjects);
+            setSubjectSelected(resSubjects[0]);
             const resGrades = await getOneSomething(
               resSubjects[0].id,
               "grades"
             );
-            if (resGrades) {
-              setStudents(resGrades);
-            }
+            if (resGrades) setStudents(resGrades);
           }
           setLoading(false);
         } catch (error) {}
@@ -54,10 +56,7 @@ function Grades() {
     if (loadingChanges) {
       async function getData() {
         try {
-          const resGrades = await getOneSomething(
-            subjectSelected.id,
-            "grades"
-          );
+          const resGrades = await getOneSomething(subjectSelected.id, "grades");
           if (resGrades) {
             setStudents(resGrades);
           }
@@ -67,6 +66,14 @@ function Grades() {
       getData();
     }
   }, [loadingChanges]);
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    onPrintError: () =>
+      toast.error(
+        "Hubo un error al tratar de imprimir el archivo. Inténtelo de nuevo o inténtelo más tarde."
+      ),
+  });
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -93,23 +100,37 @@ function Grades() {
               )}
             </div>
           </section>
+          {subjectSelected && (
+            <button
+              className="py-2 px-8 bg-blue-600 hover:bg-[#18aefa] text-white text-lg rounded-lg"
+              onClick={handlePrint}
+            >
+              Descargar calificaciones
+            </button>
+          )}
         </header>
         <div className="flex-1 w-full overflow-x-auto mt-5 border border-gray-300">
-          <table className="table-auto w-full min-w-[800px] relative">
+          <table className="table-auto w-full min-w-[1200px] relative">
             <thead className="h-[50px] bg-[#f8f9fb] font-serif font-semibold">
-              <tr>
+              <tr className="divide-x">
                 <th className="text-start px-2 min-w-[250px]">Estudiante</th>
                 {loading ? (
                   <th>Loading...</th>
                 ) : (
                   students[0]?.grades?.map((grade, index) => (
-                      <th
-                        className="text-center px-2 min-w-[150px]"
-                        key={index + grade.evaluation_number}
-                      >
-                        Evaluación {grade.evaluation_number}
-                      </th>
-                    ))
+                    <th
+                      className="text-center min-w-[150px]"
+                      key={index + grade.evaluation_number}
+                    >
+                      <div className="grid grid-cols-2 grid-rows-2">
+                        <p className="col-span-2 text-lg border-b-[1px]">
+                          Evaluación {grade.evaluation_number}
+                        </p>
+                        <p className="border-r-[1px]">Calificación</p>
+                        <p className="px-[1px]">Asistencia total</p>
+                      </div>
+                    </th>
+                  ))
                 )}
               </tr>
             </thead>
@@ -131,14 +152,17 @@ function Grades() {
                   {students.map((student, index) => (
                     <tr
                       key={index}
-                      className="border-y-[1px] border-gray-300 h-[60px] hover:bg-[#f7f7f7]"
+                      className="border-y-[1px] border-gray-300 h-[60px] hover:bg-[#f7f7f7] divide-x"
                     >
                       <td className="p-2">{`${student.firstname} ${student.lastnamepaternal} ${student.lastnamematernal}`}</td>
                       {student.grades?.map((grade, i) => (
-                          <td className="p-2 text-center" key={i}>
-                            {grade.grade}
-                          </td>
-                        ))}
+                        <td className="p-2 text-center" key={i}>
+                          <div className="grid grid-cols-2 divide-x">
+                            <p>{grade.grade}</p>
+                            <p>{grade.assist_total}</p>
+                          </div>
+                        </td>
+                      ))}
                     </tr>
                   ))}
                 </>
@@ -147,8 +171,17 @@ function Grades() {
           </table>
         </div>
       </section>
+      <div className="hidden">
+        {subjectSelected && (
+          <PrintGrades
+            students={students}
+            subject={subjectSelected}
+            ref={printRef}
+          />
+        )}
+      </div>
     </div>
   );
 }
 
-export default Grades
+export default Grades;

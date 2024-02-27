@@ -1,11 +1,12 @@
 import { useTeacher } from "@context/TeacherContext";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
 import InputSelect from "@components/InputSelect";
 import AlertMessage from "@components/AlertMessage";
 import Dialog from "@components/Dialog";
+import { useNavigate } from "react-router-dom";
 
 function RegisterGrades() {
   const {
@@ -21,6 +22,9 @@ function RegisterGrades() {
   const [students, setStudents] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [subjectSelected, setSubjectSelected] = useState(null);
+  const [validEvaluations, setValidEvaluations] = useState([]);
+  const navigate = useNavigate();
+  const evaluationNumbers = ["1", "2", "3"];
   const {
     register,
     handleSubmit,
@@ -34,13 +38,17 @@ function RegisterGrades() {
       const studentsAdded = students.map((student) => {
         return {
           sub_stud_id: student.subject_student_id,
-          grade: data[student.subject_student_id] ?? null,
+          grade: data["G" + student.subject_student_id] ?? null,
+          assist: data["A" + student.subject_student_id] ?? null,
         };
       });
       data.students = studentsAdded;
       const res = await registerSomething(data, "grades");
       handleDialog();
-      if (res?.statusText === "OK") toast.success("Registro exitoso");
+      if (res?.statusText === "OK") {
+        toast.success("Registro exitoso");
+        navigate("/teacher/grades");
+      }
     } catch (error) {
       handleDialog();
     }
@@ -56,14 +64,23 @@ function RegisterGrades() {
       async function getData() {
         try {
           const resSubjects = await getAllSomething("subject");
-          if (resSubjects) {
+          if (resSubjects.length > 0) {
             setSubjects(resSubjects);
             const resGrades = await getOneSomething(
               resSubjects[0].id,
               "grades"
             );
             setStudents(resGrades);
+            const evaluationsEvaluated = resGrades[0].grades.map((value) =>
+              value.evaluation_number.toString()
+            );
+            const difference = evaluationNumbers.filter(
+              (num) => !evaluationsEvaluated.includes(num)
+            );
+            setValidEvaluations(difference);
             setValue("grades", []);
+            if (difference.length > 0)
+              setValue("evaluation_number", difference[0]);
           }
           setLoading(false);
         } catch (error) {}
@@ -77,9 +94,21 @@ function RegisterGrades() {
       async function getData() {
         try {
           const resGrades = await getOneSomething(subjectSelected.id, "grades");
-          if (resGrades?.statusText === "OK") {
+          if (resGrades.length > 0) {
             setStudents(resGrades);
-          } else setStudents([]);
+            const evaluationsEvaluated = resGrades[0].grades.map((value) =>
+              value.evaluation_number.toString()
+            );
+            const difference = evaluationNumbers.filter(
+              (num) => !evaluationsEvaluated.includes(num)
+            );
+            setValidEvaluations(difference);
+            if (difference.length > 0)
+              setValue("evaluation_number", difference[0]);
+          } else {
+            setStudents([]);
+            setValidEvaluations([]);
+          }
           setLoadingChanges(false);
           setValue("grades", []);
         } catch (error) {
@@ -90,12 +119,17 @@ function RegisterGrades() {
     }
   }, [loadingChanges]);
 
-  const onOptionChange = (value) => {
-    const foundSubject = subjects.find(
-      (subject) => `${subject.name} - ${subject.group}` === value
-    );
-    setSubjectSelected(foundSubject);
-    setLoadingChanges(true);
+  const onOptionChange = (value, type) => {
+    if (type === "evaluation_number") {
+      setValue("evaluation_number", +value);
+    } else if (type === "subject") {
+      const foundSubject = subjects.find(
+        (subject) =>
+          `${subject.name} - ${subject.grade}${subject.group}` === value
+      );
+      setSubjectSelected(foundSubject);
+      setLoadingChanges(true);
+    }
   };
 
   /* const handleChangeInput = (e, name) => {
@@ -105,15 +139,12 @@ function RegisterGrades() {
 
   const handleChangeInput = (e, name, type) => {
     let value = null;
-    if (type === "evaluation_number")
-      value = e.target.value.replace(/[^0-9]/g, "");
-    if (type === "grade") value = e.target.value.replace(/[^0-9.]/g, "");
+    if (type === "number") value = e.target.value.replace(/[^0-9.]/g, "");
     setValue(name, value ?? e.target.value);
   };
 
   return (
     <div className="w-full h-full flex flex-col">
-      <Toaster position="top-right" reverseOrder={false} />
       <header className="h-[50px]">
         <h1 className="font-medium font-serif text-2xl">
           Registrar calificación
@@ -173,45 +204,44 @@ function RegisterGrades() {
                   ) : (
                     <InputSelect
                       options={subjects.map(
-                        (subject) => `${subject.name} - ${subject.group}`
+                        (subject) =>
+                          `${subject.name} - ${subject.grade}${subject.group}`
                       )}
-                      onOptionChange={() => onOptionChange("subject")}
+                      onOptionChange={onOptionChange}
                       style="focus:border-blue-400 focus:border focus:outline-none h-[50px]"
                       styleArrow="inset-y-[25%]"
+                      object="subject"
                     />
                   )}
                 </div>
               </div>
               <div className="relative flex-1 min-w-[150px]">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Número de evaluación<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  {...register("evaluation_number", {
-                    required: "Se requiere el número de evaluación",
-                    pattern: {
-                      value: /^[0-9]+$/,
-                      message: "Solo se permiten números del estudiante",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                  onChange={(e) =>
-                    handleChangeInput(
-                      e,
-                      "evaluation_number",
-                      "evaluation_number"
-                    )
-                  }
-                  min={0}
-                />
+                {validEvaluations.length > 0 ? (
+                  <>
+                    <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                      Número de evaluación
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <InputSelect
+                      options={validEvaluations}
+                      onOptionChange={onOptionChange}
+                      style="focus:border-blue-400 focus:border focus:outline-none h-[50px]"
+                      styleArrow="inset-y-[25%]"
+                      object="evaluation_number"
+                    />
+                  </>
+                ) : students.length <= 0 ? (
+                  <p>No se puede registrar calificaciones sin alumnos.</p>
+                ) : (
+                  <p>Ya se han registrados las tres evaluaciones.</p>
+                )}
               </div>
-              <button
-                type="submit"
-                className="py-2 px-8 bg-blue-600 hover:bg-[#18aefa] text-white text-lg rounded-lg"
-              >
-                Guardar
-              </button>
+              {students.length > 0 ? validEvaluations.length <= 0 ? null : <button
+                  type="submit"
+                  className="py-2 px-8 bg-blue-600 hover:bg-[#18aefa] text-white text-lg rounded-lg"
+                >
+                  Guardar
+                </button> : null}
             </section>
           </header>
           <div
@@ -221,12 +251,15 @@ function RegisterGrades() {
               scrollbarColor: "#a5a5a5 transparent",
             }}
           >
-            <table className="table-auto w-full max-w-[600px] relative">
+            <table className="table-auto w-full max-w-[800px] relative">
               <thead className="h-[50px] bg-[#f8f9fb] font-serif font-semibold">
                 <tr>
-                  <th className="text-start px-2 min-w-[150px]">Estudiante</th>
+                  <th className="text-start px-2 min-w-[250px]">Estudiante</th>
                   <th className="text-center px-2 min-w-[100px]">
                     Calificación
+                  </th>
+                  <th className="text-center px-2 min-w-[150px]">
+                    Asistencia total
                   </th>
                 </tr>
               </thead>
@@ -254,7 +287,7 @@ function RegisterGrades() {
                         <td className="p-2">
                           <input
                             type="text"
-                            {...register("" + student.subject_student_id, {
+                            {...register("G" + student.subject_student_id, {
                               required: `Se requiere la calificación del estudiante ${student.firstname} ${student.lastnamepaternal} ${student.lastnamematernal}`,
                               pattern: {
                                 value: /^[0-9.]+$/,
@@ -266,7 +299,28 @@ function RegisterGrades() {
                               handleChangeInput(
                                 e,
                                 "" + student.subject_student_id,
-                                "grade"
+                                "number"
+                              )
+                            }
+                            min={0}
+                          />
+                        </td>
+                        <td className="p-2">
+                          <input
+                            type="text"
+                            {...register("A" + student.subject_student_id, {
+                              required: `Se requiere la asistencia del estudiante ${student.firstname} ${student.lastnamepaternal} ${student.lastnamematernal}`,
+                              pattern: {
+                                value: /^[0-9.]+$/,
+                                message: `Solo se permiten números en la asistencia del estudiante ${student.firstname} ${student.lastnamepaternal} ${student.lastnamematernal}`,
+                              },
+                            })}
+                            className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                            onChange={(e) =>
+                              handleChangeInput(
+                                e,
+                                "" + student.subject_student_id,
+                                "number"
                               )
                             }
                             min={0}
