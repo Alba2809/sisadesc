@@ -79,13 +79,11 @@ function EditUser() {
       formData.append("email", data.email);
       formData.append("role", +data.role);
       formData.append("imageperfile", data.imageperfile);
-      console.log(data);
       const res = await updateSomething(user.id, formData, "user");
       handleDialog();
       if (res?.statusText === "OK") navigate("/admin/users");
     } catch (error) {
       handleDialog();
-      console.log(error);
     }
   });
 

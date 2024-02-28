@@ -12,6 +12,8 @@ export const registerMotherRequest = (data) => axios.post("/admin/registermother
 
 export const registerTutorRequest = (data) => axios.post("/admin/registertutor", data);
 
+export const registerParentRequest = (data) => axios.post("/admin/registerparent", data)
+
 export const registerSubjectRequest = (data) => axios.post("/admin/registersubject", data);
 
 export const updateUserRequest = (id, data) => axios.put(`/admin/updateuser/${id}`, data);
