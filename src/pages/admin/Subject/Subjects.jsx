@@ -1,15 +1,12 @@
 import { useAdmin } from "@context/AdminContext";
 import { Fragment, useEffect, useState } from "react";
-import { FiEdit2 } from "react-icons/fi";
 import { FaEye, FaChalkboardTeacher, FaRegCalendarCheck } from "react-icons/fa";
 import { BsMortarboardFill } from "react-icons/bs";
-import { RiDeleteBin6Line } from "react-icons/ri";
 import { AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { formatDateLong } from "@constants/functions";
 import InputSelect from "@components/InputSelect";
 import Dialog from "@components/Dialog";
-import { useForm } from "react-hook-form";
 
 function Subjects() {
   const { getOneSomething, getAllSomething, updateSomething } = useAdmin();
@@ -31,11 +28,6 @@ function Subjects() {
   const [students, setStudents] = useState([]);
   const [teacher, setTeacher] = useState(null);
   const [filterStatus, setFilterStatus] = useState("Activo");
-  const {
-    formState: { errors },
-    setValue,
-    getValues,
-  } = useForm();
 
   useEffect(() => {
     if (loading) {
@@ -203,7 +195,6 @@ function Subjects() {
                 defaultValue="Activo"
               />
             </div>
-            <p>registros</p>
           </section>
           <section className="flex items-center gap-5">
             <label>Buscar:</label>

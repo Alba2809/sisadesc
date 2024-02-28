@@ -1,7 +1,7 @@
 import { FaShieldAlt, FaChalkboardTeacher, FaUserCheck } from "react-icons/fa";
 import { IoMdSettings, IoIosSpeedometer, IoIosChatbubbles } from "react-icons/io";
 import { BsMortarboardFill } from "react-icons/bs";
-import { BiBookReader } from "react-icons/bi";
+import { BiBookReader, BiSolidBellRing } from "react-icons/bi";
 import { RiParentLine } from "react-icons/ri";
 import { MdOutlineFilter9Plus } from "react-icons/md";
 
@@ -12,6 +12,14 @@ export const adminOptions = [
       icon: <IoIosChatbubbles color="gray" size="1.5em" />,
       iconS: <IoIosChatbubbles color="blue" size="1.5em" />,
       to: "/chats",
+    },
+  },
+  {
+    mainOption: {
+      name: "Avisos",
+      icon: <BiSolidBellRing color="gray" size="1.5em" />,
+      iconS: <BiSolidBellRing color="blue" size="1.5em" />,
+      to: "/posts",
     },
   },
   /* {
@@ -137,6 +145,14 @@ export const teacherOptions = [
   },
   {
     mainOption: {
+      name: "Avisos",
+      icon: <BiSolidBellRing color="gray" size="1.5em" />,
+      iconS: <BiSolidBellRing color="blue" size="1.5em" />,
+      to: "/posts",
+    },
+  },
+  {
+    mainOption: {
       name: "Asistencias",
       icon: <FaUserCheck color="gray" size="1.5em" />,
       iconS: <FaUserCheck color="blue" size="1.5em" />,
@@ -148,23 +164,53 @@ export const teacherOptions = [
       name: "Calificaciones",
       icon: <MdOutlineFilter9Plus color="gray" size="1.5em" />,
       iconS: <MdOutlineFilter9Plus color="blue" size="1.5em" />,
+      to: "/teacher/grades",
     },
-    subOptions: [
-      {
-        name: "Lista de calificaciones",
-        to: "/teacher/grades",
-      },
-      {
-        name: "Registrar calificación",
-        to: "/teacher/grades/register",
-      },
-    ],
   },
 ];
 
 export const tutorOptions = [];
 
-export const secretaryOptions = [];
+export const secretaryOptions = [
+  {
+    mainOption: {
+      name: "Calificaciones",
+      icon: <MdOutlineFilter9Plus color="gray" size="1.5em" />,
+      iconS: <MdOutlineFilter9Plus color="blue" size="1.5em" />,
+    },
+    subOptions: [
+      {
+        name: "Lista de calificaciones",
+        to: "/secretary/grades",
+      },
+      {
+        name: "Registrar calificación",
+        to: "/secretary/grades/register",
+      },
+      {
+        name: "Editar calificación",
+        to: "/secretary/grades/edit",
+      },
+    ],
+  },
+  {
+    mainOption: {
+      name: "Avisos",
+      icon: <BiSolidBellRing color="gray" size="1.5em" />,
+      iconS: <BiSolidBellRing color="blue" size="1.5em" />,
+    },
+    subOptions: [
+      {
+        name: "Lista de avisos",
+        to: "/secretary/posts",
+      },
+      {
+        name: "Registrar aviso",
+        to: "/secretary/posts/register",
+      },
+    ],
+  },
+];
 
 export const principalOptions = [];
 

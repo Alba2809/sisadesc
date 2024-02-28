@@ -1,12 +1,12 @@
-import { useTeacher } from "@context/TeacherContext";
+import { useSecretary } from "@context/SecretaryContext";
 import { useEffect, useState } from "react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
-import toast, { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import InputSelect from "@components/InputSelect";
 import AlertMessage from "@components/AlertMessage";
 import Dialog from "@components/Dialog";
-import { useNavigate } from "react-router-dom";
 
 function RegisterGrades() {
   const {
@@ -14,7 +14,7 @@ function RegisterGrades() {
     getOneSomething,
     registerSomething,
     errors: registerErrors,
-  } = useTeacher();
+  } = useSecretary();
   const [showDialog, setShowDialog] = useState(false);
   const [showLoading, setShowLoading] = useState("");
   const [loading, setLoading] = useState(true);
@@ -47,7 +47,7 @@ function RegisterGrades() {
       handleDialog();
       if (res?.statusText === "OK") {
         toast.success("Registro exitoso");
-        navigate("/teacher/grades");
+        navigate("/secretary/grades");
       }
     } catch (error) {
       handleDialog();
@@ -132,11 +132,6 @@ function RegisterGrades() {
     }
   };
 
-  /* const handleChangeInput = (e, name) => {
-    setValue(name, e.target.value);
-    setDateSelected(e.target.value);
-  }; */
-
   const handleChangeInput = (e, name, type) => {
     let value = null;
     if (type === "number") value = e.target.value.replace(/[^0-9.]/g, "");
@@ -215,25 +210,27 @@ function RegisterGrades() {
                   )}
                 </div>
               </div>
-              <div className="relative flex-1 min-w-[150px]">
-                {validEvaluations.length > 0 ? (
-                  <>
-                    <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                      Número de evaluación
-                      <span className="text-red-500">*</span>
-                    </label>
-                    <InputSelect
-                      options={validEvaluations}
-                      onOptionChange={onOptionChange}
-                      style="focus:border-blue-400 focus:border focus:outline-none h-[50px]"
-                      styleArrow="inset-y-[25%]"
-                      object="evaluation_number"
-                    />
-                  </>
-                ) : students.length <= 0 ? (
-                  <p>No se puede registrar calificaciones sin alumnos.</p>
-                ) : (
-                  <p>Ya se han registrados las tres evaluaciones.</p>
+              <div className="relative flex-1 w-[205px]">
+                {!loading && !loadingChanges && (
+                  validEvaluations.length > 0 ? (
+                    <>
+                      <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                        Número de evaluación
+                        <span className="text-red-500">*</span>
+                      </label>
+                      <InputSelect
+                        options={validEvaluations}
+                        onOptionChange={onOptionChange}
+                        style="focus:border-blue-400 focus:border focus:outline-none h-[50px]"
+                        styleArrow="inset-y-[25%]"
+                        object="evaluation_number"
+                      />
+                    </>
+                  ) : students.length <= 0 ? (
+                    <p>No se puede registrar calificaciones sin alumnos.</p>
+                  ) : (
+                    <p>Ya se han registrados las tres evaluaciones.</p>
+                  )
                 )}
               </div>
               {students.length > 0 ? validEvaluations.length <= 0 ? null : <button
