@@ -32,12 +32,22 @@ const PrintAssist = forwardRef(({ students, subject }, ref) => {
             <th className="p-2 border-[1px] border-gray-300"></th>
             <th className="p-2 border-[1px] border-gray-300"></th>
             <th className="p-2 border-[1px] border-gray-300"></th>
+            <th className="p-2 border-[1px] border-gray-300"></th>
+            <th className="p-2 border-[1px] border-gray-300"></th>
+            <th className="p-2 border-[1px] border-gray-300"></th>
+            <th className="p-2 border-[1px] border-gray-300"></th>
+            <th className="p-2 border-[1px] border-gray-300"></th>
           </tr>
         </thead>
         <tbody>
           {students.map((student, index) => (
             <tr key={index} className="border-[1px] border-gray-300 h-[60px]">
               <td className="p-2">{`${student.firstname} ${student.lastnamepaternal} ${student.lastnamematernal}`}</td>
+              <td className="border-[1px] border-gray-300"></td>
+              <td className="border-[1px] border-gray-300"></td>
+              <td className="border-[1px] border-gray-300"></td>
+              <td className="border-[1px] border-gray-300"></td>
+              <td className="border-[1px] border-gray-300"></td>
               <td className="border-[1px] border-gray-300"></td>
               <td className="border-[1px] border-gray-300"></td>
               <td className="border-[1px] border-gray-300"></td>

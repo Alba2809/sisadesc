@@ -218,6 +218,7 @@ function Users() {
                                   src={user.imageperfile}
                                   alt={"Imagen de perfil - " + user.id}
                                   className="min-w-10 min-h-10 max-w-10 max-h-10 rounded-full"
+                                  loading="lazy"
                                 />
                               ) : (
                                 <img

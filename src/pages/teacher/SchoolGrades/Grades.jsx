@@ -92,7 +92,8 @@ function Grades() {
               ) : (
                 <InputSelect
                   options={subjects.map(
-                    (subject) => `${subject.name} - ${subject.grade}${subject.group}`
+                    (subject) =>
+                      `${subject.name} - ${subject.grade}${subject.group}`
                   )}
                   onOptionChange={onOptionChange}
                   object="subject"
@@ -122,12 +123,13 @@ function Grades() {
                       className="text-center min-w-[150px]"
                       key={index + grade.evaluation_number}
                     >
-                      <div className="grid grid-cols-2 grid-rows-2">
-                        <p className="col-span-2 text-lg border-b-[1px]">
+                      <div className="grid grid-cols-3 grid-rows-2">
+                        <p className="col-span-3 text-lg border-b-[1px]">
                           Evaluación {grade.evaluation_number}
                         </p>
                         <p className="border-r-[1px]">Calificación</p>
-                        <p className="px-[1px]">Asistencia total</p>
+                        <p className="border-r-[1px] px-[1px]">Asistencia total</p>
+                        <p className="px-[1px]">Inasistencia total</p>
                       </div>
                     </th>
                   ))
@@ -157,9 +159,10 @@ function Grades() {
                       <td className="p-2">{`${student.firstname} ${student.lastnamepaternal} ${student.lastnamematernal}`}</td>
                       {student.grades?.map((grade, i) => (
                         <td className="p-2 text-center" key={i}>
-                          <div className="grid grid-cols-2 divide-x">
+                          <div className="grid grid-cols-3 divide-x">
                             <p>{grade.grade}</p>
                             <p>{grade.assist_total}</p>
+                            <p>{grade.noAssist_total}</p>
                           </div>
                         </td>
                       ))}

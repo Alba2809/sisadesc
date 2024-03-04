@@ -40,6 +40,7 @@ function RegisterGrades() {
           sub_stud_id: student.subject_student_id,
           grade: data["G" + student.subject_student_id] ?? null,
           assist: data["A" + student.subject_student_id] ?? null,
+          noAssist: data["I" + student.subject_student_id] ?? null,
         };
       });
       data.students = studentsAdded;
@@ -242,13 +243,13 @@ function RegisterGrades() {
             </section>
           </header>
           <div
-            className="flex-1 max-h-full w-full overflow-y-auto max-w-[600px] overflow-x-auto mt-5 border border-gray-300"
+            className="flex-1 max-h-full w-full overflow-y-auto max-w-[800px] overflow-x-auto mt-5 border border-gray-300"
             style={{
               scrollbarWidth: "thin",
               scrollbarColor: "#a5a5a5 transparent",
             }}
           >
-            <table className="table-auto w-full max-w-[800px] relative">
+            <table className="table-auto w-full relative">
               <thead className="h-[50px] bg-[#f8f9fb] font-serif font-semibold">
                 <tr>
                   <th className="text-start px-2 min-w-[250px]">Estudiante</th>
@@ -257,6 +258,9 @@ function RegisterGrades() {
                   </th>
                   <th className="text-center px-2 min-w-[150px]">
                     Asistencia total
+                  </th>
+                  <th className="text-center px-2 min-w-[150px]">
+                    Inasistencia total
                   </th>
                 </tr>
               </thead>
@@ -310,6 +314,27 @@ function RegisterGrades() {
                               pattern: {
                                 value: /^[0-9.]+$/,
                                 message: `Solo se permiten números en la asistencia del estudiante ${student.firstname} ${student.lastnamepaternal} ${student.lastnamematernal}`,
+                              },
+                            })}
+                            className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                            onChange={(e) =>
+                              handleChangeInput(
+                                e,
+                                "" + student.subject_student_id,
+                                "number"
+                              )
+                            }
+                            min={0}
+                          />
+                        </td>
+                        <td className="p-2">
+                          <input
+                            type="text"
+                            {...register("I" + student.subject_student_id, {
+                              required: `Se requiere la inasistencia del estudiante ${student.firstname} ${student.lastnamepaternal} ${student.lastnamematernal}`,
+                              pattern: {
+                                value: /^[0-9.]+$/,
+                                message: `Solo se permiten números en la inasistencia del estudiante ${student.firstname} ${student.lastnamepaternal} ${student.lastnamematernal}`,
                               },
                             })}
                             className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"

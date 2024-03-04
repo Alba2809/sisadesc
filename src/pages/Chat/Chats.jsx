@@ -119,7 +119,7 @@ function Chats() {
               <h1 className="text-lg">{`${userSelected.firstname} ${userSelected.lastnamepaternal} ${userSelected.lastnamematernal} `}</h1>
             </header>
             <section
-              className="max-h-full overflow-y-auto overflow-x-hidden flex flex-col gap-3"
+              className="max-h-full overflow-y-auto overflow-x-hidden flex-1 flex flex-col gap-3"
               style={{
                 scrollbarWidth: "thin",
                 scrollbarColor: "#a5a5a5 transparent",

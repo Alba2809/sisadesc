@@ -34,7 +34,6 @@ function RegisterStudent() {
     handleSubmit,
     formState: { errors },
     setValue,
-    getValues,
     unregister,
   } = useForm();
   const navigate = useNavigate();
@@ -63,13 +62,11 @@ function RegisterStudent() {
 
       let totalQueries = 0;
       let queriesRealized = [];
-      console.log("Antes del delete", data);
       for (const key in data) {
         if (data[key] === "" || data[key] === null) {
           delete data[key];
         }
       }
-      console.log("Despues del delete", data);
       if (showFormNewParent === "No") {
         if (showFormFather) {
           totalQueries++;
