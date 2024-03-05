@@ -1,11 +1,11 @@
 import axios from "./axios";
 
-export const getSubjectsRequest = () => axios.get("/teacher/subjects");
+export const registerTeacherRequest = (data) => axios.post("/teacher/registerteacher", data);
 
-export const getSubjectStudentsRequest = (id) => axios.get(`/teacher/subjects/${id}`);
+export const updateTeacherRequest = (id, data) => axios.put(`/teacher/updateteacher/${id}`, data);
 
-export const registerAssistsRequest = (data) => axios.post(`/teacher/assists`, data);
+export const getTeacherRequest = (id) => axios.get(`/teacher/getteacher/${id}`);
 
-export const getGradesSubjectRequest = (id) => axios.get(`/teacher/grades/${id}`);
+export const getTeachersRequest = () => axios.get("/teacher/getteachers");
 
-export const registerGradesRequest = (data) => axios.post(`/teacher/grades`, data);
+export const deleteTeacherRequest = (id) => axios.delete(`/teacher/deleteteacher/${id}`);

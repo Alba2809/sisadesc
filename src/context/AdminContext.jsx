@@ -1,39 +1,47 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
 import {
-  registerStudentRequest,
-  registerSubjectRequest,
-  registerTeacherRequest,
-  registerUserRequest,
-  updateStudentRequest,
-  updateSubjectRequest,
-  updateTeacherRequest,
-  updateUserRequest,
-  getStudentRequest,
-  getStudentsRequest,
-  getSubjectRequest,
-  getSubjectsRequest,
-  getTeacherRequest,
-  getTeachersRequest,
+  deleteUserRequest,
   getUserRequest,
   getUsersRequest,
-  deleteStudentRequest,
-  deleteSubjectRequest,
+  registerUserRequest,
+  updateUserRequest,
+} from "../api/user";
+import {
   deleteTeacherRequest,
-  deleteUserRequest,
-  getRolesRequest,
-  getAddressesRequest,
-  registerFatherRequest,
-  registerMotherRequest,
-  registerTutorRequest,
-  updateParentRequest,
+  getTeacherRequest,
+  getTeachersRequest,
+  registerTeacherRequest,
+  updateTeacherRequest,
+} from "../api/teacher";
+import {
+  deleteStudentRequest,
+  getStudentRequest,
+  getStudentsRequest,
+  registerStudentRequest,
+  updateStudentRequest,
+} from "../api/student";
+import {
+  deleteSubjectRequest,
+  getSubjectRequest,
+  getSubjectStudentsRequest,
+  getSubjectsRequest,
+  registerSubjectRequest,
+  updateStatusSubjectRequest,
+  updateSubjectRequest,
+} from "../api/subject";
+import {
+  deleteParentRequest,
   getParentRequest,
   getParentsRequest,
-  deleteParentRequest,
-  getSubjectStudentsRequest,
-  updateStatusSubjectRequest,
+  registerFatherRequest,
+  registerMotherRequest,
   registerParentRequest,
-} from "../api/admin";
-import { Outlet } from "react-router-dom";
+  registerTutorRequest,
+  updateParentRequest,
+} from "../api/parent";
+import { getRolesRequest } from "../api/role"
+import { getAddressesRequest } from "../api/address"
 
 export const AdminContext = createContext();
 
@@ -45,7 +53,7 @@ export const useAdmin = () => {
   return context;
 };
 
-export const AdminProvider = ({children}) => {
+export const AdminProvider = ({ children }) => {
   const [errors, setErrors] = useState([]);
 
   const registerSomething = async (data, type) => {
@@ -84,11 +92,10 @@ export const AdminProvider = ({children}) => {
       }
       return false;
     } catch (error) {
-      if(typeof error.response.data === "object" && error.response.data){
-        const array = Object.values(error.response.data)
+      if (typeof error.response.data === "object" && error.response.data) {
+        const array = Object.values(error.response.data);
         setErrors(array);
-      }
-      else setErrors(error.response.data);
+      } else setErrors(error.response.data);
     }
   };
 
@@ -120,11 +127,10 @@ export const AdminProvider = ({children}) => {
       }
       return false;
     } catch (error) {
-      if(typeof error.response.data === "object" && error.response.data){
-        const array = Object.values(error.response.data)
+      if (typeof error.response.data === "object" && error.response.data) {
+        const array = Object.values(error.response.data);
         setErrors(array);
-      }
-      else setErrors(error.response.data);
+      } else setErrors(error.response.data);
     }
   };
 

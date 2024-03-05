@@ -174,6 +174,23 @@ export const tutorOptions = [];
 export const secretaryOptions = [
   {
     mainOption: {
+      name: "Docentes",
+      icon: <FaChalkboardTeacher color="gray" size="1.5em" />,
+      iconS: <FaChalkboardTeacher color="blue" size="1.5em" />,
+    },
+    subOptions: [
+      {
+        name: "Lista de docentes",
+        to: "/secretary/teachers",
+      },
+      {
+        name: "Agregar docente",
+        to: "/secretary/teachers/register",
+      },
+    ],
+  },
+  {
+    mainOption: {
       name: "Calificaciones",
       icon: <MdOutlineFilter9Plus color="gray" size="1.5em" />,
       iconS: <MdOutlineFilter9Plus color="blue" size="1.5em" />,
@@ -214,6 +231,70 @@ export const secretaryOptions = [
 
 export const principalOptions = [];
 
-export const viceprincipalOptions = [];
+export const viceprincipalOptions = [
+  {
+    mainOption: {
+      name: "Docentes",
+      icon: <FaChalkboardTeacher color="gray" size="1.5em" />,
+      iconS: <FaChalkboardTeacher color="blue" size="1.5em" />,
+    },
+    subOptions: [
+      {
+        name: "Lista de docentes",
+        to: "/viceprincipal/teachers",
+      },
+      {
+        name: "Agregar docente",
+        to: "/viceprincipal/teachers/register",
+      },
+    ],
+  },
+  {
+    mainOption: {
+      name: "Calificaciones",
+      icon: <MdOutlineFilter9Plus color="gray" size="1.5em" />,
+      iconS: <MdOutlineFilter9Plus color="blue" size="1.5em" />,
+    },
+    subOptions: [
+      {
+        name: "Lista de calificaciones",
+        to: "/viceprincipal/grades",
+      },
+      {
+        name: "Registrar calificación",
+        to: "/viceprincipal/grades/register",
+      },
+      {
+        name: "Editar calificación",
+        to: "/viceprincipal/grades/edit",
+      },
+    ],
+  },
+  {
+    mainOption: {
+      name: "Materias",
+      icon: <BiBookReader color="gray" size="1.5em" />,
+      iconS: <BiBookReader color="blue" size="1.5em" />,
+      to: "/viceprincipal/subjects",
+    },
+  },
+  {
+    mainOption: {
+      name: "Avisos",
+      icon: <BiSolidBellRing color="gray" size="1.5em" />,
+      iconS: <BiSolidBellRing color="blue" size="1.5em" />,
+    },
+    subOptions: [
+      {
+        name: "Lista de avisos",
+        to: "/viceprincipal/posts",
+      },
+      {
+        name: "Registrar aviso",
+        to: "/viceprincipal/posts/register",
+      },
+    ],
+  },
+];
 
 export const academicCoorOptions = [];

@@ -11,10 +11,10 @@ import RegisterUser from "@pages/admin/User/RegisterUser";
 import Users from "@pages/admin/User/Users";
 import MainSection from "@pages/MainSection";
 import EditUser from "@pages/admin/User/EditUser";
-import Teachers from "@pages/admin/Teacher/Teachers";
+import TeachersA from "@pages/admin/Teacher/Teachers";
 import Settings from "@pages/Settings";
-import RegisterTeacher from "@pages/admin/Teacher/RegisterTeacher";
-import EditTeacher from "@pages/admin/Teacher/EditTeacher";
+import RegisterTeacherA from "@pages/admin/Teacher/RegisterTeacher";
+import EditTeacherA from "@pages/admin/Teacher/EditTeacher";
 import Students from "@pages/admin/Student/Students";
 import EditStudent from "@pages/admin/Student/EditStudent";
 import RegisterStudent from "@pages/admin/Student/RegisterStudent";
@@ -34,8 +34,10 @@ import EditGrades from "@pages/secretary/SchoolGrades/EditGrades";
 import RegisterPost from "@pages/secretary/SchoolPosts/RegisterPost";
 import EditPost from "@pages/secretary/SchoolPosts/EditPost";
 import Posts from "@pages/secretary/SchoolPosts/Posts";
-import { PostProvider } from "./context/PostContext";
 import PostsPage from "./pages/Post/PostsPage";
+import TeachersS from "./pages/secretary/Teacher/Teachers";
+import RegisterTeacherS from "./pages/secretary/Teacher/RegisterTeacher";
+import EditTeacherS from "./pages/secretary/Teacher/EditTeacher";
 
 function App() {
   const location = useLocation();
@@ -61,9 +63,9 @@ function App() {
                 <Route path="*" element={<Navigate to="/admin/users" />} />
               </Route>
               <Route path="teachers/*">
-                <Route path="" element={<Teachers />} />
-                <Route path="edit/:id" element={<EditTeacher />} />
-                <Route path="register" element={<RegisterTeacher />} />
+                <Route path="" element={<TeachersA />} />
+                <Route path="edit/:id" element={<EditTeacherA />} />
+                <Route path="register" element={<RegisterTeacherA />} />
                 <Route path="*" element={<Navigate to="/admin/teachers" />} />
               </Route>
               <Route path="students/*">
@@ -116,6 +118,12 @@ function App() {
                 <Route path="register" element={<RegisterGrades />} />
                 <Route path="edit" element={<EditGrades />} />
                 <Route path="*" element={<Navigate to="/secretary/grades" />} />
+              </Route>
+              <Route path="teachers/*">
+                <Route path="" element={<TeachersS />} />
+                <Route path="edit/:id" element={<EditTeacherS />} />
+                <Route path="register" element={<RegisterTeacherS />} />
+                <Route path="*" element={<Navigate to="/admin/teachers" />} />
               </Route>
               <Route path="posts/*">
                 <Route path="" element={<Posts />} />

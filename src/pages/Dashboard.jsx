@@ -7,7 +7,7 @@ import {
   IoIosArrowUp,
 } from "react-icons/io";
 import { AnimatePresence, motion } from "framer-motion";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Logo from "@images-logos/logo-nombre.png";
 import {
   adminOptions,
@@ -50,7 +50,7 @@ function Dashboard() {
     setSubMenuSelect(menu);
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const path = location.pathname;
     const parts = path.split("/").filter(Boolean);
     const lastPart = parts[parts.length - 2];

@@ -1,17 +1,27 @@
 import { createContext, useContext, useEffect, useState } from "react";
+
+import { Outlet } from "react-router-dom";
+import { getSubjectStudentsRequest, getSubjectsRequest } from "../api/subject";
 import {
-  registerGradesRequest,
-  getGradesSubjectRequest,
-  getSubjectsRequest,
-  getSubjectStudentsRequest,
-  updateGradesRequest,
-  updatePostRequest,
-  registerPostRequest,
-  getPostsRequest,
   deletePostRequest,
   getPostRequest,
-} from "../api/secretary";
-import { Outlet } from "react-router-dom";
+  getPostsRequest,
+  registerPostRequest,
+  updatePostRequest,
+} from "../api/post";
+import {
+  deleteTeacherRequest,
+  getTeacherRequest,
+  getTeachersRequest,
+  registerTeacherRequest,
+  updateTeacherRequest,
+} from "../api/teacher";
+import { getAddressesRequest } from "../api/address";
+import {
+  getGradesSubjectRequest,
+  registerGradesRequest,
+  updateGradesRequest,
+} from "../api/grade";
 
 export const SecretaryContext = createContext();
 
@@ -36,6 +46,14 @@ export const SecretaryProvider = ({ children }) => {
         const res = await getPostsRequest();
         return res.data;
       }
+      if (type === "teacher") {
+        const res = await getTeachersRequest();
+        return res.data;
+      }
+      if (type === "address") {
+        const res = await getAddressesRequest();
+        return res.data;
+      }
       return false;
     } catch (error) {}
   };
@@ -54,6 +72,10 @@ export const SecretaryProvider = ({ children }) => {
         const res = await getPostRequest(id);
         return res.data;
       }
+      if (type === "teacher") {
+        const res = await getTeacherRequest(id);
+        return res.data;
+      }
       return false;
     } catch (error) {}
   };
@@ -66,6 +88,10 @@ export const SecretaryProvider = ({ children }) => {
       }
       if (type === "post") {
         const res = await registerPostRequest(data);
+        return res;
+      }
+      if (type === "teacher") {
+        const res = await registerTeacherRequest(data);
         return res;
       }
     } catch (error) {
@@ -86,6 +112,10 @@ export const SecretaryProvider = ({ children }) => {
         const res = await updatePostRequest(id, data);
         return res;
       }
+      if (type === "teacher") {
+        const res = await updateTeacherRequest(id, data);
+        return res;
+      }
     } catch (error) {
       if (typeof error.response.data === "object" && error.response.data) {
         const array = Object.values(error.response.data);
@@ -98,6 +128,10 @@ export const SecretaryProvider = ({ children }) => {
     try {
       if (type === "post") {
         const res = await deletePostRequest(id);
+        return res;
+      }
+      if (type === "teacher") {
+        const res = await deleteTeacherRequest(id);
         return res;
       }
     } catch (error) {

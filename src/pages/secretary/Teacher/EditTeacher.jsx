@@ -1,4 +1,4 @@
-import { useAdmin } from "@context/AdminContext";
+import { useSecretary } from "@context/SecretaryContext";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -16,7 +16,7 @@ function EditTeacher() {
     getAllSomething,
     updateSomething,
     errors: updateErrors,
-  } = useAdmin();
+  } = useSecretary();
   const [object, setObject] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [addresses, setAddresses] = useState([]);
@@ -58,14 +58,12 @@ function EditTeacher() {
   const onSubmit = handleSubmit(async (data) => {
     try {
       handleDialog();
-      console.log(data)
-      const res = await updateSomething(object.id, data, "teacher");
-      if (res?.statusText === "OK") navigate("/admin/teachers");
+      const res = await updateSomething(data, "teacher", object.id);
+      if (res?.statusText === "OK") navigate("/secretary/teachers");
       else scrollToTop()
       handleDialog();
     } catch (error) {
       handleDialog();
-      console.log(error);
     }
   });
 
