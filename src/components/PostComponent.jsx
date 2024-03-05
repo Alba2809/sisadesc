@@ -39,11 +39,12 @@ function PostComponent({ data, handleDelete }) {
       >
         <p className="font-serif text-sm">{data.description}</p>
       </section>
-      {user?.role.name === "secretary" && (
+      {/* user logged hava access to edit and delete (roles accepted are "secretary" and "viceprincipal") */}
+      {["secretary", "viceprincipal"].includes(user?.role.name) && (
         <footer className="flex gap-2 items-center mt-3">
           <Link
             className="bg-[#f7f7fa] hover:bg-[#3d5ee1] w-[30px] h-[30px] rounded-full flex justify-center items-center"
-            to={`/secretary/posts/edit/${data.id}`}
+            to={`/${user?.role.name}/posts/edit/${data.id}`}
           >
             <FiEdit2 color="black" />
           </Link>

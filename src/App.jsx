@@ -1,8 +1,10 @@
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { ChatProvider } from "@context/ChatContext";
-import { AdminProvider } from "./context/AdminContext";
+import { AdminProvider } from "@context/AdminContext";
 import { TeacherProvider } from "@context/TeacherContext";
-import { SecretaryProvider } from "./context/SecretaryContext";
+import { SecretaryProvider } from "@context/SecretaryContext";
+import { ViceprincipalProvider } from "@context/ViceprincipalContext";
+import { PrincipalProvider } from "@context/PrincipalContext";
+import { AcademicProvider } from "@context/AcademicContext";
 import Dashboard from "@pages/Dashboard";
 import Login from "@pages/Login";
 import AuthValidator from "@components/auth/AuthValidator";
@@ -34,10 +36,24 @@ import EditGrades from "@pages/secretary/SchoolGrades/EditGrades";
 import RegisterPost from "@pages/secretary/SchoolPosts/RegisterPost";
 import EditPost from "@pages/secretary/SchoolPosts/EditPost";
 import Posts from "@pages/secretary/SchoolPosts/Posts";
-import PostsPage from "./pages/Post/PostsPage";
-import TeachersS from "./pages/secretary/Teacher/Teachers";
-import RegisterTeacherS from "./pages/secretary/Teacher/RegisterTeacher";
-import EditTeacherS from "./pages/secretary/Teacher/EditTeacher";
+import PostsPage from "@pages/Post/PostsPage";
+import TeachersS from "@pages/secretary/Teacher/Teachers";
+import RegisterTeacherS from "@pages/secretary/Teacher/RegisterTeacher";
+import EditTeacherS from "@pages/secretary/Teacher/EditTeacher";
+import TeachersVP from "@pages/viceprincipal/Teacher/Teachers";
+import RegisterTeacherVP from "@pages/viceprincipal/Teacher/RegisterTeacher";
+import EditTeacherVP from "@pages/viceprincipal/Teacher/EditTeacher";
+import GradesVP from "@pages/viceprincipal/SchoolGrades/Grades";
+import RegisterGradesVP from "@pages/viceprincipal/SchoolGrades/RegisterGrades";
+import EditGradesVP from "@pages/viceprincipal/SchoolGrades/EditGrades";
+import PostsVP from "@pages/viceprincipal/SchoolPosts/Posts";
+import RegisterPostVP from "@pages/viceprincipal/SchoolPosts/RegisterPost";
+import EditPostVP from "@pages/viceprincipal/SchoolPosts/EditPost";
+import SubjectsVP from "@pages/viceprincipal/Subject/Subjects";
+import EditSubjectVP from "@pages/viceprincipal/Subject/EditSubject";
+import GradesP from "@pages/principal/SchoolGrades/Grades";
+import EventsAC from "@pages/academicCoor/Events/Events";
+import EventsG from "./pages/Event/Events";
 
 function App() {
   const location = useLocation();
@@ -53,6 +69,7 @@ function App() {
 
           <Route path="/" element={<MainSection />} />
           <Route path="/posts" element={<PostsPage />} />
+          <Route path="/schedule" element={<EventsG />} />
 
           <Route element={<RolValidator rolRoute="admin" />}>
             <Route path="/admin/*" element={<AdminProvider />}>
@@ -123,7 +140,10 @@ function App() {
                 <Route path="" element={<TeachersS />} />
                 <Route path="edit/:id" element={<EditTeacherS />} />
                 <Route path="register" element={<RegisterTeacherS />} />
-                <Route path="*" element={<Navigate to="/admin/teachers" />} />
+                <Route
+                  path="*"
+                  element={<Navigate to="/secretary/teachers" />}
+                />
               </Route>
               <Route path="posts/*">
                 <Route path="" element={<Posts />} />
@@ -145,23 +165,69 @@ function App() {
           </Route>
 
           <Route element={<RolValidator rolRoute="principal" />}>
-            <Route path="/principal/*" element={<AdminProvider />}>
-              {" "}
-              {/* Cambiar el context */}
+            <Route path="/principal/*" element={<PrincipalProvider />}>
+              <Route path="grades/*">
+                <Route path="" element={<GradesP />} />
+                <Route path="*" element={<Navigate to="/principal/grades" />} />
+              </Route>
               <Route path="*" element={<Navigate to="/" />} />
             </Route>
           </Route>
 
           <Route element={<RolValidator rolRoute="viceprincipal" />}>
-            <Route path="/viceprincipal/*" element={<AdminProvider />}>
-              {" "}
-              {/* Cambiar el context */}
+            <Route path="/viceprincipal/*" element={<ViceprincipalProvider />}>
+              <Route path="teachers/*">
+                <Route path="" element={<TeachersVP />} />
+                <Route path="edit/:id" element={<EditTeacherVP />} />
+                <Route path="register" element={<RegisterTeacherVP />} />
+                <Route
+                  path="*"
+                  element={<Navigate to="/viceprincipal/teachers" />}
+                />
+              </Route>
+              <Route path="grades/*">
+                <Route path="" element={<GradesVP />} />
+                <Route path="register" element={<RegisterGradesVP />} />
+                <Route path="edit" element={<EditGradesVP />} />
+                <Route
+                  path="*"
+                  element={<Navigate to="/viceprincipal/grades" />}
+                />
+              </Route>
+              <Route path="posts/*">
+                <Route path="" element={<PostsVP />} />
+                <Route path="register" element={<RegisterPostVP />} />
+                <Route path="edit/:id" element={<EditPostVP />} />
+                <Route
+                  path="*"
+                  element={<Navigate to="/viceprincipal/posts" />}
+                />
+              </Route>
+              <Route path="subjects/*">
+                <Route path="" element={<SubjectsVP />} />
+                <Route
+                  path="edit/students/:id"
+                  element={<EditSubjectVP type="student" />}
+                />
+                <Route
+                  path="edit/teacher/:id"
+                  element={<EditSubjectVP type="teacher" />}
+                />
+                <Route path="*" element={<Navigate to="/admin/subjects" />} />
+              </Route>
               <Route path="*" element={<Navigate to="/" />} />
             </Route>
           </Route>
 
           <Route element={<RolValidator rolRoute="academiccoor" />}>
-            <Route path="/academicoor/*" element={<AdminProvider />}>
+            <Route path="/academiccoor/*" element={<AcademicProvider />}>
+              <Route path="schedule/*">
+                <Route path="" element={<EventsAC />} />
+                <Route
+                  path="*"
+                  element={<Navigate to="/academiccoor/shedule" />}
+                />
+              </Route>
               <Route path="*" element={<Navigate to="/" />} />
             </Route>
           </Route>

@@ -1,11 +1,11 @@
-import { useTeacher } from "@context/TeacherContext";
+import { useViceprincipal } from "@context/ViceprincipalContext";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import InputSelect from "@components/InputSelect";
 import PrintGrades from "@components/Pdf/PrintGrades";
 
 function Grades() {
-  const { getAllSomething, getOneSomething } = useTeacher();
+  const { getAllSomething, getOneSomething } = useViceprincipal();
   const [loading, setLoading] = useState(true);
   const [loadingChanges, setLoadingChanges] = useState(false);
   const [students, setStudents] = useState([]);
@@ -37,7 +37,8 @@ function Grades() {
   const onOptionChange = (value, type) => {
     if (type === "subject") {
       const foundSubject = subjects.find(
-        (subject) => `${subject.name} - ${subject.grade}${subject.group}` === value
+        (subject) =>
+          `${subject.name} - ${subject.grade}${subject.group}` === value
       );
       setSubjectSelected(foundSubject);
       setLoadingChanges(true);

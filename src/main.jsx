@@ -7,6 +7,7 @@ import "./index.css";
 import { SocketProvider } from "./context/SocketContext.jsx";
 import { PostProvider } from "./context/PostContext.jsx";
 import { ChatProvider } from "./context/ChatContext.jsx";
+import { EventProvider } from "./context/EventContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -14,9 +15,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <AuthProvider>
         <SocketProvider>
           <PostProvider>
-            <ChatProvider>
-              <App />
-            </ChatProvider>
+            <EventProvider>
+              <ChatProvider>
+                <App />
+              </ChatProvider>
+            </EventProvider>
           </PostProvider>
         </SocketProvider>
       </AuthProvider>

@@ -1,3 +1,3 @@
 import axios from "./axios";
 
-export const getAddressesRequest = () => axios.get("/admin/getaddresses");
+export const getAddressesRequest = () => axios.get("/address/getaddresses");

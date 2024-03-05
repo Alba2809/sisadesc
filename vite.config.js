@@ -14,6 +14,7 @@ export default defineConfig({
       '@images-logos': path.resolve(__dirname, 'src/assets/logos'),
       '@images-icons': path.resolve(__dirname, 'src/assets/icons'),
       '@constants': path.resolve(__dirname, 'src/constants'),
+      '@styles': path.resolve(__dirname, 'src/styles'),
       // Añade más alias según tus necesidades
     },
   },

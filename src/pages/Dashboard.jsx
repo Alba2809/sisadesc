@@ -46,7 +46,6 @@ function Dashboard() {
   const handleLogout = () => logout();
 
   const handleShowSubMenu = (menu) => {
-    if (subMenuSelect === menu) return setSubMenuSelect("");
     setSubMenuSelect(menu);
   };
 

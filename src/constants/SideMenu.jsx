@@ -1,5 +1,5 @@
-import { FaShieldAlt, FaChalkboardTeacher, FaUserCheck } from "react-icons/fa";
-import { IoMdSettings, IoIosSpeedometer, IoIosChatbubbles } from "react-icons/io";
+import { FaShieldAlt, FaChalkboardTeacher, FaUserCheck, FaRegCalendarAlt } from "react-icons/fa";
+import { IoIosSpeedometer, IoIosChatbubbles } from "react-icons/io";
 import { BsMortarboardFill } from "react-icons/bs";
 import { BiBookReader, BiSolidBellRing } from "react-icons/bi";
 import { RiParentLine } from "react-icons/ri";
@@ -229,7 +229,24 @@ export const secretaryOptions = [
   },
 ];
 
-export const principalOptions = [];
+export const principalOptions = [
+  {
+    mainOption: {
+      name: "Avisos",
+      icon: <BiSolidBellRing color="gray" size="1.5em" />,
+      iconS: <BiSolidBellRing color="blue" size="1.5em" />,
+      to: "/posts",
+    },
+  },
+  {
+    mainOption: {
+      name: "Calificaciones",
+      icon: <MdOutlineFilter9Plus color="gray" size="1.5em" />,
+      iconS: <MdOutlineFilter9Plus color="blue" size="1.5em" />,
+      to: "/principal/grades",
+    },
+  },
+];
 
 export const viceprincipalOptions = [
   {
@@ -295,6 +312,31 @@ export const viceprincipalOptions = [
       },
     ],
   },
+  {
+    mainOption: {
+      name: "Horario académico",
+      icon: <FaRegCalendarAlt color="gray" size="1.5em" />,
+      iconS: <FaRegCalendarAlt color="blue" size="1.5em" />,
+      to: "/schedule",
+    },
+  },
 ];
 
-export const academicCoorOptions = [];
+export const academicCoorOptions = [
+  {
+    mainOption: {
+      name: "Avisos",
+      icon: <BiSolidBellRing color="gray" size="1.5em" />,
+      iconS: <BiSolidBellRing color="blue" size="1.5em" />,
+      to: "/posts",
+    },
+  },
+  {
+    mainOption: {
+      name: "Horario académico",
+      icon: <FaRegCalendarAlt color="gray" size="1.5em" />,
+      iconS: <FaRegCalendarAlt color="blue" size="1.5em" />,
+      to: "/academiccoor/schedule",
+    },
+  },
+];

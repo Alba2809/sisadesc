@@ -1,11 +1,11 @@
-import { useTeacher } from "@context/TeacherContext";
+import { usePrincipal } from "@context/PrincipalContext";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import InputSelect from "@components/InputSelect";
 import PrintGrades from "@components/Pdf/PrintGrades";
 
 function Grades() {
-  const { getAllSomething, getOneSomething } = useTeacher();
+  const { getAllSomething, getOneSomething } = usePrincipal();
   const [loading, setLoading] = useState(true);
   const [loadingChanges, setLoadingChanges] = useState(false);
   const [students, setStudents] = useState([]);
