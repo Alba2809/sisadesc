@@ -90,13 +90,18 @@ function Events() {
   const onSubmit = handleSubmit(async (data, action) => {
     try {
       if (action === "register") {
+        setLoadingAdd(true);
         const res = await registerSomething(data, "events");
         if (res?.statusText === "OK") {
           toast.success("Evento registrado correctamente.");
           const newEvents = [...events, res.data];
           setEvents(newEvents);
-          setLoadingAdd(true);
+          setValue("description", "");
+          setShowDelete(false);
+          setShowUpdate(false);
+          setShowRegister(false);
         }
+        setLoadingAdd(false);
       }
       if (action === "update" && eventSelect) {
         const res = await updateSomething(eventSelect?.id, data, "events");
@@ -113,6 +118,7 @@ function Events() {
         }
       }
       if (action === "delete" && eventSelect) {
+        setLoadingAdd(true);
         const res = await deleteSomething(eventSelect?.id, "events");
         if (res?.statusText === "OK") {
           toast.success("Evento eliminado correctamente.");
@@ -125,10 +131,15 @@ function Events() {
             setEvents(newEvents);
           }
           setValue("description", "");
+          setShowDelete(false);
+          setShowUpdate(false);
+          setShowRegister(false);
         }
+        setLoadingAdd(false);
       }
     } catch (error) {
-      toast.error("Ha ocurrido un error al actualizar el evento.");
+      toast.error("Ha ocurrido un error con el evento.");
+      setLoadingAdd(false);
     }
   });
 

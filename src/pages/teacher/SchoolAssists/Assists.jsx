@@ -1,7 +1,7 @@
 import { useTeacher } from "@context/TeacherContext";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import InputSelect from "@components/InputSelect";
 import PrintAssist from "@components/Pdf/PrintAssist";
 

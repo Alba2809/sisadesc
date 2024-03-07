@@ -21,36 +21,29 @@ export const EventProvider = ({ children }) => {
   const [errors, setErrors] = useState([]);
   const [events, setEvents] = useState([]);
   const [eventUpdated, setEventUpdated] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [eventAdded, setEventAdded] = useState(null);
+  const [eventDeleted, setEventDeleted] = useState(null);
 
   const getEvents = async () => {
     try {
-      setLoading(true);
       const res = await getEventsRequest();
       setEvents(res.data);
-      setLoading(false);
       return res.data;
     } catch (error) {
       if (typeof error.response.data === "object" && error.response.data) {
         const array = Object.values(error.response.data);
         setErrors(array);
       } else setErrors(error.response.data);
-      setLoading(false);
     }
   };
 
   useEffect(() => {
     socket?.on("newEvent", (newEvent) => {
-      setLoading(true);
-      toast.success(`Nuevo evento registrado`, {
-        icon: <FaRegCalendarAlt color="green" />,
-      });
       setEvents([...events, newEvent]);
-      if (loading) setLoading(false);
+      setEventAdded(newEvent);
     });
 
     socket?.on("updateEvent", (updateEvent) => {
-      setLoading(true);
       const index = events.findIndex((event) => event.id === updateEvent.id);
       if (index !== -1) {
         const newEvents = [...events];
@@ -58,18 +51,16 @@ export const EventProvider = ({ children }) => {
         setEvents(newEvents);
         setEventUpdated(updateEvent);
       }
-      if (loading) setLoading(false);
     });
 
     socket?.on("deleteEvent", (eventId) => {
-      setLoading(true);
       const index = events.findIndex((event) => +event.id === +eventId);
       if (index !== -1) {
         const newEvents = [...events];
         newEvents.splice(index, 1);
         setEvents(newEvents);
+        setEventDeleted(eventId);
       }
-      if (loading) setLoading(false);
     });
 
     return () => {
@@ -92,8 +83,12 @@ export const EventProvider = ({ children }) => {
         getEvents,
         setEvents,
         setEventUpdated,
+        setEventAdded,
+        setEventDeleted,
         events,
         eventUpdated,
+        eventAdded,
+        eventDeleted,
         errors,
       }}
     >

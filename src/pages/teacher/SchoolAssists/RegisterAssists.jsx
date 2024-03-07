@@ -4,7 +4,7 @@ import { FaCheck } from "react-icons/fa";
 import { formatDateShort, formatDateLong } from "@constants/functions";
 import { useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import InputSelect from "@components/InputSelect";
 import AlertMessage from "@components/AlertMessage";
 import Dialog from "@components/Dialog";
@@ -133,7 +133,6 @@ function RegisterAssists() {
 
   return (
     <div className="w-full h-full flex flex-col">
-      <Toaster position="top-right" reverseOrder={false} />
       <header className="h-[50px]">
         <h1 className="font-medium font-serif text-2xl">
           Registrar asistencia

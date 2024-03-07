@@ -5,7 +5,7 @@ import Calendar from "react-calendar";
 import "@styles/calendar.css";
 
 function Events() {
-  const { getEvents, events, loading, eventUpdated, setEventUpdated } = useEvent();
+  const { getEvents, events, loading, eventUpdated, setEventUpdated, eventAdded, setEventAdded, eventDeleted, setEventDeleted } = useEvent();
   const [eventSelect, setEventSelect] = useState(null);
 
   const tileContent = ({ date, view }) => {
@@ -42,7 +42,7 @@ function Events() {
       );
       setEventSelect(eventFound);
     } else {
-      setEventSelect(null);
+      setEventSelect({date: formatDateShort(date)});
     }
   };
 
@@ -51,14 +51,25 @@ function Events() {
   }, []);
 
   useEffect(() => {
-    /* validate that an event was updated, and if the eventSelected.id is equal to eventUpdated.id then change eventSelected to eventUpdated */
     if (eventUpdated) {
-      if (eventSelect?.id === eventUpdated.id) {
+      if (eventSelect?.id === eventUpdated?.id) {
         setEventSelect(eventUpdated);
       }
       setEventUpdated(null);
     }
-  }, [eventUpdated])
+    if (eventAdded) {
+      if (eventSelect?.date === formatDateShort(eventAdded?.date) || eventSelect === formatDateShort(eventAdded?.date)) {
+        setEventSelect(eventAdded);
+      }
+      setEventAdded(null);
+    }
+    if (eventDeleted) {
+      if (+eventSelect?.id === +eventDeleted) {
+        setEventSelect(formatDateShort(eventSelect?.date));
+      }
+      setEventDeleted(null);
+    }
+  }, [eventUpdated, eventAdded, eventDeleted]);
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -78,11 +89,11 @@ function Events() {
             />
             <div className="relative flex-1 mt-5">
               <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                Descripción del evento<span className="text-red-500">*</span>
+                Descripción del evento
               </label>
               <textarea
                 maxLength={1000}
-                placeholder="Escriba una descripción del evento"
+                placeholder={eventSelect?.description !== "" && "No hay un evento en esta fecha."}
                 defaultValue={eventSelect?.description ?? ""}
                 className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none resize-none"
                 rows={10}
@@ -90,6 +101,7 @@ function Events() {
                   scrollbarWidth: "thin",
                   scrollbarColor: "#a5a5a5 transparent",
                 }}
+                disabled
               />
             </div>
           </>
