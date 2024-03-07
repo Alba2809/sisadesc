@@ -1,12 +1,12 @@
 export function extractTime(date) {
   const newDate = new Date(date);
-  const hours = padZero(newDate.getHours());;
-  const minutes = padZero(newDate.getMinutes());;
+  const hours = padZero(newDate.getHours());
+  const minutes = padZero(newDate.getMinutes());
   return `${hours}:${minutes}`;
 }
 
 function padZero(number) {
-  return number.toString().padStart(2, "0");;
+  return number.toString().padStart(2, "0");
 }
 
 export const formatDateLong = (dateString, utc) => {
@@ -16,7 +16,7 @@ export const formatDateLong = (dateString, utc) => {
     month: "long",
     day: "numeric",
   };
-  if(utc) options.timeZone = "UTC";
+  if (utc) options.timeZone = "UTC";
   const formattedDate = new Date(dateString).toLocaleDateString(
     "es-MX",
     options
@@ -55,4 +55,37 @@ export const formatDateTime = (date) => {
 
 export const scrollToTop = () => {
   document.getElementById("container").scrollTo({ top: 0, behavior: "smooth" });
+};
+
+export const blobToBase64 = (blob) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = () => {
+      resolve(reader.result.split(",")[1]);
+      // "data:image/jpg;base64,    =sdCXDSAsadsadsa"
+    };
+  });
+};
+
+export const base64ToPDF = async (base64, fileName) => {
+  const decodedData = atob(base64);
+
+  // Convertir la cadena decodificada en un ArrayBuffer
+  const arrayBuffer = new ArrayBuffer(decodedData.length);
+  const uint8Array = new Uint8Array(arrayBuffer);
+  for (let i = 0; i < decodedData.length; i++) {
+    uint8Array[i] = decodedData.charCodeAt(i);
+  }
+
+  // Crear un Blob a partir del ArrayBuffer
+  const blob = new Blob([arrayBuffer], { type: "application/pdf" });
+
+  // Crear una URL para el Blob y descargar el archivo
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", fileName);
+  document.body.appendChild(link);
+  link.click();
 };

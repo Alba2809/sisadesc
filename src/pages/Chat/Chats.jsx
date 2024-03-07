@@ -2,20 +2,35 @@ import { useChat } from "@context/ChatContext";
 import { useAuth } from "@context/AuthContext";
 import { useEffect, useRef, useState } from "react";
 import { IoIosSend } from "react-icons/io";
-import { useForm } from "react-hook-form";
+import { AiOutlineLoading } from "react-icons/ai";
+import { LuFileCheck } from "react-icons/lu";
+import { get, useForm } from "react-hook-form";
+import { blobToBase64, base64ToPDF } from "@constants/functions";
 import Conversation from "@components/Chat/Conversation";
 import Message from "@components/Chat/Message";
+import TextareaAutosize from "react-textarea-autosize";
+import UploadFileChat from "@components/UploadFileChat";
 
 function Chats() {
-  const { getConversations, getMessages, sendMessage, messages, setMessages } =
-    useChat();
+  const {
+    getConversations,
+    getMessages,
+    sendMessage,
+    messages,
+    setMessages,
+    getFileOfMessage,
+  } = useChat();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [focusMessage, setFocusMessage] = useState(false);
+  const [textAreaValue, setTextAreaValue] = useState("");
+  const [file, setFile] = useState(null);
   const [conversationsView, setConversationsView] = useState([]);
   const [conversations, setConversations] = useState([]);
   const [userSelected, setUserSelected] = useState(null);
-  const { register, handleSubmit, setValue } = useForm();
   const lastMessageRef = useRef(null);
+  const { register, handleSubmit, setValue, unregister, getValues } = useForm();
 
   useEffect(() => {
     const time = setTimeout(() => {
@@ -47,13 +62,26 @@ function Chats() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
+      if (sending) return;
+      if (!data.file && data.message === "") return;
+      setSending(true);
+      if (data.file) {
+        const fileData = await blobToBase64(data.file);
+        data.fileData = fileData;
+        data.fileName = data.file.name;
+      }
       const res = await sendMessage(data, userSelected.id);
       if (res?.statusText === "OK") {
         setValue("message", "");
+        setTextAreaValue("");
         setMessages([...messages, res.data]);
+        unregister("file");
+        setFile(null);
       }
+      setSending(false);
     } catch (error) {
       console.log(error);
+      setSending(false);
     }
   });
 
@@ -83,6 +111,30 @@ function Chats() {
 
   const handleUserSelect = (user) => {
     setUserSelected(user);
+  };
+
+  const handleInput = (event) => {
+    setValue("message", event.target.value);
+    setTextAreaValue(event.target.value);
+  };
+
+  const onFileChange = (file) => {
+    setValue("file", file);
+    setFile(file);
+  };
+
+  const handleDownloadFile = async (messageId) => {
+    try {
+      const file = await getFileOfMessage(messageId);
+      await base64ToPDF(file.fileData, file.fileName);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDeleteFile = () => {
+    setFile(null);
+    unregister("file");
   };
 
   return (
@@ -130,25 +182,72 @@ function Chats() {
               )}
               {messages?.map((message, i) => (
                 <div key={i} ref={lastMessageRef}>
-                  <Message message={message} userLogged={user.id} />
+                  <Message
+                    message={message}
+                    userLogged={user.id}
+                    onClickFile={handleDownloadFile}
+                  />
                 </div>
               ))}
             </section>
             <footer>
-              <form onSubmit={onSubmit} className="flex flex-row gap-2">
+              <form
+                onSubmit={onSubmit}
+                className="flex flex-row gap-2 relative"
+              >
+                {file && (
+                  <button
+                    type="button"
+                    className="flex flex-wrap gap-2 items-center absolute -top-[33px]"
+                    onClick={handleDeleteFile}
+                  >
+                    <LuFileCheck color="green" size="1.5em" />
+                    <p className="text-gray-500 text-xs">{file.name}</p>
+                  </button>
+                )}
+                <div
+                  className={`flex-1 px-4 py-3 text-black rounded-md ${
+                    focusMessage
+                      ? "border-blue-400 border outline-none"
+                      : "border border-gray-300"
+                  }`}
+                >
+                  <TextareaAutosize
+                    onFocus={() => setFocusMessage(true)}
+                    onBlur={() => setFocusMessage(false)}
+                    className="w-full h-full resize-none focus:outline-none bg-transparent"
+                    style={{
+                      scrollbarWidth: "none",
+                    }}
+                    maxRows={4}
+                    minRows={1}
+                    onInput={handleInput}
+                    value={textAreaValue}
+                  />
+                </div>
                 <input
                   type="text"
                   {...register("message", {
-                    required: "Se requiere el mensaje",
+                    required: false,
                   })}
-                  placeholder="Escriba su mensaje"
-                  className="flex-1 text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  className="hidden"
+                  hidden
                 />
+                <div className="w-[50px]">
+                  <UploadFileChat
+                    onFileChange={onFileChange}
+                    cancelFile={file ? false : true}
+                  />
+                </div>
                 <button
                   type="submit"
                   className="w-[50px] flex justify-center items-center hover:bg-slate-200 rounded-md"
                 >
-                  <IoIosSend size="2em" />
+                  {sending ? (
+                    <AiOutlineLoading size="2em" className="animate-spin" />
+                  ) : (
+                    <IoIosSend size="2em" />
+                  )}
                 </button>
               </form>
             </footer>

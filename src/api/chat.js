@@ -7,3 +7,5 @@ export const sendMessageRequest = (data, reciever_id) =>
 
 export const getMessagesRequest = (userToChat) =>
   axios.get(`/chat/getmessages/${userToChat}`);
+
+export const getFileOfMessageRequest = (messageId) => axios.get(`/chat/getFile/${messageId}`);

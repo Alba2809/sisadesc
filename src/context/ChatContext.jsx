@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import {
+  getFileOfMessageRequest,
   getMessagesRequest,
   getUsersToChatRequest,
   sendMessageRequest,
@@ -63,6 +64,18 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
+  const getFileOfMessage = async (messageId) => {
+    try {
+      const res = await getFileOfMessageRequest(messageId);
+      return res.data;
+    } catch (error) {
+      if (typeof error.response.data === "object" && error.response.data) {
+        const array = Object.values(error.response.data);
+        setErrors(array);
+      } else setErrors(error.response.data);
+    }
+  };
+
   useEffect(() => {
     socket?.on("message", ({ newMessage, receiver, sender }) => {
       /* alert with message icon */
@@ -89,13 +102,13 @@ export const ChatProvider = ({ children }) => {
       value={{
         getConversations,
         getMessages,
+        getFileOfMessage,
         sendMessage,
         setMessages,
         messages,
         errors,
       }}
     >
-      <Toaster position="top-right" reverseOrder={false} />
       {children ?? <Outlet />}
     </ChatContext.Provider>
   );
