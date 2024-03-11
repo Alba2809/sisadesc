@@ -1,12 +1,13 @@
 import { useEvent } from "@context/EventContext";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { formatDateShort } from "@constants/functions";
+import { AnimatePresence, motion } from "framer-motion";
 import Calendar from "react-calendar";
 import "@styles/calendar.css";
 
 function Events() {
-  const { getEvents, events, loading, eventUpdated, setEventUpdated, eventAdded, setEventAdded, eventDeleted, setEventDeleted } = useEvent();
-  const [eventSelect, setEventSelect] = useState(null);
+  const { getEvents, events, loading } = useEvent();
+  const [eventsSelect, setEventsSelect] = useState([]);
 
   const tileContent = ({ date, view }) => {
     if (view === "month") {
@@ -14,8 +15,13 @@ function Events() {
       const hasEvents = events?.some(
         (event) => formatDateShort(event.date) === formattedDate
       );
+      const totalEvents = events?.filter(
+        (event) => formatDateShort(event.date) === formattedDate
+      ).length;
       return hasEvents ? (
-        <div className="size-3 absolute top-[20%] right-[35%] bg-red-600 rounded-full animate-bounce"></div>
+        <div className="size-4 absolute top-[20%] right-[35%] bg-red-600 rounded-full animate-bounce text-white">
+          {totalEvents > 0 && totalEvents}
+        </div>
       ) : null;
     }
     return null;
@@ -37,12 +43,12 @@ function Events() {
       (event) => formatDateShort(event.date) === formatDateShort(date)
     );
     if (haveEvents) {
-      const eventFound = events?.find(
+      const eventsFound = events?.filter(
         (event) => formatDateShort(event.date) === formatDateShort(date)
       );
-      setEventSelect(eventFound);
+      setEventsSelect(eventsFound);
     } else {
-      setEventSelect({date: formatDateShort(date)});
+      setEventsSelect([]);
     }
   };
 
@@ -50,33 +56,18 @@ function Events() {
     getEvents("events");
   }, []);
 
-  useEffect(() => {
-    if (eventUpdated) {
-      if (eventSelect?.id === eventUpdated?.id) {
-        setEventSelect(eventUpdated);
-      }
-      setEventUpdated(null);
-    }
-    if (eventAdded) {
-      if (eventSelect?.date === formatDateShort(eventAdded?.date) || eventSelect === formatDateShort(eventAdded?.date)) {
-        setEventSelect(eventAdded);
-      }
-      setEventAdded(null);
-    }
-    if (eventDeleted) {
-      if (+eventSelect?.id === +eventDeleted) {
-        setEventSelect(formatDateShort(eventSelect?.date));
-      }
-      setEventDeleted(null);
-    }
-  }, [eventUpdated, eventAdded, eventDeleted]);
-
   return (
     <div className="w-full h-full flex flex-col">
       <header className="h-[50px]">
         <h1 className="font-medium font-serif text-2xl">Lista de eventos</h1>
       </header>
-      <section className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
+      <section
+        className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto"
+        style={{
+          scrollbarWidth: "thin",
+          scrollbarColor: "#a5a5a5 transparent",
+        }}
+      >
         {loading ? (
           <p>Loading...</p>
         ) : (
@@ -87,23 +78,41 @@ function Events() {
               tileClassName={tileClassName}
               className={`w-full`}
             />
-            <div className="relative flex-1 mt-5">
-              <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                Descripción del evento
-              </label>
-              <textarea
-                maxLength={1000}
-                placeholder={eventSelect?.description !== "" && "No hay un evento en esta fecha."}
-                defaultValue={eventSelect?.description ?? ""}
-                className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none resize-none"
-                rows={10}
-                style={{
-                  scrollbarWidth: "thin",
-                  scrollbarColor: "#a5a5a5 transparent",
-                }}
-                disabled
-              />
-            </div>
+            <section className="w-full flex flex-col justify-around drop-shadow-md rounded-md p-y-3 gap-y-4 mt-4">
+              <AnimatePresence mode="layaout">
+                {eventsSelect?.map((event) => (
+                  <motion.div
+                    layout
+                    key={event.id}
+                    className="w-full flex flex-row gap-3"
+                    initial={{ height: 0, y: -10, opacity: 0 }}
+                    animate={{ height: 48, y: 0, opacity: 1 }}
+                    exit={{ height: 0, y: -10, opacity: 0 }}
+                  >
+                    <input
+                      type="text"
+                      className="w-full max-w-[500px] text-black px-4 py-3 rounded-md border border-gray-300 resize-none bg-white focus:border-blue-400 focus:border focus:outline-none"
+                      defaultValue={event.description}
+                      readOnly
+                    />
+                    <input
+                      type="time"
+                      className="w-[150px] text-black px-4 py-3 rounded-md border border-gray
+                    -300 text-center bg-white"
+                      defaultValue={event.start_time}
+                      disabled
+                    />
+                    <input
+                      type="time"
+                      className="w-[150px] text-black px-4 py-3 rounded-md border border-gray
+                    -300 text-center bg-white"
+                      defaultValue={event.end_time}
+                      disabled
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </section>
           </>
         )}
       </section>

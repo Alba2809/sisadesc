@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { formatDateShort } from "@constants/functions";
 import { useAcademic } from "@context/AcademicContext";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
+import { FaSquarePlus } from "react-icons/fa6";
+import { FiEdit2 } from "react-icons/fi";
+import { RiDeleteBin6Line } from "react-icons/ri";
 import AlertMessage from "@components/AlertMessage";
 import toast from "react-hot-toast";
 import Calendar from "react-calendar";
@@ -17,17 +20,13 @@ function Events() {
     errors: eventErrors,
   } = useAcademic();
   const [loading, setLoading] = useState(true);
-  const [loadingAdd, setLoadingAdd] = useState(false);
   const [events, setEvents] = useState([]);
-  const [eventSelect, setEventSelect] = useState(null);
-  const [showRegister, setShowRegister] = useState(false);
-  const [showUpdate, setShowUpdate] = useState(false);
-  const [showDelete, setShowDelete] = useState(false);
+  const [eventsSelect, setEventsSelect] = useState([]);
   const {
     register,
-    handleSubmit,
     formState: { errors },
     setValue,
+    getValues,
   } = useForm();
   const calendarRef = useRef();
 
@@ -37,8 +36,13 @@ function Events() {
       const hasEvents = events?.some(
         (event) => formatDateShort(event.date) === formattedDate
       );
+      const totalEvents = events?.filter(
+        (event) => formatDateShort(event.date) === formattedDate
+      ).length;
       return hasEvents ? (
-        <div className="size-3 absolute top-[20%] right-[35%] bg-red-600 rounded-full animate-bounce"></div>
+        <div className="size-4 absolute top-[20%] right-[35%] bg-red-600 rounded-full animate-bounce text-white">
+          {totalEvents > 0 && totalEvents}
+        </div>
       ) : null;
     }
     return null;
@@ -60,22 +64,74 @@ function Events() {
       (event) => formatDateShort(event.date) === formatDateShort(date)
     );
     if (haveEvents) {
-      const eventFound = events?.find(
+      const eventsFound = events?.filter(
         (event) => formatDateShort(event.date) === formatDateShort(date)
       );
-      setEventSelect(eventFound);
-      setValue("description", eventFound?.description);
-      setShowUpdate(true);
-      setShowDelete(true);
-      setShowRegister(false);
+      setEventsSelect(eventsFound);
     } else {
-      setEventSelect(null);
-      setValue("description", "");
-      setShowRegister(true);
-      setShowUpdate(false);
-      setShowDelete(false);
+      setEventsSelect([]);
     }
     setValue("date", formatDateShort(date));
+  };
+
+  const handleAddEvent = async () => {
+    const eventsLength = eventsSelect?.length;
+    if (eventsLength === 5) {
+      toast.error("No se puede agregar mas eventos a la misma fecha.");
+      return;
+    }
+    try {
+      const dataEvent = {
+        date: getValues("date"),
+        description: getValues("newDescription"),
+        start_time: getValues("newStart_time"),
+        end_time: getValues("newEnd_time"),
+      };
+      const res = await registerSomething(dataEvent, "events");
+      if (res?.statusText === "OK") {
+        toast.success("Evento registrado correctamente.");
+        const newEvents = [...events, res.data];
+        setEvents(newEvents);
+        setEventsSelect([...eventsSelect, res.data]);
+        setValue("newDescription", "");
+        setValue("newStart_time", "");
+        setValue("newEnd_time", "");
+      }
+    } catch (error) {
+      toast.error("No se pudo registrar el evento intentelo de nuevo.");
+    }
+  };
+
+  const handleEditEvent = async (id) => {
+    try {
+      const dataEvent = {
+        date: getValues("date"),
+        description: getValues("description" + id),
+        start_time: getValues("start_time" + id),
+        end_time: getValues("end_time" + id),
+      };
+      const res = await updateSomething(id, dataEvent, "events");
+      if (res?.statusText === "OK") {
+        toast.success("Evento actualizado correctamente.");
+      }
+    } catch (error) {
+      toast.error("No se pudo actualizar el evento intentelo de nuevo.");
+    }
+  };
+
+  const handleDeleteEvent = async (id) => {
+    try {
+      const res = await deleteSomething(id, "events");
+      if (res?.statusText === "OK") {
+        toast.success("Evento eliminado correctamente.");
+        const newEvents = events.filter((event) => event.id !== id);
+        setEvents(newEvents);
+        const newEventsSelect = eventsSelect.filter((event) => event.id !== id);
+        setEventsSelect(newEventsSelect);
+      }
+    } catch (error) {
+      toast.error("No se pudo eliminar el evento intentelo de nuevo.");
+    }
   };
 
   useEffect(() => {
@@ -87,71 +143,19 @@ function Events() {
     if (loading) getEvents();
   }, [loading]);
 
-  const onSubmit = handleSubmit(async (data, action) => {
-    try {
-      if (action === "register") {
-        setLoadingAdd(true);
-        const res = await registerSomething(data, "events");
-        if (res?.statusText === "OK") {
-          toast.success("Evento registrado correctamente.");
-          const newEvents = [...events, res.data];
-          setEvents(newEvents);
-          setValue("description", "");
-          setShowDelete(false);
-          setShowUpdate(false);
-          setShowRegister(false);
-        }
-        setLoadingAdd(false);
-      }
-      if (action === "update" && eventSelect) {
-        const res = await updateSomething(eventSelect?.id, data, "events");
-        if (res?.statusText === "OK") {
-          toast.success("Evento actualizado correctamente.");
-          const eventIndex = events?.findIndex(
-            (event) => event?.id === eventSelect?.id
-          );
-          if (eventIndex !== -1) {
-            const newEvents = events;
-            newEvents[eventIndex].description = data.description;
-            setEvents(newEvents);
-          }
-        }
-      }
-      if (action === "delete" && eventSelect) {
-        setLoadingAdd(true);
-        const res = await deleteSomething(eventSelect?.id, "events");
-        if (res?.statusText === "OK") {
-          toast.success("Evento eliminado correctamente.");
-          const eventIndex = events?.findIndex(
-            (event) => event?.id === eventSelect?.id
-          );
-          if (eventIndex !== -1) {
-            const newEvents = events;
-            newEvents.splice(eventIndex, 1);
-            setEvents(newEvents);
-          }
-          setValue("description", "");
-          setShowDelete(false);
-          setShowUpdate(false);
-          setShowRegister(false);
-        }
-        setLoadingAdd(false);
-      }
-    } catch (error) {
-      toast.error("Ha ocurrido un error con el evento.");
-      setLoadingAdd(false);
-    }
-  });
-
   return (
     <div className="w-full h-full flex flex-col">
       <header className="h-[50px]">
-        <h1 className="font-medium font-serif text-2xl">
-          Lista de eventos
-        </h1>
+        <h1 className="font-medium font-serif text-2xl">Lista de eventos</h1>
       </header>
-      <section className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
-        {loading || loadingAdd ? (
+      <section
+        className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto"
+        style={{
+          scrollbarWidth: "thin",
+          scrollbarColor: "#a5a5a5 transparent",
+        }}
+      >
+        {loading ? (
           <p>Loading...</p>
         ) : (
           <>
@@ -189,7 +193,7 @@ function Events() {
                 </motion.div>
               ))}
             </AnimatePresence>
-            <form onSubmit={onSubmit} className="flex flex-col mt-5 gap-3">
+            <form className="flex flex-col mt-5 gap-3">
               <input
                 type="date"
                 {...register("date", {
@@ -198,57 +202,104 @@ function Events() {
                 className="hidden"
                 hidden
               />
-              <div className="relative flex-1">
-                <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                  Descripción del evento<span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  maxLength={1000}
-                  placeholder="Escriba una descripción del evento"
-                  {...register("description", {
-                    required: "Se requiere la descripción",
-                    maxLength: {
-                      value: 1000,
-                      message:
-                        "La descripción no debe exceder los 1000 caracteres",
-                    },
-                  })}
-                  className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none resize-none"
-                  rows={10}
-                  style={{
-                    scrollbarWidth: "thin",
-                    scrollbarColor: "#a5a5a5 transparent",
-                  }}
-                />
+              <div className="flex-1 flex flex-wrap gap-3 items-center">
+                <div className="relative max-w-[500px] w-full">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Descripción del evento nuevo
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    {...register("newDescription", {
+                      required: "Se requiere la descripción",
+                    })}
+                    className="w-full max-w-[500px] text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none resize-none"
+                  />
+                </div>
+                <div className="relative max-w-[170px] w-full">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Hora de inicio
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="time"
+                    {...register("newStart_time", {
+                      required: "Se requiere la hora de inicio",
+                    })}
+                    className="w-full max-w-[170px] text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none resize-none"
+                  />
+                </div>
+                <div className="relative max-w-[170px] w-full">
+                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                    Hora de finalización
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="time"
+                    {...register("newEnd_time", {
+                      required: "Se requiere la hora de finalización",
+                    })}
+                    className="w-full max-w-[170px] text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none resize-none"
+                  />
+                </div>
+                <button type="button" onClick={handleAddEvent}>
+                  <FaSquarePlus size="2em" color="green" />
+                </button>
               </div>
-              <section className="w-full flex flex-wrap justify-around">
-                {showRegister && (
-                  <button
-                    type="submit"
-                    onClick={(e) => onSubmit("register")}
-                    className="py-2 px-8 bg-blue-600 hover:bg-[#18aefa] text-white text-lg rounded-lg"
-                  >
-                    Guardar
-                  </button>
-                )}
-                {showUpdate && (
-                  <button
-                    type="submit"
-                    onClick={(e) => onSubmit("update")}
-                    className="py-2 px-8 bg-blue-600 hover:bg-[#18aefa] text-white text-lg rounded-lg"
-                  >
-                    Editar
-                  </button>
-                )}
-                {showDelete && (
-                  <button
-                    type="submit"
-                    onClick={(e) => onSubmit("delete")}
-                    className="py-2 px-8 bg-red-600 hover:bg-[#18aefa] text-white text-lg rounded-lg"
-                  >
-                    Eliminar
-                  </button>
-                )}
+              <section className="w-full flex flex-col justify-around drop-shadow-md rounded-md p-y-3 gap-y-4 mt-4">
+                <AnimatePresence mode="layaout">
+                  {eventsSelect?.map((event) => (
+                    <motion.div
+                      layout
+                      key={event.id}
+                      className="w-full flex flex-row gap-3"
+                      initial={{ height: 0, y: -10, opacity: 0 }}
+                      animate={{ height: 48, y: 0, opacity: 1 }}
+                      exit={{ height: 0, y: -10, opacity: 0 }}
+                    >
+                      <input
+                        type="text"
+                        {...register("description" + event.id, {
+                          required: "Se requiere la descripción",
+                        })}
+                        className="w-full max-w-[500px] text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none resize-none"
+                        defaultValue={event.description}
+                      />
+                      <input
+                        type="time"
+                        {...register("start_time" + event.id, {
+                          required: "Se requiere la hora de inicio",
+                        })}
+                        className="w-[200px] text-black px-4 py-3 rounded-md border border-gray
+                    -300 focus:border-blue-400 focus:border focus:outline-none resize-none"
+                        defaultValue={event.start_time}
+                      />
+                      <input
+                        type="time"
+                        {...register("end_time" + event.id, {
+                          required: "Se requiere la hora de finalización",
+                        })}
+                        className="w-[200px] text-black px-4 py-3 rounded-md border border-gray
+                    -300 focus:border-blue-400 focus:border focus:outline-none resize-none"
+                        defaultValue={event.end_time}
+                      />
+                      <div className="flex flex-row gap-5">
+                        <button
+                          type="button"
+                          onClick={() => handleEditEvent(event.id)}
+                        >
+                          <FiEdit2 size="1.5em" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteEvent(event.id)}
+                        >
+                          <RiDeleteBin6Line size="1.5em" />
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </section>
             </form>
           </>
