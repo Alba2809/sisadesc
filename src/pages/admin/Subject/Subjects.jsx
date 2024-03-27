@@ -1,44 +1,42 @@
-import { useAdmin } from "@context/AdminContext";
 import { Fragment, useEffect, useState } from "react";
 import { FaEye, FaChalkboardTeacher, FaRegCalendarCheck } from "react-icons/fa";
 import { BsMortarboardFill } from "react-icons/bs";
 import { AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { formatDateLong } from "../../../constants/functions";
+import { useSubject } from "../../../hooks/useSubject";
+import { useGroupTable } from "../../../hooks/useGroupTable";
 import InputSelect from "../../../components/InputSelect";
 import Dialog from "../../../components/Dialog";
-import { useSubject } from "../../../hooks/useSubject";
 
 function Subjects() {
   const {
     loading,
-    allSubjects,
-    subjects,
-    groupSize,
-    groupIndex,
     showDialogStatus,
     showDialogView,
-    subjectSelected,
     students,
     teacher,
     counselor,
-    filterStatus,
     getSubjects,
-    groupSubjects,
+    handleDialogStatus,
+    handleDialogView,
+    handleActionStatus,
+    handleCloseView,
+  } = useSubject();
+  const {
+    allObjects,
+    setData,
+    objects,
+    groupIndex,
+    handleOptionGroup,
+    handleOptionStatus,
     handleNext,
     handleBack,
     startRecord,
     endRecord,
     totalRecords,
     handleSearch,
-    handleStatusObject,
-    handleDialogStatus,
-    handleDialogView,
-    handleActionStatus,
-    handleCloseView,
-    handleOptionGroup,
-    handleOptionStatus
-  } = useSubject();
+  } = useGroupTable();
   const [isHoverEditStudents, setIsHoverEditStudents] = useState(0);
   const [isHoverEditTeacher, setIsHoverEditTeacher] = useState(0);
   const [isHoverView, setIsHoverView] = useState(0);
@@ -47,7 +45,8 @@ function Subjects() {
 
   useEffect(() => {
     async function getData() {
-      await getSubjects();
+      const res = await getSubjects();
+      setData(res);
     }
     getData();
   }, []);
@@ -119,13 +118,13 @@ function Subjects() {
                 <tr className="border-t text-gray-500">
                   <td className="p-2">Loading...</td>
                 </tr>
-              ) : allSubjects.length < 1 ? (
+              ) : allObjects.length < 1 ? (
                 <tr className="border-t text-gray-500">
                   <td colSpan="17" className="p-2">
                     No hay materias registrados.
                   </td>
                 </tr>
-              ) : subjects.length < 1 ? (
+              ) : objects.length < 1 ? (
                 <>
                   <tr className="border-t text-gray-500">
                     <td colSpan="17" className="p-2">
@@ -135,7 +134,7 @@ function Subjects() {
                 </>
               ) : (
                 <>
-                  {subjects
+                  {objects
                     .filter((group, index) => index === groupIndex)
                     .map((group, groupIndex) => (
                       <Fragment key={groupIndex}>
@@ -278,7 +277,7 @@ function Subjects() {
           </table>
         </div>
         <footer className="flex flex-row justify-between mt-8 items-center">
-          {allSubjects.length > 0 ? (
+          {allObjects.length > 0 ? (
             <p>
               Mostrando {startRecord} a {endRecord} de {totalRecords}{" "}
               registro(s)
@@ -289,7 +288,7 @@ function Subjects() {
           <div>
             <button
               onClick={handleBack}
-              disabled={groupIndex === 0 || allSubjects.length < 1}
+              disabled={groupIndex === 0 || allObjects.length < 1}
               className="px-3 py-2 bg-white border-y border-l border-gray-300 rounded-s-md text-gray-500 hover:bg-[#3c5fdf] hover:text-white"
             >
               Anterior
@@ -300,7 +299,7 @@ function Subjects() {
             <button
               onClick={handleNext}
               disabled={
-                groupIndex === subjects.length - 1 || allSubjects.length < 1
+                groupIndex === objects.length - 1 || allObjects.length < 1
               }
               className="px-3 py-2 bg-white border-y border-r border-gray-300 rounded-e-md text-gray-500 hover:bg-[#3c5fdf] hover:text-white"
             >

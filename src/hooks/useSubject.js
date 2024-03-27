@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  getSubjectRequest,
   getSubjectStudentsRequest,
   getSubjectsRequest,
+  registerSubjectRequest,
   updateStatusSubjectRequest,
+  updateSubjectRequest,
 } from "../api/subject";
 import toast from "react-hot-toast";
 import { groupArray } from "../constants/functions";
@@ -11,33 +14,39 @@ import { getUserRequest } from "../api/user";
 
 export function useSubject() {
   const [loading, setLoading] = useState(true);
-  const [allSubjects, setAllSubjects] = useState([]);
-  const [subjects, setSubjects] = useState([]);
-  const [groupSize, setGroupsSize] = useState(5);
-  const [groupIndex, setGroupIndex] = useState(0);
   const [showDialogStatus, setShowDialogStatus] = useState(false);
   const [showDialogView, setShowDialogView] = useState(false);
   const [subjectSelected, setSubjectSelected] = useState(null);
   const [students, setStudents] = useState([]);
   const [teacher, setTeacher] = useState(null);
   const [counselor, setCounselor] = useState(null);
-  const [filterStatus, setFilterStatus] = useState("Activo");
+  const [errors, setErrors] = useState([]);
+
+  const registerSubject = async (data) => {
+    try {
+      setLoading(true);
+      const res = await toast.promise(registerSubjectRequest(data), {
+        loading: "Registrando materia...",
+        success: "¡Materia registrada!",
+        error: "¡Error al registrar materia!",
+      });
+
+      return res
+    } catch(error) {
+      if (typeof error.response.data === "object" && error.response.data) {
+        const array = Object.values(error.response.data);
+        setErrors(array);
+      } else setErrors(error.response.data);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const getSubjects = async () => {
     try {
       setLoading(true);
       const res = await getSubjectsRequest();
-      if (res.data) {
-        setAllSubjects(res.data);
-        setSubjects(
-          groupArray(
-            res.data.filter((object) =>
-              filterStatus === "Ambos" ? true : object.status === filterStatus
-            ),
-            groupSize
-          )
-        );
-      }
+      return res.data;
     } catch (error) {
       console.log(error);
       toast.error("Error al obtener las materias");
@@ -46,69 +55,54 @@ export function useSubject() {
     }
   };
 
-  const groupSubjects = (groupSize, filterStatus) => {
-    return setSubjects(
-      groupArray(
-        allSubjects.filter((object) =>
-          filterStatus === "Ambos" ? true : object.status === filterStatus
-        ),
-        groupSize
-      )
-    );
-  };
-  const handleOptionGroup = (value) => {
-    setGroupsSize(+value);
-    setGroupIndex(0);
-    groupSubjects(+value, filterStatus);
-  };
-
-  const handleOptionStatus = (status) => {
-    setFilterStatus(status);
-    groupSubjects(groupSize, status);
-  };
-
-  const handleNext = () => {
-    setGroupIndex((prevIndex) => Math.min(prevIndex + 1, subjects.length - 1));
-  };
-
-  const handleBack = () => {
-    setGroupIndex((prevIndex) => Math.max(prevIndex - 1, 0));
-  };
-
-  const startRecord = groupIndex * groupSize + 1;
-
-  const endRecord = Math.min((groupIndex + 1) * groupSize, allSubjects.length);
-  
-  const totalRecords = allSubjects.length;
-
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      if (e.target.value === "") return getSubjects()
-
-      const filteredObjects = allSubjects.filter((user) =>
-        Object.entries(user).some(
-          ([key, value]) =>
-            key !== "id" &&
-            key !== "createdAt" &&
-            key !== "updatedAt" &&
-            (typeof value === "string" || typeof value === "number") &&
-            value
-              .toString()
-              .toLowerCase()
-              .includes(e.target.value.toLowerCase())
-        )
-      );
-
-      setSubjects(
-        groupArray(
-          filteredObjects.filter((object) =>
-            filterStatus === "Ambos" ? true : object.status === filterStatus
-          ),
-          groupSize
-        )
-      );
+  const getSubject = async (subjectId) => {
+    try {
+      setLoading(true);
+      const res = await getSubjectRequest(subjectId);
+      setSubjectSelected(res.data);
+      return res.data
+    } catch (error) {
+      console.log(error);
+      toast.error("Error al obtener la materia");
+    } finally {
+      setLoading(false);
     }
   };
+
+  const getSubjectStudents = async (subjectId) => {
+    try {
+      setLoading(true);
+      const res = await getSubjectStudentsRequest(subjectId);
+      if (res.data) {
+        setStudents(res.data);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Error al obtener los estudiantes");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateSubject = async (subjectId, data) => {
+    try {
+      setLoading(true);
+      const res = await toast.promise(updateSubjectRequest(subjectId, data), {
+        loading: "Actualizando materia...",
+        success: "Materia actualizada!",
+        error: "¡Error al actualizar la materia!",
+      });
+      return res
+    } catch (error) {
+      console.log(error);
+      if (typeof error.response.data === "object" && error.response.data) {
+        const array = Object.values(error.response.data);
+        setErrors(array);
+      } else setErrors(error.response.data);
+    } finally{
+      setLoading(false)
+    }
+  }
 
   const handleStatusObject = async () => {
     try {
@@ -176,33 +170,33 @@ export function useSubject() {
     setShowDialogView(false);
   };
 
+  useEffect(() => {
+    if (errors.length > 0) {
+      const timer = setTimeout(() => {
+        setErrors([]);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errors]);
+
   return {
     loading,
-    allSubjects,
-    subjects,
-    groupSize,
-    groupIndex,
     showDialogStatus,
     showDialogView,
     subjectSelected,
     students,
     teacher,
     counselor,
-    filterStatus,
+    getSubject,
+    getSubjectStudents,
     getSubjects,
-    groupSubjects,
-    handleNext,
-    handleBack,
-    startRecord,
-    endRecord,
-    totalRecords,
-    handleSearch,
     handleStatusObject,
     handleDialogStatus,
     handleDialogView,
     handleActionStatus,
     handleCloseView,
-    handleOptionGroup,
-    handleOptionStatus,
+    registerSubject,
+    errors,
+    updateSubject,
   };
 }

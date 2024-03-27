@@ -1,22 +1,17 @@
-import { useAdmin } from "@context/AdminContext";
 import { AnimatePresence, motion } from "framer-motion";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { FaCheck } from "react-icons/fa";
-import { grades, groups } from "@constants/constants";
-import Dialog from "@components/Dialog";
-import AlertMessage from "@components/AlertMessage";
-import InputSelect from "@components/InputSelect";
+import { grades, groups } from "../../../constants/constants";
+import { useSubject } from "../../../hooks/useSubject";
+import AlertMessage from "../../../components/AlertMessage";
+import InputSelect from "../../../components/InputSelect";
 
 function RegisterSubject() {
-  const { registerSomething, errors: registerErrors } = useAdmin();
-  const [showDialog, setShowDialog] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
+  const { registerSubject, errors: registerErrors } = useSubject()
   const {
     register,
     handleSubmit,
-    getValues,
     setValue,
     formState: { errors },
   } = useForm();
@@ -24,19 +19,12 @@ function RegisterSubject() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      handleDialog();
-      const res = await registerSomething(data, "subject");
-      handleDialog();
+      const res = await registerSubject(data);
       if (res?.statusText === "OK") navigate("/admin/subjects");
     } catch (error) {
-      handleDialog();
+      console.log(error)
     }
   });
-
-  const handleDialog = () => {
-    setShowLoading((prev) => (prev === "" ? "true" : ""));
-    setShowDialog((prev) => !prev);
-  };
 
   const handleChangeSelect = (value, name) => setValue(name, value);
 
@@ -163,7 +151,29 @@ function RegisterSubject() {
                 pattern: {
                   value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
                   message:
-                    "CURP inválido. Verifique el formato y que las letras sean mayúsculas.",
+                    "CURP del maestro inválido. Verifique el formato y que las letras sean mayúsculas.",
+                },
+              })}
+              className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+            />
+          </div>
+          <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
+            <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+              CURP del asesor
+            </label>
+            <input
+              type="text"
+              maxLength={18}
+              {...register("counselor", {
+                required: false,
+                maxLength: {
+                  value: 18,
+                  message: "La CURP no debe exceder los 18 caracteres",
+                },
+                pattern: {
+                  value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
+                  message:
+                    "CURP del asesor inválido. Verifique el formato y que las letras sean mayúsculas.",
                 },
               })}
               className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
@@ -179,16 +189,6 @@ function RegisterSubject() {
           </section>
         </form>
       </section>
-      <AnimatePresence>
-        {showDialog && (
-          <Dialog
-            title="Realizando registro"
-            textAccept="Registrando"
-            message=""
-            showLoading={showLoading}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
