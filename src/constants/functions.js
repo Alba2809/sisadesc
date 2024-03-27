@@ -71,21 +71,27 @@ export const blobToBase64 = (blob) => {
 export const base64ToPDF = async (base64, fileName) => {
   const decodedData = atob(base64);
 
-  // Convertir la cadena decodificada en un ArrayBuffer
   const arrayBuffer = new ArrayBuffer(decodedData.length);
   const uint8Array = new Uint8Array(arrayBuffer);
   for (let i = 0; i < decodedData.length; i++) {
     uint8Array[i] = decodedData.charCodeAt(i);
   }
 
-  // Crear un Blob a partir del ArrayBuffer
   const blob = new Blob([arrayBuffer], { type: "application/pdf" });
 
-  // Crear una URL para el Blob y descargar el archivo
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
   link.setAttribute("download", fileName);
   document.body.appendChild(link);
   link.click();
+};
+
+export const groupArray = (array, groupSize) => {
+  const organizedArray = Array.from(
+    { length: Math.ceil(array.length / groupSize) },
+    (_, index) => array.slice(index * groupSize, (index + 1) * groupSize)
+  );
+
+  return organizedArray;
 };

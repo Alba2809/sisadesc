@@ -32,16 +32,6 @@ function Login() {
       <section className="grid grid-cols-2 rounded-xl overflow-hidden max-w-[1200px] bg-white">
         <div className="relative bg-[#18aefa] rounded-xl">
           <img src={ImagePerson} alt="Imagen principal de login" className="" />
-          {/* <img
-            src={LoginIcon1}
-            alt="Icono 1"
-            className="absolute top-0 left-0 max-w-[13rem] w-full"
-          />
-          <img
-            src={LoginIcon2}
-            alt="Icono 2"
-            className="absolute top-0 right-0 max-w-[15rem]"
-          /> */}
         </div>
         <section className="px-10 flex flex-col justify-center font-sans">
           <h1 className="font-bold text-3xl">Bienvenido al inicio</h1>

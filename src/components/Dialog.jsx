@@ -11,7 +11,7 @@ function Dialog({
   contentComponent
 }) {
   const handleClick = (option) => {
-    if (showLoading === "true") return;
+    if (showLoading) return;
     if (handleAction) return handleAction(option);
   };
 
@@ -24,7 +24,7 @@ function Dialog({
         exit={{ opacitiy: 0 }}
         onClick={() => handleClick(false)}
       ></motion.div>
-      {showLoading === "true" ? (
+      {showLoading ? (
         <motion.section
           className="flex flex-col bg-white py-5 px-8 rounded-md z-[9999]"
           initial={{ y: -20, opacity: 0 }}

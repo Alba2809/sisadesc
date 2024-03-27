@@ -1,65 +1,44 @@
-import { useAdmin } from "@context/AdminContext";
 import { Fragment, useEffect, useState } from "react";
 import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { formatDateLong } from "@constants/functions";
-import InputSelect from "@components/InputSelect";
-import Dialog from "@components/Dialog";
+import { formatDateLong } from "../../../constants/functions";
+import InputSelect from "../../../components/InputSelect";
+import Dialog from "../../../components/Dialog";
+import { useUser } from "../../../hooks/useUser";
 
 function Users() {
-  const { getAllSomething, deleteSomething } = useAdmin();
-  const [loading, setLoading] = useState(true);
-  const [loadingTable, setLoadingTable] = useState(false);
-  const [allUsers, setAllUsers] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [groupSize, setGroupsSize] = useState(5);
-  const [groupIndex, setGroupIndex] = useState(0);
+  const {
+    allUsers,
+    users,
+    loading,
+    groupSize,
+    groupIndex,
+    setGroupsSize,
+    setGroupIndex,
+    getUsers,
+    handleSearch,
+    groupUsers,
+    handleActionDialog,
+    handleShowDialog,
+    showDialog
+  } = useUser();
   const [isHoverEdit, setIsHoverEdit] = useState(0);
   const [isHoverDelete, setIsHoverDelete] = useState(0);
   const [isHoverRow, setIsHoverRow] = useState(0);
-  const [showDialog, setShowDialog] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
-  const [userToDelete, setUserToDelete] = useState("");
 
   useEffect(() => {
-    if (loading) {
-      async function getUsers() {
-        try {
-          const res = await getAllSomething("user");
-          setAllUsers(res);
-          setUsers(groupUsers(res));
-          setLoading(false);
-        } catch (error) {
-          console.log(error);
-          setAllUsers([]);
-        }
-      }
-      getUsers();
+    async function getData() {
+      await getUsers(groupSize);
     }
-  }, [loading]);
-
-  useEffect(() => {
-    if (loadingTable) {
-      setUsers(groupUsers(allUsers));
-      setLoadingTable(false);
-    }
-  }, [loadingTable]);
-
-  const groupUsers = (value) => {
-    const organizedValue = Array.from(
-      { length: Math.ceil(value.length / groupSize) },
-      (_, index) => value.slice(index * groupSize, (index + 1) * groupSize)
-    );
-
-    return organizedValue;
-  };
+    getData();
+  }, []);
 
   const onOptionChange = (number) => {
-    setGroupsSize(Number.parseInt(number));
+    setGroupsSize(+number);
     setGroupIndex(0);
-    setLoadingTable(true);
+    groupUsers(+number);
   };
 
   const handleNext = () => {
@@ -73,54 +52,6 @@ function Users() {
   const startRecord = groupIndex * groupSize + 1;
   const endRecord = Math.min((groupIndex + 1) * groupSize, allUsers.length);
   const totalRecords = allUsers.length;
-
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      if (e.target.value === "") setLoading(true);
-
-      const filteredUsers = allUsers.filter((user) =>
-        Object.entries(user).some(
-          ([key, value]) =>
-            key !== "id" &&
-            key !== "imageperfile" &&
-            key !== "createdAt" &&
-            key !== "updatedAt" &&
-            key !== "role" &&
-            key !== "address" &&
-            (typeof value === "string" || typeof value === "number") &&
-            value
-              .toString()
-              .toLowerCase()
-              .includes(e.target.value.toLowerCase())
-        )
-      );
-
-      setUsers(groupUsers(filteredUsers));
-    }
-  };
-
-  const handleDeleteUser = () => {
-    try {
-      if(userToDelete) deleteSomething(userToDelete, "user");
-      handleDialog("");
-      setLoading(true);
-    } catch (error) {
-      handleDialog("");
-      console.log(error);
-    }
-  };
-
-  const handleDialog = (user) => {
-    setUserToDelete(user);
-    setShowLoading("");
-    setShowDialog((prev) => !prev);
-  };
-
-  const handleDelete = (accept) => {
-    if (!accept) return handleDialog("");
-    setShowLoading("true");
-    handleDeleteUser();
-  };
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -184,18 +115,22 @@ function Users() {
               </tr>
             </thead>
             <tbody>
-              {loading || loadingTable ? (
+              {loading ? (
                 <tr className="border-t text-gray-500">
                   <td className="p-2">Loading...</td>
                 </tr>
               ) : allUsers.length < 1 ? (
                 <tr className="border-t text-gray-500">
-                  <td colSpan="17" className="p-2">No hay usuarios registrados.</td>
+                  <td colSpan="17" className="p-2">
+                    No hay usuarios registrados.
+                  </td>
                 </tr>
               ) : users.length < 1 ? (
                 <>
                   <tr className="border-t text-gray-500">
-                    <td colSpan="17" className="p-2">No se encontraron usuarios.</td>
+                    <td colSpan="17" className="p-2">
+                      No se encontraron usuarios.
+                    </td>
                   </tr>
                 </>
               ) : (
@@ -235,9 +170,9 @@ function Users() {
                             <td className="p-2">{user.rfc}</td>
                             <td className="p-2">{user.email}</td>
                             <td className="p-2">
-                            <time dateTime={user.birthdate}>
-                                  {formatDateLong(user.birthdate)}
-                                </time>
+                              <time dateTime={user.birthdate}>
+                                {formatDateLong(user.birthdate)}
+                              </time>
                             </td>
                             <td className="p-2">{user.address.street}</td>
                             <td className="p-2">{user.address.settlement}</td>
@@ -260,9 +195,7 @@ function Users() {
                               <div className=" flex gap-3 items-center justify-center">
                                 <Link
                                   className="bg-[#f7f7fa] hover:bg-[#3d5ee1] w-[30px] h-[30px] rounded-full flex justify-center items-center"
-                                  onMouseEnter={() =>
-                                    setIsHoverEdit(user.id)
-                                  }
+                                  onMouseEnter={() => setIsHoverEdit(user.id)}
                                   onMouseLeave={() => setIsHoverEdit(0)}
                                   to={`/admin/users/edit/${user.id}`}
                                 >
@@ -276,11 +209,9 @@ function Users() {
                                 </Link>
                                 <button
                                   className="bg-[#f7f7fa] hover:bg-[#3d5ee1] w-[30px] h-[30px] rounded-full flex justify-center items-center"
-                                  onMouseEnter={() =>
-                                    setIsHoverDelete(user.id)
-                                  }
+                                  onMouseEnter={() => setIsHoverDelete(user.id)}
                                   onMouseLeave={() => setIsHoverDelete(0)}
-                                  onClick={() => handleDialog(user.id)}
+                                  onClick={() => handleShowDialog(user.id)}
                                 >
                                   <RiDeleteBin6Line
                                     color={
@@ -302,15 +233,14 @@ function Users() {
           </table>
         </div>
         <footer className="flex flex-row justify-between mt-8 items-center">
-        {allUsers.length > 0 ? 
+          {allUsers.length > 0 ? (
             <p>
               Mostrando {startRecord} a {endRecord} de {totalRecords}{" "}
               registro(s)
-            </p> :
-            <p>
-            Mostrando 0 a 0 de 0 registro(s)
-          </p>
-          }
+            </p>
+          ) : (
+            <p>Mostrando 0 a 0 de 0 registro(s)</p>
+          )}
           <div>
             <button
               onClick={handleBack}
@@ -324,7 +254,7 @@ function Users() {
             </label>
             <button
               onClick={handleNext}
-              disabled={groupIndex === users.length - 1}
+              disabled={groupIndex === users?.length - 1}
               className="px-3 py-2 bg-white border-y border-r border-gray-300 rounded-e-md text-gray-500 hover:bg-[#3c5fdf] hover:text-white"
             >
               Siguiente
@@ -338,8 +268,7 @@ function Users() {
             title="Eliminar usuario"
             textAccept="Eliminar"
             message="¿Está seguro de eliminar el usuario?"
-            handleAction={handleDelete}
-            showLoading={showLoading}
+            handleAction={handleActionDialog}
             addCancel
           />
         )}

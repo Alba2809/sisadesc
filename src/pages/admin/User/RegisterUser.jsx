@@ -1,24 +1,17 @@
-import { useAdmin } from "@context/AdminContext";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import InputSelect from "@components/InputSelect";
-import Dialog from "@components/Dialog";
-import AlertMessage from "@components/AlertMessage";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { useUser } from "../../../hooks/useUser";
+import { useRole } from "../../../hooks/useRole";
+import InputSelect from "../../../components/InputSelect";
+import AlertMessage from "../../../components/AlertMessage";
+import toast from "react-hot-toast";
 
 function RegisterUser() {
-  const {
-    getAllSomething,
-    registerSomething,
-    errors: registerErrors,
-  } = useAdmin();
-  const [roles, setRoles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { registerUser, errors: registerErrors } = useUser()
   const [seePassword, setSeePassword] = useState(false);
-  const [showDialog, setShowDialog] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
   const {
     register,
     handleSubmit,
@@ -26,39 +19,17 @@ function RegisterUser() {
     setValue,
     getValues,
   } = useForm();
+  const { roles, loading, handleChangeRole } = useRole({ setValue })
   const navigate = useNavigate();
-
-  useEffect(() => {
-    async function getUser() {
-      const rolesData = await getAllSomething("role");
-      setRoles(rolesData);
-      setValue("role", rolesData[0].id);
-      setLoading(false);
-    }
-    getUser();
-  }, []);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      handleDialog();
-      const res = await registerSomething(data, "user");
-      handleDialog();
+      const res = await registerUser(data)
       if (res?.statusText === "OK") navigate("/admin/users");
     } catch (error) {
-      handleDialog();
+      toast.error("Error al registrar usuario");
     }
   });
-
-  const handleDialog = () => {
-    setShowLoading((prev) => (prev === "" ? "true" : ""));
-    setShowDialog((prev) => !prev);
-  };
-
-  const handleChangeRole = (value) => {
-    const rol = roles.find((role) => role.name === value);
-    if (rol) return setValue("role", rol.id);
-    setValue("role", null);
-  };
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -314,16 +285,6 @@ function RegisterUser() {
           </>
         )}
       </section>
-      <AnimatePresence>
-        {showDialog && (
-          <Dialog
-            title="Realizando registro"
-            textAccept="Registrando"
-            message=""
-            showLoading={showLoading}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

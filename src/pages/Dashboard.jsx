@@ -1,5 +1,4 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "@context/AuthContext";
+import { Link, Outlet } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import {
   IoIosArrowDown,
@@ -7,8 +6,9 @@ import {
   IoIosArrowUp,
 } from "react-icons/io";
 import { AnimatePresence, motion } from "framer-motion";
-import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
-import Logo from "@images-logos/logo-nombre.png";
+import { Fragment, useEffect } from "react";
+import { Toaster } from "react-hot-toast";
+import { useDashboard } from "../hooks/useDashboard";
 import {
   adminOptions,
   studentOptions,
@@ -18,96 +18,30 @@ import {
   principalOptions,
   viceprincipalOptions,
   academicCoorOptions,
-} from "@constants/SideMenu";
-import { Toaster } from "react-hot-toast";
+} from "../constants/SideMenu";
+import Logo from "../assets/logos/logo-escudo.png";
 
 function Dashboard() {
-  const { user, logout, getUser } = useAuth();
-  const [showMenuUser, setShowMenuUser] = useState(false);
-  const [showSideBar, setShowSideBar] = useState(true);
-  const [subMenuSelect, setSubMenuSelect] = useState("");
-  const [subOptionSelect, setSubOptionSelect] = useState("");
-  const menuRef = useRef(null);
-  const location = useLocation();
-
-  const handleClickOutside = (event) => {
-    if (menuRef.current && !menuRef.current.contains(event.target)) {
-      setShowMenuUser(false);
-    }
-  };
+  const {
+    handleClickOutside,
+    handleLogout,
+    handleShowSubMenu,
+    menuRef,
+    setShowMenuUser,
+    setShowSideBar,
+    showMenuUser,
+    showSideBar,
+    subMenuSelect,
+    subOptionSelect,
+    userRole,
+    user,
+  } = useDashboard();
 
   useEffect(() => {
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, []);
-
-  const handleLogout = () => logout();
-
-  const handleShowSubMenu = (menu) => {
-    setSubMenuSelect(menu);
-  };
-
-  useLayoutEffect(() => {
-    const path = location.pathname;
-    const parts = path.split("/").filter(Boolean);
-    const lastPart = parts[parts.length - 2];
-    const preLastPart = parts[parts.length - 3];
-    const withoutLastPart = "/" + parts.slice(0, -2).join("/");
-    const withoutPreLastPart = "/" + parts.slice(0, -3).join("/");
-
-    const matchingOption = (
-      user.role.name === "admin"
-        ? adminOptions
-        : user.role.name === "student"
-        ? studentOptions
-        : user.role.name === "teacher"
-        ? teacherOptions
-        : user.role.name === "tutor"
-        ? tutorOptions
-        : user.role.name === "secretary"
-        ? secretaryOptions
-        : user.role.name === "principal"
-        ? principalOptions
-        : user.role.name === "viceprincipal"
-        ? viceprincipalOptions
-        : user.role.name === "academiccoor"
-        ? academicCoorOptions
-        : []
-    )
-      .map((option) => {
-        if (option.mainOption.to === path) {
-          return { mainOptionName: option.mainOption.name };
-        }
-
-        if (option.subOptions) {
-          const subOption = option.subOptions.find(
-            (subOption) =>
-              subOption.to ===
-              (lastPart ? (lastPart === "edit" ? withoutLastPart : preLastPart === "edit" ? withoutPreLastPart : path) : path)
-          );
-          return subOption
-            ? { mainOptionName: option.mainOption.name, subOption }
-            : null;
-        }
-
-        return null;
-      })
-      .filter((matchingOption) => matchingOption)[0];
-
-    if (matchingOption) {
-      setSubMenuSelect(matchingOption.mainOptionName);
-      if (matchingOption.subOption)
-        setSubOptionSelect(matchingOption.subOption.name);
-    } else {
-      setSubMenuSelect("");
-      setSubOptionSelect("");
-    }
-  }, [location.pathname]);
-
-  useEffect(() => {
-    getUser();
   }, []);
 
   return (
@@ -134,7 +68,7 @@ function Dashboard() {
           )}
           <section className="flex flex-col">
             <h1 className="font-semibold font-sans">{user.firstname}</h1>
-            <h2 className="text-[#5855ff] text-sm">{user.role.name}</h2>
+            <h2 className="text-[#5855ff] text-sm">{userRole}</h2>
           </section>
           <IoIosArrowDown
             onClick={() => setShowMenuUser((prev) => !prev)}

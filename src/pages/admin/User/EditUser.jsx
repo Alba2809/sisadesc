@@ -1,30 +1,17 @@
-import { useAdmin } from "@context/AdminContext";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
-import { formatDateShort, formatDateTime } from "@constants/functions";
-import InputSelect from "@components/InputSelect";
-import Dialog from "@components/Dialog";
-import AlertMessage from "@components/AlertMessage";
-import UploadImagePerfile from "@components/UploadImagePerfile";
+import { formatDateShort, formatDateTime } from "../../../constants/functions";
+import { useRole } from "../../../hooks/useRole";
+import { useUser } from "../../../hooks/useUser";
+import { useAddress } from "../../../hooks/useAddress";
+import InputSelect from "../../../components/InputSelect";
+import AlertMessage from "../../../components/AlertMessage";
+import UploadImagePerfile from "../../../components/UploadImagePerfile";
 
 function EditUser() {
   const params = useParams();
-  const {
-    getOneSomething,
-    getAllSomething,
-    updateSomething,
-    errors: updateErrors,
-  } = useAdmin();
-  const [user, setUser] = useState(null);
-  const [roles, setRoles] = useState([]);
-  const [addresses, setAddresses] = useState([]);
-  const [suggestions, setSuggestions] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [showDialog, setShowDialog] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
   const {
     register,
     handleSubmit,
@@ -32,39 +19,28 @@ function EditUser() {
     formState: { errors },
     setValue,
   } = useForm();
+  const { roles, handleChangeRole } = useRole({ setValue });
+  const {
+    getUser,
+    updateUser,
+    loading,
+    user,
+    errors: updateErrors,
+  } = useUser();
+  const { handleChangeCP, handleSelectAddress, suggestions } = useAddress({
+    setValue,
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function getUser() {
-      const userData = await getOneSomething(params.id, "user");
-      const rolesData = await getAllSomething("role");
-      const addressesData = await getAllSomething("address");
-      setUser(userData);
-      setValue("firstname", userData.firstname);
-      setValue("lastnamepaternal", userData.lastnamepaternal);
-      setValue("lastnamematernal", userData.lastnamematernal);
-      setValue("curp", userData.curp);
-      setValue("rfc", userData.rfc);
-      setValue("email", userData.email);
-      setValue("addressid", +userData.address.id);
-      setValue("street", userData.address.street);
-      setValue("colony", userData.address.settlement);
-      setValue("postalcode", userData.address.postalcode);
-      setValue("phonenumber", userData.phonenumber);
-      setValue("birthdate", formatDateShort(userData.birthdate));
-      setValue("status", userData.status);
-      setValue("role", +userData.role.id);
-      setValue("imageperfile", userData.imageperfile);
-      setRoles(rolesData);
-      setAddresses(addressesData);
-      setLoading(false);
+    async function getData() {
+      await getUser(params.id, setValue);
     }
-    getUser();
+    getData();
   }, []);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      handleDialog();
       const formData = new FormData();
       formData.append("firstname", data.firstname);
       formData.append("lastnamepaternal", data.lastnamepaternal);
@@ -79,18 +55,10 @@ function EditUser() {
       formData.append("email", data.email);
       formData.append("role", +data.role);
       formData.append("imageperfile", data.imageperfile);
-      const res = await updateSomething(user.id, formData, "user");
-      handleDialog();
+      const res = await updateUser(user.id, formData);
       if (res?.statusText === "OK") navigate("/admin/users");
-    } catch (error) {
-      handleDialog();
-    }
+    } catch (error) {}
   });
-
-  const handleDialog = () => {
-    setShowLoading((prev) => (prev === "" ? "true" : ""));
-    setShowDialog((prev) => !prev);
-  };
 
   const dateInputRef = useRef(null);
 
@@ -103,33 +71,19 @@ function EditUser() {
     setValue("status", value);
   };
 
-  const handleChangeRole = (value) => {
-    const rol = roles.find((role) => role.name === value);
-    if (rol) return setValue("role", rol.id);
-    setValue("role", null);
-  };
-
   const handleFileChange = (file) => {
     setValue("imageperfile", file);
   };
 
-  const handleChangeCP = (e) => {
-    const postalcode = e.target.value.replace(/[^0-9]/g, "");
-    setValue("postalcode", postalcode);
-    if (postalcode.length === 5) {
-      const matchingAddresses = addresses.filter((address) =>
-        address.CP.includes(postalcode)
-      );
-      setSuggestions(matchingAddresses);
-    }
-  };
+  const handleInputNumber = (e) => {
+    const { value } = e.target;
 
-  const handleSelectAddress = (address) => {
-    setSelectedAddress(address);
-    setValue("colony", address.asentamiento);
-    setValue("postalcode", address.CP);
-    setValue("addressid", address.id);
-    setSuggestions([]);
+    const regex = /^\d*$/;
+    if (regex.test(value)) {
+      setValue("phonenumber", value);
+    } else {
+      e.target.value = e.target.value.replace(/\D/g, "");
+    }
   };
 
   return (
@@ -362,7 +316,7 @@ function EditUser() {
                   Teléfono<span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   maxLength={10}
                   minLength={10}
                   {...register("phonenumber", {
@@ -377,6 +331,7 @@ function EditUser() {
                     },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                  onChange={handleInputNumber}
                 />
               </div>
               <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
@@ -454,16 +409,6 @@ function EditUser() {
           </>
         )}
       </section>
-      <AnimatePresence>
-        {showDialog && (
-          <Dialog
-            title="Realizando cambios"
-            textAccept="Actualizar"
-            message="¿Está seguro de eliminar el usuario?"
-            showLoading={showLoading}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
