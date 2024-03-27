@@ -6,18 +6,14 @@ import {
   registerUserRequest,
   updateUserRequest,
 } from "../api/user";
-import { formatDateShort, groupArray } from "../constants/functions";
+import { formatDateShort } from "../constants/functions";
 import toast from "react-hot-toast";
 
 export function useUser() {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [allUsers, setAllUsers] = useState([]);
-  const [users, setUsers] = useState([]);
   const [user, setUser] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);
-  const [groupSize, setGroupsSize] = useState(5);
-  const [groupIndex, setGroupIndex] = useState(0);
   const [showDialog, setShowDialog] = useState(false);
 
   const registerUser = async (data) => {
@@ -94,8 +90,6 @@ export function useUser() {
     try {
       setLoading(true);
       const res = await getUsersRequest();
-      setAllUsers(res.data);
-      setUsers(groupArray(res.data, groupSize));
       return res.data;
     } catch (error) {
       console.log(error);
@@ -146,35 +140,6 @@ export function useUser() {
     setShowDialog(false);
   };
 
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      if (e.target.value === "") return getUsers(5);
-
-      const filteredUsers = allUsers.filter((user) =>
-        Object.entries(user).some(
-          ([key, value]) =>
-            key !== "id" &&
-            key !== "imageperfile" &&
-            key !== "createdAt" &&
-            key !== "updatedAt" &&
-            key !== "role" &&
-            key !== "address" &&
-            (typeof value === "string" || typeof value === "number") &&
-            value
-              .toString()
-              .toLowerCase()
-              .includes(e.target.value.toLowerCase())
-        )
-      );
-
-      setUsers(groupArray(filteredUsers, groupSize));
-    }
-  };
-
-  const groupUsers = (groupSize) => {
-    return setUsers(groupArray(allUsers, groupSize));
-  };
-
   useEffect(() => {
     if (errors.length > 0) {
       const timer = setTimeout(() => {
@@ -187,23 +152,15 @@ export function useUser() {
   return {
     errors,
     loading,
-    allUsers,
-    users,
     user,
-    groupSize,
-    groupIndex,
     userToDelete,
     setUser,
     setUserToDelete,
-    setGroupsSize,
-    setGroupIndex,
     registerUser,
     updateUser,
     getUser,
     getUsers,
     deleteUser,
-    handleSearch,
-    groupUsers,
     handleShowDialog,
     showDialog,
     handleActionDialog,

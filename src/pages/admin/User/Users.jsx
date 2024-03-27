@@ -4,54 +4,43 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { formatDateLong } from "../../../constants/functions";
+import { useUser } from "../../../hooks/useUser";
+import { useGroupTable } from "../../../hooks/useGroupTable";
 import InputSelect from "../../../components/InputSelect";
 import Dialog from "../../../components/Dialog";
-import { useUser } from "../../../hooks/useUser";
 
 function Users() {
   const {
-    allUsers,
-    users,
     loading,
-    groupSize,
-    groupIndex,
-    setGroupsSize,
-    setGroupIndex,
     getUsers,
-    handleSearch,
-    groupUsers,
     handleActionDialog,
     handleShowDialog,
     showDialog
   } = useUser();
+  const {
+    allObjects: allUsers,
+    setDataWithoutFilter,
+    objects: users,
+    groupIndex,
+    handleOptionGroup,
+    handleNext,
+    handleBack,
+    startRecord,
+    endRecord,
+    totalRecords,
+    handleSearch,
+  } = useGroupTable();
   const [isHoverEdit, setIsHoverEdit] = useState(0);
   const [isHoverDelete, setIsHoverDelete] = useState(0);
   const [isHoverRow, setIsHoverRow] = useState(0);
 
   useEffect(() => {
     async function getData() {
-      await getUsers(groupSize);
+      const res = await getUsers();
+      setDataWithoutFilter(res);
     }
     getData();
   }, []);
-
-  const onOptionChange = (number) => {
-    setGroupsSize(+number);
-    setGroupIndex(0);
-    groupUsers(+number);
-  };
-
-  const handleNext = () => {
-    setGroupIndex((prevIndex) => Math.min(prevIndex + 1, users.length - 1));
-  };
-
-  const handleBack = () => {
-    setGroupIndex((prevIndex) => Math.max(prevIndex - 1, 0));
-  };
-
-  const startRecord = groupIndex * groupSize + 1;
-  const endRecord = Math.min((groupIndex + 1) * groupSize, allUsers.length);
-  const totalRecords = allUsers.length;
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -65,7 +54,7 @@ function Users() {
             <div className="w-[70px]">
               <InputSelect
                 options={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
-                onOptionChange={onOptionChange}
+                onOptionChange={handleOptionGroup}
                 defaultValue="5"
               />
             </div>

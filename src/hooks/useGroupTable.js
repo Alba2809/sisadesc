@@ -87,6 +87,7 @@ export function useGroupTable() {
   const setDataWithoutFilter = (data) => {
     setAllObjects(data);
     setObjects(groupArray(data, groupSize));
+    setFilterStatus("Ambos");
   };
 
   return {
