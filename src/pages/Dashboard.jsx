@@ -48,7 +48,10 @@ function Dashboard() {
     <div className="w-full h-full overflow-hidden relative">
       <Toaster position="top-right" reverseOrder={false} />
       <header className="bg-white h-[70px] flex flex-row p-2 w-full justify-between">
-        <img src={Logo} alt="Logo del sistema" className="" />
+        <div className="flex flex-row items-center gap-3">
+        <img src={Logo} alt="Logo del sistema" className="h-full" />
+        <h1 className="font-bold text-3xl">SISADESC</h1>
+        </div>
         <section
           className="flex flex-row items-center gap-3 relative mr-5"
           ref={menuRef}
