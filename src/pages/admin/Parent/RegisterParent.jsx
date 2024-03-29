@@ -1,97 +1,51 @@
-import { useAdmin } from "@context/AdminContext";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { genders, vitalStatus } from "@constants/constants";
-import { scrollToTop } from "@constants/functions";
-import InputSelect from "@components/InputSelect";
-import Dialog from "@components/Dialog";
-import AlertMessage from "@components/AlertMessage";
+import { genders, vitalStatus } from "../../../constants/constants";
+import { useParent } from "../../../hooks/useParent";
+import { useAddress } from "../../../hooks/useAddress";
+import InputSelect from "../../../components/InputSelect";
+import AlertMessage from "../../../components/AlertMessage";
+import toast from "react-hot-toast";
 
 function RegisterParent() {
-  const {
-    getAllSomething,
-    registerSomething,
-    errors: registerErrors,
-  } = useAdmin();
   const dateInputRef = useRef(null);
-  const [showDialog, setShowDialog] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
-  const [addresses, setAddresses] = useState([]);
-  const [suggestions, setSuggestions] = useState([]);
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
   } = useForm();
+  const { handleChangeCP, handleSelectAddress, suggestions } = useAddress({
+    setValue,
+  });
+  const {
+    registerParent,
+    handleChangeSelect,
+    handleChangeInput,
+    errors: registerErrors,
+  } = useParent({ setValue });
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function getData() {
-      const addressesData = await getAllSomething("address");
-      setAddresses(addressesData);
-    }
     setValue("gender", genders[0]);
     setValue("status", vitalStatus[0]);
-    getData();
   }, []);
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      handleDialog();
-
-      /* delete all data equal to "" or null */
-      for (const key in data) {
-        if (data[key] === "" || data[key] === null) delete data[key];
-      }
-
-      const res = await registerSomething(data, "parent");
-
-      if (res?.statusText === "OK") {
-        navigate("/admin/parents");
-      }
-
-      handleDialog();
-    } catch (error) {
-      handleDialog();
+    for (const key in data) {
+      if (data[key] === "" || data[key] === null) delete data[key];
+    }
+    const res = await registerParent(data);
+    if (res?.statusText === "OK") {
+      navigate("/admin/parents");
     }
   });
 
-  const handleDialog = () => {
-    setShowLoading((prev) => (prev === "" ? "true" : ""));
-    setShowDialog((prev) => !prev);
-  };
-
-  const handleChangeSelect = (value, name) => {
-    setValue(name, value);
-  };
-
-  const handleChangeInput = (e, name, type) => {
-    let value = null;
-    if (type === "number") value = e.target.value.replace(/[^0-9]/g, "");
-    setValue(name, value ?? e.target.value);
-    if (name.includes("postalcode")) {
-      if (value.length === 5) {
-        const matchingAddresses = addresses.filter((address) =>
-          address.CP.includes(value)
-        );
-
-        setSuggestions(matchingAddresses);
-      }
-    }
-  };
-
-  const handleSelectAddress = (address) => {
-    setValue("colony", address.asentamiento);
-    setValue("postalcode", address.CP);
-    setValue("addressid", address.id);
-    setSuggestions([]);
-  };
-
   useEffect(() => {
-    if (errors.length > 0) scrollToTop();
+    if (Object.keys(errors).length > 0)
+      toast.error("Hay errores en el formulario");
   }, [errors]);
 
   return (
@@ -342,7 +296,7 @@ function RegisterParent() {
                 },
               })}
               className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-              onChange={(e) => handleChangeInput(e, "postalcode", "number")}
+              onChange={handleChangeCP}
               min={0}
             />
             {suggestions.length > 0 && (
@@ -400,16 +354,6 @@ function RegisterParent() {
           </section>
         </form>
       </section>
-      <AnimatePresence>
-        {showDialog && (
-          <Dialog
-            title="Realizando registro"
-            textAccept="Registrando"
-            message=""
-            showLoading={showLoading}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

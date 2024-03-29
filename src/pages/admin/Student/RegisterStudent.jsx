@@ -1,34 +1,18 @@
-import { useAdmin } from "@context/AdminContext";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { genders, vitalStatus, grades, groups } from "@constants/constants";
-import { scrollToTop } from "@constants/functions";
 import { FaCheck } from "react-icons/fa";
-import InputSelect from "@components/InputSelect";
-import Dialog from "@components/Dialog";
-import AlertMessage from "@components/AlertMessage";
+import { useAddress } from "../../../hooks/useAddress";
+import { useStudent } from "../../../hooks/useStudent";
+import { useParent } from "../../../hooks/useParent";
+import InputSelect from "../../../components/InputSelect";
+import AlertMessage from "../../../components/AlertMessage";
+import toast from "react-hot-toast";
 
 function RegisterStudent() {
-  const {
-    registerSomething,
-    getAllSomething,
-    deleteSomething,
-    errors: registerErrors,
-  } = useAdmin();
   const dateInputRef = useRef(null);
-  const [showDialog, setShowDialog] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
-  const [addresses, setAddresses] = useState([]);
-  const [studentSuggestions, setStudentSuggestions] = useState([]);
-  const [fatherSuggestions, setFatherSuggestions] = useState([]);
-  const [motherSuggestions, setMotherSuggestions] = useState([]);
-  const [tutorSuggestions, setTutorSuggestions] = useState([]);
-  const [showFormNewParent, setShowFormNewParent] = useState(null);
-  const [showFormFather, setShowFormFather] = useState(false);
-  const [showFormMother, setShowFormMother] = useState(false);
-  const [showFormTutor, setShowFormTutor] = useState(false);
   const {
     register,
     handleSubmit,
@@ -36,13 +20,30 @@ function RegisterStudent() {
     setValue,
     unregister,
   } = useForm();
+  const {
+    handleChangeCP,
+    handleSelectAddress,
+    fatherSuggestions,
+    motherSuggestions,
+    tutorSuggestions,
+    studentSuggestions,
+  } = useAddress({ setValue, unregister });
+  const {
+    handleChangeInput,
+    handleChangeSelect,
+    handleClickRegister,
+    showFormFather,
+    showFormMother,
+    showFormNewParent,
+    showFormTutor,
+    handleShowForm,
+    registerStudent,
+    errors: errorsStudent,
+  } = useStudent({ setValue, unregister });
+  const { deleteParent, registerParent, errors: errorsParent } = useParent();
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function getData() {
-      const addressesData = await getAllSomething("address");
-      setAddresses(addressesData);
-    }
     setValue("student_gender", genders[0]);
     setValue("student_grade", grades[0]);
     setValue("student_group", groups[0]);
@@ -53,204 +54,57 @@ function RegisterStudent() {
     setValue("mother_status", vitalStatus[0]);
     setValue("tutor_status", vitalStatus[0]);
     setValue("isTutor", "Madre");
-    getData();
   }, []);
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      handleDialog();
-
-      let totalQueries = 0;
-      let queriesRealized = [];
-      for (const key in data) {
-        if (data[key] === "" || data[key] === null) {
-          delete data[key];
-        }
+    let totalQueries = 0;
+    let queriesRealized = [];
+    for (const key in data) {
+      if (data[key] === "" || data[key] === null) {
+        delete data[key];
       }
-      if (showFormNewParent === "No") {
-        if (showFormFather) {
-          totalQueries++;
-          const resFather = await registerSomething(data, "father");
-          if (resFather?.statusText === "OK") {
-            queriesRealized.push(resFather);
-            data.father_firstname = null;
-          } else scrollToTop();
-        }
-        if (showFormMother) {
-          totalQueries++;
-          const resMother = await registerSomething(data, "mother");
-          if (resMother?.statusText === "OK") {
-            queriesRealized.push(resMother);
-            data.mother_firstname = null;
-          } else scrollToTop();
-        }
-        if (showFormTutor) {
-          totalQueries++;
-          const resTutor = await registerSomething(data, "tutor");
-          if (resTutor?.statusText === "OK") {
-            queriesRealized.push(resTutor);
-            data.tutor_firstname = null;
-          } else scrollToTop();
-        }
-      }
-
-      if (queriesRealized.length !== totalQueries) {
-        queriesRealized.map(async (query) => {
-          console.log(query);
-          await deleteSomething(query.data, "parent");
-        });
-        handleDialog();
-        return;
-      }
-      const res = await registerSomething(data, "student");
-      if (res?.statusText === "OK") navigate("/admin/students");
-      else scrollToTop();
-
-      handleDialog();
-    } catch (error) {
-      handleDialog();
     }
+    if (showFormNewParent === "No") {
+      if (showFormFather) {
+        totalQueries++;
+        const resFather = await registerParent(data, "father");
+        if (resFather?.statusText === "OK") {
+          queriesRealized.push(resFather);
+          data.father_firstname = null;
+        }
+      }
+      if (showFormMother) {
+        totalQueries++;
+        const resMother = await registerParent(data, "mother");
+        if (resMother?.statusText === "OK") {
+          queriesRealized.push(resMother);
+          data.mother_firstname = null;
+        }
+      }
+      if (showFormTutor) {
+        totalQueries++;
+        const resTutor = await registerParent(data, "tutor");
+        if (resTutor?.statusText === "OK") {
+          queriesRealized.push(resTutor);
+          data.tutor_firstname = null;
+        }
+      }
+    }
+
+    if (queriesRealized.length !== totalQueries) {
+      queriesRealized.map(async (query) => {
+        console.log(query);
+        await deleteParent(query.data);
+      });
+      return;
+    }
+
+    const res = await registerStudent(data);
+    if (res?.statusText === "OK") navigate("/admin/students");
   });
 
-  const handleDialog = () => {
-    setShowLoading((prev) => (prev === "" ? "true" : ""));
-    setShowDialog((prev) => !prev);
-  };
-
-  const handleChangeSelect = (value, name) => setValue(name, value);
-
-  const handleChangeInput = (e, name, type, person) => {
-    let value = null;
-    if (type === "number") value = e.target.value.replace(/[^0-9]/g, "");
-    setValue(name, value ?? e.target.value);
-    if (name.includes("postalcode")) {
-      if (value.length === 5) {
-        const matchingAddresses = addresses.filter((address) =>
-          address.CP.includes(value)
-        );
-
-        if (person === "father") setFatherSuggestions(matchingAddresses);
-        if (person === "mother") setMotherSuggestions(matchingAddresses);
-        if (person === "tutor") setTutorSuggestions(matchingAddresses);
-        if (person === "student") setStudentSuggestions(matchingAddresses);
-      }
-    }
-  };
-
-  const handleSelectAddress = (address, type) => {
-    if (type === "father") {
-      setValue("father_colony", address.asentamiento);
-      setValue("father_postalcode", address.CP);
-      setValue("father_addressid", address.id);
-      setFatherSuggestions([]);
-    }
-    if (type === "mother") {
-      setValue("mother_colony", address.asentamiento);
-      setValue("mother_postalcode", address.CP);
-      setValue("mother_addressid", address.id);
-      setMotherSuggestions([]);
-    }
-    if (type === "tutor") {
-      setValue("tutor_colony", address.asentamiento);
-      setValue("tutor_postalcode", address.CP);
-      setValue("tutor_addressid", address.id);
-      setTutorSuggestions([]);
-    }
-    if (type === "student") {
-      setValue("student_colony", address.asentamiento);
-      setValue("student_postalcode", address.CP);
-      setValue("student_addressid", address.id);
-      setStudentSuggestions([]);
-    }
-  };
-
-  const handleClickRegister = (e) => {
-    if (showFormNewParent !== e.target.value) {
-      setShowFormNewParent(e.target.value);
-      if (e.target.value === "Yes") {
-        setShowFormFather(false);
-        setShowFormMother(false);
-        setShowFormTutor(false);
-      }
-    }
-  };
-
-  const handleShowForm = (type) => {
-    if (type === "father") {
-      setShowFormFather((prev) => !prev);
-    }
-    if (type === "mother") {
-      setShowFormMother((prev) => !prev);
-    }
-    if (type === "tutor") {
-      setShowFormTutor((prev) => !prev);
-    }
-  };
-
   useEffect(() => {
-    if (!showFormFather) {
-      unregister([
-        "father_firstname",
-        "father_lastnamepaternal",
-        "father_lastnamematernal",
-        "father_curp",
-        "father_rfc",
-        "father_birthdate",
-        "father_email",
-        "father_phonenumber",
-        "father_colony",
-        "father_postalcode",
-        "father_addressid",
-        "father_status",
-        "father_street",
-      ]);
-    }
-    if (!showFormMother) {
-      unregister([
-        "mother_firstname",
-        "mother_lastnamepaternal",
-        "mother_lastnamematernal",
-        "mother_curp",
-        "mother_rfc",
-        "mother_birthdate",
-        "mother_email",
-        "mother_phonenumber",
-        "mother_colony",
-        "mother_postalcode",
-        "mother_addressid",
-        "mother_status",
-        "mother_street",
-      ]);
-    }
-    if (!showFormTutor) {
-      unregister([
-        "tutor_firstname",
-        "tutor_lastnamepaternal",
-        "tutor_lastnamematernal",
-        "tutor_curp",
-        "tutor_rfc",
-        "tutor_birthdate",
-        "tutor_email",
-        "tutor_phonenumber",
-        "tutor_colony",
-        "tutor_postalcode",
-        "tutor_addressid",
-        "tutor_status",
-        "tutor_street",
-      ]);
-    }
-    if (showFormFather && !showFormMother && !showFormTutor)
-      setValue("isTutor", "Padre");
-    else if (showFormMother && !showFormFather && !showFormTutor)
-      setValue("isTutor", "Madre");
-    else if(showFormFather && showFormMother && !showFormTutor)
-      setValue("isTutor", "Madre");
-    else if (!showFormTutor && !showFormFather && !showFormMother)
-      unregister(["isTutor"]);
-  }, [showFormFather, showFormMother, showFormTutor]);
-
-  useEffect(() => {
-    if (errors.length > 0) scrollToTop();
+    if (Object.keys(errors).length > 0) toast.error("Hay errores en el formulario.");
   }, [errors]);
 
   return (
@@ -267,7 +121,18 @@ function RegisterStudent() {
         }}
       >
         <AnimatePresence mode="sync">
-          {registerErrors.map((error, i) => (
+          {errorsParent.map((error, i) => (
+            <motion.div
+              key={i}
+              initial={{ height: 0, y: -10, opacity: 0 }}
+              animate={{ height: 48, y: 0, opacity: 1 }}
+              exit={{ height: 0, y: -10, opacity: 0 }}
+              transition={{ type: "spring", delay: i * 0.2 }}
+            >
+              <AlertMessage key={i} message={error} />
+            </motion.div>
+          ))}
+          {errorsStudent.map((error, i) => (
             <motion.div
               key={i}
               initial={{ height: 0, y: -10, opacity: 0 }}
@@ -504,14 +369,7 @@ function RegisterStudent() {
                   },
                 })}
                 className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                onChange={(e) =>
-                  handleChangeInput(
-                    e,
-                    "student_postalcode",
-                    "number",
-                    "student"
-                  )
-                }
+                onChange={(e) => handleChangeCP(e, "student")}
                 min={0}
               />
               {studentSuggestions.length > 0 && (
@@ -872,14 +730,7 @@ function RegisterStudent() {
                         },
                       })}
                       className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                      onChange={(e) =>
-                        handleChangeInput(
-                          e,
-                          "father_postalcode",
-                          "number",
-                          "father"
-                        )
-                      }
+                      onChange={(e) => handleChangeCP(e, "father")}
                       min={0}
                     />
                     {fatherSuggestions.length > 0 && (
@@ -937,7 +788,7 @@ function RegisterStudent() {
                   </div>
                   {!showFormMother && !showFormTutor && (
                     <p className="w-full font-medium font-serif text-lg">
-                      Nota: Debido a que sólo se registrará el padre, el padre
+                      Nota: Debido a que sólo se está registrando el padre, el padre
                       será agregado como el tutor del estudiante.
                     </p>
                   )}
@@ -1172,14 +1023,7 @@ function RegisterStudent() {
                         },
                       })}
                       className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                      onChange={(e) =>
-                        handleChangeInput(
-                          e,
-                          "mother_postalcode",
-                          "number",
-                          "mother"
-                        )
-                      }
+                      onChange={(e) => handleChangeCP(e, "mother")}
                       min={0}
                     />
                     {motherSuggestions.length > 0 && (
@@ -1237,7 +1081,7 @@ function RegisterStudent() {
                   </div>
                   {!showFormFather && !showFormTutor && (
                     <p className="w-full font-medium font-serif text-lg">
-                      Nota: Debido a que sólo se registrará la madre, la madre
+                      Nota: Debido a que sólo se está registrando la madre, la madre
                       será agregado como el tutor del estudiante.
                     </p>
                   )}
@@ -1501,14 +1345,7 @@ function RegisterStudent() {
                         },
                       })}
                       className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                      onChange={(e) =>
-                        handleChangeInput(
-                          e,
-                          "tutor_postalcode",
-                          "number",
-                          "tutor"
-                        )
-                      }
+                      onChange={(e) => handleChangeCP(e, "tutor")}
                       min={0}
                     />
                     {tutorSuggestions.length > 0 && (
@@ -1652,16 +1489,6 @@ function RegisterStudent() {
           </section>
         </form>
       </section>
-      <AnimatePresence>
-        {showDialog && (
-          <Dialog
-            title="Realizando registro"
-            textAccept="Registrando"
-            message=""
-            showLoading={showLoading}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

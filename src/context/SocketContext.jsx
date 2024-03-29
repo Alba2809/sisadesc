@@ -26,10 +26,10 @@ export const SocketProvider = ({ children }) => {
       });
       setSocket(socket);
 
-      return () => socket.close();
+      return () => socket?.close();
     } else {
       if (socket) {
-        socket.close();
+        socket?.close();
         setSocket(null);
       }
     }

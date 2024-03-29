@@ -30,7 +30,7 @@ export function useGroupTable() {
   };
 
   const handleNext = () => {
-    setGroupIndex((prevIndex) => Math.min(prevIndex + 1, subjects.length - 1));
+    setGroupIndex((prevIndex) => Math.min(prevIndex + 1, objects.length - 1));
   };
 
   const handleBack = () => {

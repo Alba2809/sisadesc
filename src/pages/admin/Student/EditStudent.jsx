@@ -1,109 +1,37 @@
-import { useAdmin } from "@context/AdminContext";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { formatDateShort, scrollToTop } from "@constants/functions";
-import { genders, grades, groups } from "@constants/constants";
-import InputSelect from "@components/InputSelect";
-import Dialog from "@components/Dialog";
-import AlertMessage from "@components/AlertMessage";
+import { formatDateShort } from "../../../constants/functions";
+import { genders, grades, groups } from "../../../constants/constants";
+import { useAddress } from "../../../hooks/useAddress";
+import { useStudent } from "../../../hooks/useStudent";
+import InputSelect from "../../../components/InputSelect";
+import AlertMessage from "../../../components/AlertMessage";
 
 function EditStudent() {
   const params = useParams();
-  const {
-    getOneSomething,
-    getAllSomething,
-    updateSomething,
-    errors: updateErrors,
-  } = useAdmin();
-  const [object, setObject] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [addresses, setAddresses] = useState([]);
-  const [studentSuggestions, setStudentSuggestions] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(null);
-  const [showDialog, setShowDialog] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
   } = useForm();
+  const { studentSuggestions, handleChangeCP, handleSelectAddress } =
+    useAddress({ setValue });
+  const { getStudent, student: object, loading, handleChangeInput, handleChangeSelect, updateStudent, errors: updateErrors } = useStudent({ setValue });
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function getObject() {
-      const objectData = await getOneSomething(params.id, "student");
-      const addressesData = await getAllSomething("address");
-      setAddresses(addressesData);
-      setObject(objectData);
-      setValue("student_firstname", objectData.firstname);
-      setValue("student_lastnamepaternal", objectData.lastnamepaternal);
-      setValue("student_lastnamematernal", objectData.lastnamematernal);
-      setValue("student_curp", objectData.curp);
-      setValue("student_gender", objectData.gender);
-      setValue("student_birthdate", formatDateShort(objectData.birthdate));
-      setValue("student_street", objectData.address.street);
-      setValue("student_colony", objectData.address.settlement);
-      setValue("student_addressid", objectData.address.id);
-      setValue("student_postalcode", objectData.address.postalcode);
-      setValue("student_group", objectData.group);
-      setValue("student_grade", objectData.grade?.toString());
-      setValue("student_phonenumber", objectData.phonenumber);
-      setValue("student_email", objectData.email);
-      setValue("father_curp", objectData.father_curp);
-      setValue("mother_curp", objectData.mother_curp);
-      setValue("tutor_curp", objectData.tutor_curp);
-      setLoading(false);
-    }
-    if (loading) getObject();
-  }, [loading]);
+    getStudent(params.id);
+  }, []);
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      handleDialog();
-      const res = await updateSomething(object.id, data, "student");
+      const res = await updateStudent(object.id, data);
       if (res?.statusText === "OK") navigate("/admin/students");
-      else scrollToTop();
-      handleDialog();
-    } catch (error) {
-      handleDialog();
-    }
   });
 
-  const handleDialog = () => {
-    setShowLoading((prev) => (prev === "" ? "true" : ""));
-    setShowDialog((prev) => !prev);
-  };
-
   const dateInputRef = useRef(null);
-
-  const handleChangeSelect = (value, name) => {
-    setValue(name, value);
-  };
-
-  const handleChangeInput = (e, name, type, person) => {
-    let value = null;
-    if (type === "number") value = e.target.value.replace(/[^0-9]/g, "");
-    setValue(name, value ?? e.target.value);
-    if (name.includes("postalcode")) {
-      if (value.length === 5) {
-        const matchingAddresses = addresses.filter((address) =>
-          address.CP.includes(value)
-        );
-        if (person === "student") setStudentSuggestions(matchingAddresses);
-      }
-    }
-  };
-
-  const handleSelectAddress = (address) => {
-    setSelectedAddress(address);
-    setValue("student_colony", address.asentamiento);
-    setValue("student_postalcode", address.CP);
-    setValue("student_addressid", address.id);
-    setStudentSuggestions([]);
-  };
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -113,6 +41,9 @@ function EditStudent() {
       <section
         id="container"
         className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto"
+        style={{
+          scrollbarWidth: "thin",
+        }}
       >
         {loading ? (
           <p>Loading...</p>
@@ -263,13 +194,13 @@ function EditStudent() {
                 </div>
                 <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                   <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                    Email<span className="text-red-500">*</span>
+                    Email
                   </label>
                   <input
                     type="email"
                     maxLength={30}
                     {...register("student_email", {
-                      required: "Se requiere el email del estudiante",
+                      required: false,
                       maxLength: {
                         value: 30,
                         message:
@@ -305,14 +236,14 @@ function EditStudent() {
                 </div>
                 <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
                   <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                    Teléfono<span className="text-red-500">*</span>
+                    Teléfono
                   </label>
                   <input
                     type="text"
                     maxLength={10}
                     minLength={10}
                     {...register("student_phonenumber", {
-                      required: "Se requiere el código postal del estudiante",
+                      required: false,
                       pattern: {
                         value: /^[0-9]+$/,
                         message: "Solo se permiten números del estudiante",
@@ -364,10 +295,8 @@ function EditStudent() {
                     })}
                     className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                     onChange={(e) =>
-                      handleChangeInput(
+                      handleChangeCP(
                         e,
-                        "student_postalcode",
-                        "number",
                         "student"
                       )
                     }
@@ -506,15 +435,6 @@ function EditStudent() {
           </>
         )}
       </section>
-      <AnimatePresence>
-        {showDialog && (
-          <Dialog
-            title="Realizando cambios"
-            textAccept="Actualizar"
-            showLoading={showLoading}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
