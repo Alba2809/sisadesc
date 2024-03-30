@@ -1,143 +1,51 @@
-import { useSecretary } from "@context/SecretaryContext";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import InputSelect from "@components/InputSelect";
-import AlertMessage from "@components/AlertMessage";
-import Dialog from "@components/Dialog";
+import { useGrade } from "../../../hooks/useGrade";
+import InputSelect from "../../../components/InputSelect";
+import AlertMessage from "../../../components/AlertMessage";
 
 function RegisterGrades() {
-  const {
-    getAllSomething,
-    getOneSomething,
-    registerSomething,
-    errors: registerErrors,
-  } = useSecretary();
-  const [showDialog, setShowDialog] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [loadingChanges, setLoadingChanges] = useState(false);
-  const [students, setStudents] = useState([]);
-  const [subjects, setSubjects] = useState([]);
-  const [subjectSelected, setSubjectSelected] = useState(null);
-  const [validEvaluations, setValidEvaluations] = useState([]);
-  const navigate = useNavigate();
-  const evaluationNumbers = ["1", "2", "3"];
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
   } = useForm();
+  const navigate = useNavigate();
+  const {
+    getDataToRegisterForm,
+    loading,
+    validEvaluations,
+    students,
+    subjects,
+    handleOptionChange,
+    handleChangeInput,
+    registerGrades,
+    errors: registerErrors,
+    subjectSelected,
+  } = useGrade({ setValue });
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      handleDialog();
-      const studentsAdded = students.map((student) => {
-        return {
-          sub_stud_id: student.subject_student_id,
-          grade: data["G" + student.subject_student_id] ?? null,
-          assist: data["A" + student.subject_student_id] ?? null,
-          noAssist: data["I" + student.subject_student_id] ?? null,
-        };
-      });
-      data.students = studentsAdded;
-      const res = await registerSomething(data, "grades");
-      handleDialog();
-      if (res?.statusText === "OK") {
-        toast.success("Registro exitoso");
-        navigate("/secretary/grades");
-      }
-    } catch (error) {
-      handleDialog();
+    const studentsAdded = students.map((student) => {
+      return {
+        sub_stud_id: student.id,
+        grade: data["G" + student.id] ?? null,
+        assist: data["A" + student.id] ?? null,
+        noAssist: data["I" + student.id] ?? null,
+      };
+    });
+    data.students = studentsAdded;
+    const res = await registerGrades(data);
+    if (res?.statusText === "OK") {
+      navigate("/secretary/grades");
     }
   });
 
-  const handleDialog = () => {
-    setShowLoading((prev) => (prev === "" ? "true" : ""));
-    setShowDialog((prev) => !prev);
-  };
-
   useEffect(() => {
-    if (loading) {
-      async function getData() {
-        try {
-          const resSubjects = await getAllSomething("subject");
-          if (resSubjects.length > 0) {
-            setSubjects(resSubjects);
-            const resGrades = await getOneSomething(
-              resSubjects[0].id,
-              "grades"
-            );
-            setStudents(resGrades);
-            const evaluationsEvaluated = resGrades[0].grades.map((value) =>
-              value.evaluation_number.toString()
-            );
-            const difference = evaluationNumbers.filter(
-              (num) => !evaluationsEvaluated.includes(num)
-            );
-            setValidEvaluations(difference);
-            setValue("grades", []);
-            if (difference.length > 0)
-              setValue("evaluation_number", difference[0]);
-          }
-          setLoading(false);
-        } catch (error) {}
-      }
-      getData();
-    }
-  }, [loading]);
-
-  useEffect(() => {
-    if (loadingChanges) {
-      async function getData() {
-        try {
-          const resGrades = await getOneSomething(subjectSelected.id, "grades");
-          if (resGrades.length > 0) {
-            setStudents(resGrades);
-            const evaluationsEvaluated = resGrades[0].grades.map((value) =>
-              value.evaluation_number.toString()
-            );
-            const difference = evaluationNumbers.filter(
-              (num) => !evaluationsEvaluated.includes(num)
-            );
-            setValidEvaluations(difference);
-            if (difference.length > 0)
-              setValue("evaluation_number", difference[0]);
-          } else {
-            setStudents([]);
-            setValidEvaluations([]);
-          }
-          setLoadingChanges(false);
-          setValue("grades", []);
-        } catch (error) {
-          setStudents([]);
-        }
-      }
-      getData();
-    }
-  }, [loadingChanges]);
-
-  const onOptionChange = (value, type) => {
-    if (type === "evaluation_number") {
-      setValue("evaluation_number", +value);
-    } else if (type === "subject") {
-      const foundSubject = subjects.find(
-        (subject) =>
-          `${subject.name} - ${subject.grade}${subject.group}` === value
-      );
-      setSubjectSelected(foundSubject);
-      setLoadingChanges(true);
-    }
-  };
-
-  const handleChangeInput = (e, name, type) => {
-    let value = null;
-    if (type === "number") value = e.target.value.replace(/[^0-9.]/g, "");
-    setValue(name, value ?? e.target.value);
-  };
+    getDataToRegisterForm();
+  }, []);
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -195,15 +103,13 @@ function RegisterGrades() {
                   Materia
                 </label>
                 <div className="w-[200px]">
-                  {loading ? (
-                    "Loading..."
-                  ) : (
+                  {!loading && (
                     <InputSelect
-                      options={subjects.map(
+                      options={subjects?.map(
                         (subject) =>
                           `${subject.name} - ${subject.grade}${subject.group}`
                       )}
-                      onOptionChange={onOptionChange}
+                      onOptionChange={handleOptionChange}
                       style="focus:border-blue-400 focus:border focus:outline-none h-[50px]"
                       styleArrow="inset-y-[25%]"
                       object="subject"
@@ -212,8 +118,8 @@ function RegisterGrades() {
                 </div>
               </div>
               <div className="relative flex-1 w-[205px]">
-                {!loading && !loadingChanges && (
-                  validEvaluations.length > 0 ? (
+                {!loading &&
+                  (validEvaluations.length > 0 ? (
                     <>
                       <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
                         Número de evaluación
@@ -221,7 +127,7 @@ function RegisterGrades() {
                       </label>
                       <InputSelect
                         options={validEvaluations}
-                        onOptionChange={onOptionChange}
+                        onOptionChange={handleOptionChange}
                         style="focus:border-blue-400 focus:border focus:outline-none h-[50px]"
                         styleArrow="inset-y-[25%]"
                         object="evaluation_number"
@@ -231,15 +137,18 @@ function RegisterGrades() {
                     <p>No se puede registrar calificaciones sin alumnos.</p>
                   ) : (
                     <p>Ya se han registrados las tres evaluaciones.</p>
-                  )
-                )}
+                  ))}
               </div>
-              {students.length > 0 ? validEvaluations.length <= 0 ? null : <button
-                  type="submit"
-                  className="py-2 px-8 bg-blue-600 hover:bg-[#18aefa] text-white text-lg rounded-lg"
-                >
-                  Guardar
-                </button> : null}
+              {students.length > 0 ? (
+                validEvaluations.length <= 0 ? null : (
+                  <button
+                    type="submit"
+                    className="py-2 px-8 bg-blue-600 hover:bg-[#18aefa] text-white text-lg rounded-lg"
+                  >
+                    Guardar
+                  </button>
+                )
+              ) : null}
             </section>
           </header>
           <div
@@ -249,6 +158,7 @@ function RegisterGrades() {
               scrollbarColor: "#a5a5a5 transparent",
             }}
           >
+            <h1 className="flex-1 py-1 text-center border-b font-medium text-xl">{`${subjectSelected?.name} - ${subjectSelected?.grade}${subjectSelected?.group}`}</h1>
             <table className="table-auto w-full relative">
               <thead className="h-[50px] bg-[#f8f9fb] font-serif font-semibold">
                 <tr>
@@ -265,7 +175,7 @@ function RegisterGrades() {
                 </tr>
               </thead>
               <tbody>
-                {loading || loadingChanges ? (
+                {loading ? (
                   <tr className="border-t text-gray-500">
                     <td className="p-2">Loading...</td>
                   </tr>
@@ -288,7 +198,7 @@ function RegisterGrades() {
                         <td className="p-2">
                           <input
                             type="text"
-                            {...register("G" + student.subject_student_id, {
+                            {...register("G" + student.id, {
                               required: `Se requiere la calificación del estudiante ${student.firstname} ${student.lastnamepaternal} ${student.lastnamematernal}`,
                               pattern: {
                                 value: /^[0-9.]+$/,
@@ -297,11 +207,7 @@ function RegisterGrades() {
                             })}
                             className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                             onChange={(e) =>
-                              handleChangeInput(
-                                e,
-                                "" + student.subject_student_id,
-                                "number"
-                              )
+                              handleChangeInput(e, "" + student.id, "number")
                             }
                             min={0}
                           />
@@ -309,7 +215,7 @@ function RegisterGrades() {
                         <td className="p-2">
                           <input
                             type="text"
-                            {...register("A" + student.subject_student_id, {
+                            {...register("A" + student.id, {
                               required: `Se requiere la asistencia del estudiante ${student.firstname} ${student.lastnamepaternal} ${student.lastnamematernal}`,
                               pattern: {
                                 value: /^[0-9.]+$/,
@@ -318,11 +224,7 @@ function RegisterGrades() {
                             })}
                             className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                             onChange={(e) =>
-                              handleChangeInput(
-                                e,
-                                "" + student.subject_student_id,
-                                "number"
-                              )
+                              handleChangeInput(e, "" + student.id, "number")
                             }
                             min={0}
                           />
@@ -330,7 +232,7 @@ function RegisterGrades() {
                         <td className="p-2">
                           <input
                             type="text"
-                            {...register("I" + student.subject_student_id, {
+                            {...register("I" + student.id, {
                               required: `Se requiere la inasistencia del estudiante ${student.firstname} ${student.lastnamepaternal} ${student.lastnamematernal}`,
                               pattern: {
                                 value: /^[0-9.]+$/,
@@ -339,11 +241,7 @@ function RegisterGrades() {
                             })}
                             className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                             onChange={(e) =>
-                              handleChangeInput(
-                                e,
-                                "" + student.subject_student_id,
-                                "number"
-                              )
+                              handleChangeInput(e, "" + student.id, "number")
                             }
                             min={0}
                           />
@@ -357,16 +255,6 @@ function RegisterGrades() {
           </div>
         </form>
       </section>
-      <AnimatePresence>
-        {showDialog && (
-          <Dialog
-            title="Realizando registro"
-            textAccept="Registrando"
-            message=""
-            showLoading={showLoading}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

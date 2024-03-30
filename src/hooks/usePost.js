@@ -44,7 +44,11 @@ export function usePost({ setValue } = {}) {
       if (typeof error.response.data === "object" && error.response.data) {
         const array = Object.values(error.response.data);
         setErrors(array);
-      } else setErrors(error.response.data);
+        array.map((error) => toast.error(error));
+      } else{
+        setErrors(error.response.data);
+        error.response.data.map((error) => toast.error(error));
+      }
     }
   };
 

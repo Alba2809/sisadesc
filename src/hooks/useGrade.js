@@ -7,6 +7,7 @@ import {
 import { useState } from "react";
 import { useSubject } from "./useSubject";
 import { evaluationNumbers } from "../constants/constants";
+import { getSubjectsOfTeacherRequest } from "../api/subject";
 
 export function useGrade({ setValue } = {}) {
   const [errors, setErrors] = useState([]);
@@ -60,11 +61,37 @@ export function useGrade({ setValue } = {}) {
       setLoading(true);
       const resSubjects = await getSubjects();
       setSubjects(resSubjects);
+      if(!resSubjects[0]) return
       setSubjectSelected(resSubjects[0]);
       const resGrades = await getGradesSubjectRequest(resSubjects[0]?.id);
       if (resGrades) setStudents(resGrades.data);
     } catch (error) {
       toast.error("¡Error al obtener las calificaciones!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getSubjectsOfTeacherAndGrades = async () => {
+    try {
+      setLoading(true);
+      const res = await getSubjectsOfTeacherRequest();
+      const resSubjects = res.data;
+      setSubjects(resSubjects);
+
+      if(!resSubjects[0]) return
+      setSubjectSelected(resSubjects[0]);
+
+      const resGrades = await getGradesSubjectRequest(resSubjects[0]?.id);
+      if (resGrades) setStudents(resGrades.data);
+    } catch (error) {
+      toast.error("¡Error al obtener las calificaciones!");
+      if (typeof error.response.data === "object" && error.response.data) {
+        const array = Object.values(error.response.data);
+        array.map((error) => toast.error(error));
+      } else {
+        error.response.data.map((error) => toast.error(error));
+      }
     } finally {
       setLoading(false);
     }
@@ -208,6 +235,7 @@ export function useGrade({ setValue } = {}) {
   return {
     loading,
     getSubjectsAndGrades,
+    getSubjectsOfTeacherAndGrades,
     students,
     subjectSelected,
     subjects,

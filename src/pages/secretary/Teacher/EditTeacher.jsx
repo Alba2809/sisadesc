@@ -1,104 +1,45 @@
-import { useSecretary } from "@context/SecretaryContext";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { formatDateShort, scrollToTop } from "@constants/functions";
-import { genders } from "@constants/constants";
-import InputSelect from "@components/InputSelect";
-import Dialog from "@components/Dialog";
-import AlertMessage from "@components/AlertMessage";
+import { formatDateShort } from "../../../constants/functions";
+import { genders } from "../../../constants/constants";
+import { useTeacher } from "../../../hooks/useTeacher";
+import { useAddress } from "../../../hooks/useAddress";
+import InputSelect from "../../../components/InputSelect";
+import AlertMessage from "../../../components/AlertMessage";
 
 function EditTeacher() {
   const params = useParams();
-  const {
-    getOneSomething,
-    getAllSomething,
-    updateSomething,
-    errors: updateErrors,
-  } = useSecretary();
-  const [object, setObject] = useState(null);
-  const [suggestions, setSuggestions] = useState([]);
-  const [addresses, setAddresses] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [showDialog, setShowDialog] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
   } = useForm();
+  const { handleChangeCP, handleSelectAddress, suggestions } = useAddress({
+    setValue,
+  });
+  const {
+    errors: updateErrors,
+    getTeacher,
+    loading,
+    teacher: object,
+    handleChangeGender,
+    handleChangeInput,
+    updateTeacher,
+  } = useTeacher({ setValue });
   const navigate = useNavigate();
+  const dateInputRef = useRef(null);
 
   useEffect(() => {
-    async function getObject() {
-      const objectData = await getOneSomething(params.id, "teacher");
-      const addressesData = await getAllSomething("address");
-      setAddresses(addressesData);
-      setObject(objectData);
-      setValue("firstname", objectData.firstname);
-      setValue("lastnamepaternal", objectData.lastnamepaternal);
-      setValue("lastnamematernal", objectData.lastnamematernal);
-      setValue("curp", objectData.curp);
-      setValue("rfc", objectData.rfc);
-      setValue("gender", objectData.gender);
-      setValue("phonenumber", objectData.phonenumber);
-      setValue("birthdate", formatDateShort(objectData.birthdate));
-      setValue("addressid", +objectData.address.id);
-      setValue("street", objectData.address.street);
-      setValue("colony", objectData.address.settlement);
-      setValue("postalcode", objectData.address.postalcode);
-      setLoading(false);
-    }
-    getObject();
+    getTeacher(params.id);
   }, []);
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      handleDialog();
-      const res = await updateSomething(data, "teacher", object.id);
-      if (res?.statusText === "OK") navigate("/secretary/teachers");
-      else scrollToTop()
-      handleDialog();
-    } catch (error) {
-      handleDialog();
-    }
+    const res = await updateTeacher(object?.id, data);
+    if (res?.statusText === "OK") navigate("/secretary/teachers");
   });
-
-  const handleDialog = () => {
-    setShowLoading((prev) => (prev === "" ? "true" : ""));
-    setShowDialog((prev) => !prev);
-  };
-
-  const dateInputRef = useRef(null);
-
-  const handleChangeGender = (value) => {
-    setValue("gender", value);
-  };
-
-  const handleChangeInput = (e, name, type) => {
-    let value = null;
-    if (type === "number") value = e.target.value.replace(/[^0-9]/g, "");
-    setValue(name, value ?? e.target.value);
-    if (name === "postalcode") {
-      if (value.length === 5) {
-        const matchingAddresses = addresses.filter((address) =>
-          address.CP.includes(value)
-        );
-        setSuggestions(matchingAddresses);
-      }
-    }
-  };
-
-  const handleSelectAddress = (address) => {
-    setSelectedAddress(address);
-    setValue("colony", address.asentamiento);
-    setValue("postalcode", address.CP);
-    setValue("addressid", address.id);
-    setSuggestions([]);
-  };
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -332,7 +273,7 @@ function EditTeacher() {
                     },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                  onChange={(e) => handleChangeInput(e, "postalcode", "number")}
+                  onChange={handleChangeCP}
                   min={0}
                 />
                 {suggestions.length > 0 && (
@@ -391,15 +332,6 @@ function EditTeacher() {
           </>
         )}
       </section>
-      <AnimatePresence>
-        {showDialog && (
-          <Dialog
-            title="Realizando cambios"
-            textAccept="Actualizar"
-            showLoading={showLoading}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

@@ -1,67 +1,24 @@
-import { useTeacher } from "@context/TeacherContext";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
+import { useAssist } from "../../../hooks/useAssist";
 import toast from "react-hot-toast";
 import InputSelect from "@components/InputSelect";
 import PrintAssist from "@components/Pdf/PrintAssist";
 
 function Assists() {
-  const { getAllSomething, getOneSomething } = useTeacher();
-  const [loading, setLoading] = useState(true);
-  const [loadingChanges, setLoadingChanges] = useState(false);
-  const [students, setStudents] = useState([]);
-  const [subjects, setSubjects] = useState([]);
-  const [subjectSelected, setSubjectSelected] = useState(null);
   const printRef = useRef();
+  const {
+    getSubjectsAndStudents,
+    loading,
+    students,
+    subjectSelected,
+    subjects,
+    handleOptionChange,
+  } = useAssist();
 
   useEffect(() => {
-    if (loading) {
-      async function getData() {
-        try {
-          const resSubjects = await getAllSomething("subject");
-          if (resSubjects.length > 0) {
-            setSubjects(resSubjects);
-            setSubjectSelected(resSubjects[0]);
-            const resAssists = await getOneSomething(
-              resSubjects[0].id,
-              "student"
-            );
-            if (resAssists) {
-              setStudents(resAssists);
-            }
-          }
-          setLoading(false);
-        } catch (error) {}
-      }
-      getData();
-    }
-  }, [loading]);
-
-  const onOptionChange = (value) => {
-    const foundSubject = subjects.find(
-      (subject) => `${subject.name} - ${subject.group}` === value
-    );
-    setSubjectSelected(foundSubject);
-    setLoadingChanges(true);
-  };
-
-  useEffect(() => {
-    if (loadingChanges) {
-      async function getData() {
-        try {
-          const resAssists = await getOneSomething(
-            subjectSelected.id,
-            "student"
-          );
-          if (resAssists) {
-            setStudents(resAssists);
-          }
-          setLoadingChanges(false);
-        } catch (error) {}
-      }
-      getData();
-    }
-  }, [loadingChanges]);
+    getSubjectsAndStudents();
+  }, []);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -83,27 +40,28 @@ function Assists() {
           <section className="flex flex-row gap-5 items-center">
             <p>Materia</p>
             <div className="w-[200px]">
-              {loading ? (
-                "Loading..."
-              ) : subjects.length > 0 ? (
+              {!loading && (
                 <InputSelect
-                  options={subjects.map(
-                    (subject) => `${subject.name} - ${subject.group}`
+                  options={subjects?.map(
+                    (subject) =>
+                      `${subject.name} - ${subject.grade}${subject.group}`
                   )}
-                  onOptionChange={onOptionChange}
+                  onOptionChange={handleOptionChange}
                 />
-              ) : (
-                <p>No se encontraron materias activas.</p>
               )}
             </div>
           </section>
           {subjectSelected && (
-            <button className="py-2 px-8 bg-blue-600 hover:bg-[#18aefa] text-white text-lg rounded-lg" onClick={handlePrint}>
+            <button
+              className="py-2 px-8 bg-blue-600 hover:bg-[#18aefa] text-white text-lg rounded-lg"
+              onClick={handlePrint}
+            >
               Descargar lista
             </button>
           )}
         </header>
         <div className="flex-1 w-full overflow-x-auto mt-5 border border-gray-300">
+          <h1 className="flex-1 py-1 text-center border-b font-medium text-xl">{`${subjectSelected?.name} - ${subjectSelected?.grade}${subjectSelected?.group}`}</h1>
           <table className="table-auto w-full min-w-[800px] relative">
             <thead className="h-[50px] bg-[#f8f9fb] font-serif font-semibold">
               <tr>
@@ -111,7 +69,7 @@ function Assists() {
               </tr>
             </thead>
             <tbody>
-              {loading || loadingChanges ? (
+              {loading ? (
                 <tr className="border-t text-gray-500">
                   <td className="p-2">Loading...</td>
                 </tr>

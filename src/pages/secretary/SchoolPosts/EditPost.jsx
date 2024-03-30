@@ -1,64 +1,29 @@
-import { useSecretary } from "@context/SecretaryContext";
-import { useEffect, useState } from "react";
-import { set, useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
-import { useParams } from "react-router-dom";
-import toast from "react-hot-toast";
-import AlertMessage from "@components/AlertMessage";
-import Dialog from "@components/Dialog";
+import { useNavigate, useParams } from "react-router-dom";
+import { usePost } from "../../../hooks/usePost";
+import AlertMessage from "../../../components/AlertMessage";
 
 function EditPost() {
   const params = useParams();
-  const {
-    updateSomething,
-    getOneSomething,
-    errors: updateErrors,
-  } = useSecretary();
-  const [post, setPost] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [showDialog, setShowDialog] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
   } = useForm();
+  const { updatePost, errors: updateErrors, getPost } = usePost({ setValue })
 
   useEffect(() => {
-    async function getPost() {
-      try {
-        const postData = await getOneSomething(params.id, "post");
-        if (postData) {
-          setPost(postData);
-          setValue("title", postData.title);
-          setValue("description", postData.description);
-        }
-        setLoading(false);
-      } catch (error) {
-        toast.error("Error al obtener el aviso");
-      }
-    }
-    if (loading) getPost();
-  }, [loading]);
+    getPost(params.id);
+  }, []);
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      handleDialog();
-      const res = await updateSomething(data, "post", params.id);
-      handleDialog();
-      if (res?.statusText === "OK") {
-        toast.success("Actualización exitosa");
-      }
-    } catch (error) {
-      handleDialog();
-    }
+    const res = await updatePost(params.id, data);
+    if (res?.statusText === "OK") navigate("/secretary/posts");
   });
-
-  const handleDialog = () => {
-    setShowLoading((prev) => (prev === "" ? "true" : ""));
-    setShowDialog((prev) => !prev);
-  };
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -151,16 +116,6 @@ function EditPost() {
           </section>
         </form>
       </section>
-      <AnimatePresence>
-        {showDialog && (
-          <Dialog
-            title="Realizando registro"
-            textAccept="Registrando"
-            message=""
-            showLoading={showLoading}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

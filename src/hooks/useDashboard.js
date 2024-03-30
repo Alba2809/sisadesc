@@ -26,15 +26,17 @@ export function useDashboard() {
       : user.role.name === "teacher"
       ? "Profesor"
       : user.role.name === "tutor"
-      ? "Tutor"
+      ? "Tutor/Padre"
       : user.role.name === "secretary"
       ? "Secretaria"
       : user.role.name === "principal"
-      ? "Principal"
+      ? "Director"
       : user.role.name === "viceprincipal"
-      ? "Viceprincipal"
+      ? "Subdirector"
       : user.role.name === "academiccoor"
       ? "Coordinador"
+      : user.role.name === "counselor"
+      ? "Asesor"
       : "Invitado";
   const menuRef = useRef(null);
   const location = useLocation();

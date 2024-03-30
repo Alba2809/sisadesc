@@ -1,123 +1,58 @@
-import { useSecretary } from "@context/SecretaryContext";
 import { Fragment, useEffect, useState } from "react";
 import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { formatDateLong } from "@constants/functions";
-import InputSelect from "@components/InputSelect";
-import Dialog from "@components/Dialog";
+import { formatDateLong } from "../../../constants/functions";
+import { useTeacher } from "../../../hooks/useTeacher";
+import { useGroupTable } from "../../../hooks/useGroupTable";
+import InputSelect from "../../../components/InputSelect";
+import Dialog from "../../../components/Dialog";
 
 function Teachers() {
-  const { getAllSomething, deleteSomething } = useSecretary();
-  const [loading, setLoading] = useState(true);
-  const [loadingTable, setLoadingTable] = useState(false);
-  const [allObjects, setAllObjects] = useState([]);
-  const [objects, setObjects] = useState([]);
-  const [groupSize, setGroupsSize] = useState(5);
-  const [groupIndex, setGroupIndex] = useState(0);
   const [isHoverEdit, setIsHoverEdit] = useState(0);
   const [isHoverDelete, setIsHoverDelete] = useState(0);
   const [isHoverRow, setIsHoverRow] = useState(0);
-  const [showDialog, setShowDialog] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
-  const [objectToDelete, setObjectToDelete] = useState("");
+  const {
+    deleteTeacher,
+    getTeachers,
+    handleDialog,
+    loading,
+    showDialog,
+  } = useTeacher();
+  const {
+    allObjects,
+    endRecord,
+    groupIndex,
+    handleBack,
+    handleNext,
+    handleOptionGroup,
+    handleSearch,
+    objects,
+    setDataWithoutFilter,
+    startRecord,
+    totalRecords,
+  } = useGroupTable();
 
   useEffect(() => {
-    if (loading) {
       async function getObjects() {
-        try {
-          const res = await getAllSomething("teacher");
-          if (res) {
-            setAllObjects(res);
-            setObjects(groupObjects(res));
-          }
-          setLoading(false);
-        } catch (error) {
-          setAllObjects([]);
-        }
+          const res = await getTeachers();
+          setDataWithoutFilter(res)
       }
       getObjects();
+  }, []);
+
+  const handleActionDialog = async (accept) => {
+    if (!accept) return handleDialog(null)
+
+    if (teacherToDelete){
+      const res = await deleteTeacher(teacherToDelete);
+      if (res?.status === 200) {
+        const newObjects = allObjects.filter(obj => obj.id!== teacherToDelete);
+        setDataWithoutFilter(newObjects);
+        handleDialog(null);
+      }
     }
-  }, [loading]);
-
-  useEffect(() => {
-    if (loadingTable) {
-      setObjects(groupObjects(allObjects));
-      setLoadingTable(false);
-    }
-  }, [loadingTable]);
-
-  const groupObjects = (value) => {
-    const organizedValue = Array.from(
-      { length: Math.ceil(value.length / groupSize) },
-      (_, index) => value.slice(index * groupSize, (index + 1) * groupSize)
-    );
-
-    return organizedValue;
-  };
-
-  const onOptionChange = (number) => {
-    setGroupsSize(Number.parseInt(number));
-    setGroupIndex(0);
-    setLoadingTable(true);
-  };
-
-  const handleNext = () => {
-    setGroupIndex((prevIndex) => Math.min(prevIndex + 1, objects.length - 1));
-  };
-
-  const handleBack = () => {
-    setGroupIndex((prevIndex) => Math.max(prevIndex - 1, 0));
-  };
-
-  const startRecord = groupIndex * groupSize + 1;
-  const endRecord = Math.min((groupIndex + 1) * groupSize, allObjects.length);
-  const totalRecords = allObjects.length;
-
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      if (e.target.value === "") setLoading(true);
-
-      const filteredObjects = allObjects.filter((user) =>
-        Object.entries(user).some(
-          ([key, value]) =>
-            key !== "id" &&
-            key !== "imageperfile" &&
-            key !== "createdAt" &&
-            key !== "updatedAt" &&
-            (typeof value === "string" || typeof value === "number") &&
-            value
-              .toString()
-              .toLowerCase()
-              .includes(e.target.value.toLowerCase())
-        )
-      );
-
-      setObjects(groupObjects(filteredObjects));
-    }
-  };
-
-  const handleDeleteObject = () => {
-    try {
-      if(objectToDelete) deleteSomething(objectToDelete, "teacher");
-      handleDialog("");
-      setLoading(true);
-    } catch (error) {
-      handleDialog("");
-    }
-  };
-
-  const handleDialog = (user) => {
-    setObjectToDelete(user);
-    setShowLoading("");
-    setShowDialog((prev) => !prev);
-  };
-
-  const handleDelete = (accept) => {
-    if (!accept) return handleDialog("");
-    setShowLoading("true");
-    handleDeleteObject();
   };
 
   return (
@@ -132,7 +67,7 @@ function Teachers() {
             <div className="w-[70px]">
               <InputSelect
                 options={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
-                onOptionChange={onOptionChange}
+                onOptionChange={handleOptionGroup}
                 defaultValue="5"
               />
             </div>
@@ -176,7 +111,7 @@ function Teachers() {
               </tr>
             </thead>
             <tbody>
-              {loading || loadingTable ? (
+              {loading ? (
                 <tr className="border-t text-gray-500">
                   <td className="p-2">Loading...</td>
                 </tr>
@@ -207,7 +142,7 @@ function Teachers() {
                             onMouseEnter={() => setIsHoverRow(object.id)}
                             onMouseLeave={() => setIsHoverRow(0)}
                           >
-                            <td className="p-2">{"MTR"+object.id}</td>
+                            <td className="p-2">{"MTR" + object.id}</td>
                             <td className="p-2">{object.firstname}</td>
                             <td className="p-2">{object.lastnamepaternal}</td>
                             <td className="p-2">{object.lastnamematernal}</td>
@@ -224,9 +159,7 @@ function Teachers() {
                             </td>
                             <td className="p-2">{object.address.street}</td>
                             <td className="p-2">{object.address.settlement}</td>
-                            <td className="p-2">
-                              {object.address.postalcode}
-                            </td>
+                            <td className="p-2">{object.address.postalcode}</td>
                             <td
                               className={`p-2 sticky -right-[1px] ${
                                 isHoverRow === object.id
@@ -237,9 +170,7 @@ function Teachers() {
                               <div className=" flex gap-3 items-center justify-center">
                                 <Link
                                   className="bg-[#f7f7fa] hover:bg-[#3d5ee1] w-[30px] h-[30px] rounded-full flex justify-center items-center"
-                                  onMouseEnter={() =>
-                                    setIsHoverEdit(object.id)
-                                  }
+                                  onMouseEnter={() => setIsHoverEdit(object.id)}
                                   onMouseLeave={() => setIsHoverEdit(0)}
                                   to={`/secretary/teachers/edit/${object.id}`}
                                 >
@@ -316,8 +247,7 @@ function Teachers() {
             title="Eliminar docente"
             textAccept="Eliminar"
             message="¿Está seguro de eliminar el docente?"
-            handleAction={handleDelete}
-            showLoading={showLoading}
+            handleAction={handleActionDialog}
             addCancel
           />
         )}

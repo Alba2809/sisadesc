@@ -1,8 +1,4 @@
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { TeacherProvider } from "./context/TeacherContext";
-import { SecretaryProvider } from "./context/SecretaryContext";
-import { PrincipalProvider } from "./context/PrincipalContext";
-import { AcademicProvider } from "./context/AcademicContext";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import AuthValidator from "./components/auth/AuthValidator";
@@ -113,7 +109,7 @@ function App() {
           </Route>
 
           <Route element={<RolValidator rolRoute="teacher" />}>
-            <Route path="/teacher/*" element={<TeacherProvider />}>
+            <Route path="/teacher/*">
               <Route path="assists/*">
                 <Route path="" element={<Assists />} />
                 <Route path="*" element={<Navigate to="/teacher/assists" />} />
@@ -127,7 +123,7 @@ function App() {
           </Route>
 
           <Route element={<RolValidator rolRoute="secretary" />}>
-            <Route path="/secretary/*" element={<SecretaryProvider />}>
+            <Route path="/secretary/*">
               <Route path="grades/*">
                 <Route path="" element={<SecretaryGrades />} />
                 <Route path="register" element={<RegisterGrades />} />
@@ -163,7 +159,7 @@ function App() {
           </Route>
 
           <Route element={<RolValidator rolRoute="principal" />}>
-            <Route path="/principal/*" element={<PrincipalProvider />}>
+            <Route path="/principal/*">
               <Route path="grades/*">
                 <Route path="" element={<GradesP />} />
                 <Route path="*" element={<Navigate to="/principal/grades" />} />
@@ -218,7 +214,7 @@ function App() {
           </Route>
 
           <Route element={<RolValidator rolRoute="academiccoor" />}>
-            <Route path="/academiccoor/*" element={<AcademicProvider />}>
+            <Route path="/academiccoor/*">
               <Route path="schedule/*">
                 <Route path="" element={<EventsAC />} />
                 <Route

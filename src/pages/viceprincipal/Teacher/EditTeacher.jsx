@@ -7,7 +7,6 @@ import { genders } from "../../../constants/constants";
 import { useTeacher } from "../../../hooks/useTeacher";
 import { useAddress } from "../../../hooks/useAddress";
 import InputSelect from "../../../components/InputSelect";
-import Dialog from "../../../components/Dialog";
 import AlertMessage from "../../../components/AlertMessage";
 
 function EditTeacher() {
@@ -211,7 +210,7 @@ function EditTeacher() {
                   maxLength={10}
                   minLength={10}
                   {...register("phonenumber", {
-                    required: "Se requiere el código postal",
+                    required: "Se requiere el teléfono",
                     pattern: {
                       value: /^[0-9]+$/,
                       message: "Solo se permiten números",
@@ -226,7 +225,9 @@ function EditTeacher() {
                     },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                  onChange={handleChangeCP}
+                  onChange={(e) =>
+                    handleChangeInput(e, "phonenumber", "number")
+                  }
                   min={0}
                 />
               </div>
@@ -272,7 +273,7 @@ function EditTeacher() {
                     },
                   })}
                   className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                  onChange={(e) => handleChangeInput(e, "postalcode", "number")}
+                  onChange={handleChangeCP}
                   min={0}
                 />
                 {suggestions.length > 0 && (

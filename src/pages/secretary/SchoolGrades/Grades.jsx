@@ -1,72 +1,23 @@
-import { useSecretary } from "@context/SecretaryContext";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
-import InputSelect from "@components/InputSelect";
-import PrintGrades from "@components/Pdf/PrintGrades";
+import { useGrade } from "../../../hooks/useGrade";
+import InputSelect from "../../../components/InputSelect";
+import PrintGrades from "../../../components/Pdf/PrintGrades";
 
 function Grades() {
-  const { getAllSomething, getOneSomething } = useSecretary();
-  const [loading, setLoading] = useState(true);
-  const [loadingChanges, setLoadingChanges] = useState(false);
-  const [students, setStudents] = useState([]);
-  const [subjects, setSubjects] = useState([]);
-  const [subjectSelected, setSubjectSelected] = useState(null);
+  const {
+    getSubjectsAndGrades,
+    loading,
+    students,
+    subjectSelected,
+    subjects,
+    handleOptionChange,
+  } = useGrade();
   const printRef = useRef();
 
   useEffect(() => {
-    if (loading) {
-      async function getData() {
-        try {
-          const resSubjects = await getAllSomething("subject");
-          if (resSubjects?.length > 0) {
-            setSubjects(resSubjects);
-            setSubjectSelected(resSubjects[0]);
-            const resGrades = await getOneSomething(
-              resSubjects[0].id,
-              "grades"
-            );
-            if (resGrades) setStudents(resGrades);
-          }
-          setLoading(false);
-        } catch (error) {}
-      }
-      getData();
-    }
-  }, [loading]);
-
-  const onOptionChange = (value, type) => {
-    if (type === "subject") {
-      const foundSubject = subjects.find(
-        (subject) =>
-          `${subject.name} - ${subject.grade}${subject.group}` === value
-      );
-      setSubjectSelected(foundSubject);
-      setLoadingChanges(true);
-    } else if (type === "dates") {
-      if (rangesDates[value] === null) {
-        setStartDate(null);
-        setEndDate(null);
-      } else {
-        setStartDate(rangesDates[value].start);
-        setEndDate(rangesDates[value].end);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (loadingChanges) {
-      async function getData() {
-        try {
-          const resGrades = await getOneSomething(subjectSelected.id, "grades");
-          if (resGrades) {
-            setStudents(resGrades);
-          }
-          setLoadingChanges(false);
-        } catch (error) {}
-      }
-      getData();
-    }
-  }, [loadingChanges]);
+    getSubjectsAndGrades();
+  }, []);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -88,16 +39,13 @@ function Grades() {
           <section className="flex flex-row gap-5 items-center">
             <p>Materia</p>
             <div className="w-[200px]">
-              {loading ? (
-                "Loading..."
-              ) : (
+              {!loading && (
                 <InputSelect
-                  options={subjects.map(
+                  options={subjects?.map(
                     (subject) =>
                       `${subject.name} - ${subject.grade}${subject.group}`
                   )}
-                  onOptionChange={onOptionChange}
-                  object="subject"
+                  onOptionChange={handleOptionChange}
                 />
               )}
             </div>
@@ -112,6 +60,7 @@ function Grades() {
           )}
         </header>
         <div className="flex-1 w-full overflow-x-auto mt-5 border border-gray-300">
+          <h1 className="flex-1 py-1 text-center border-b font-medium text-xl">{`${subjectSelected?.name} - ${subjectSelected?.grade}${subjectSelected?.group}`}</h1>
           <table className="table-auto w-full min-w-[1200px] relative">
             <thead className="h-[50px] bg-[#f8f9fb] font-serif font-semibold">
               <tr className="divide-x">
@@ -129,7 +78,9 @@ function Grades() {
                           Evaluación {grade.evaluation_number}
                         </p>
                         <p className="border-r-[1px]">Calificación</p>
-                        <p className="border-r-[1px] px-[1px]">Asistencia total</p>
+                        <p className="border-r-[1px] px-[1px]">
+                          Asistencia total
+                        </p>
                         <p className="px-[1px]">Inasistencia total</p>
                       </div>
                     </th>
@@ -138,7 +89,7 @@ function Grades() {
               </tr>
             </thead>
             <tbody>
-              {loading || loadingChanges ? (
+              {loading ? (
                 <tr className="border-t text-gray-500">
                   <td className="p-2">Loading...</td>
                 </tr>

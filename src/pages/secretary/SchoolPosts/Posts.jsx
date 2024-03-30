@@ -1,59 +1,28 @@
-import { useSecretary } from "@context/SecretaryContext";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import PostComponent from "@components/PostComponent";
-import Dialog from "@components/Dialog";
-import toast from "react-hot-toast";
+import { usePost } from "../../../hooks/usePost";
+import PostComponent from "../../../components/PostComponent";
+import Dialog from "../../../components/Dialog";
 
 function Posts() {
-  const { getAllSomething, deleteSomething, error } = useSecretary();
-  const [loading, setLoading] = useState(true);
-  const [posts, setPosts] = useState([]);
-  const [showDialog, setShowDialog] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
-  const [postToDelete, setPostToDelete] = useState(null);
+  const { deletePost, getPosts, handleDialog, loading, postToDelete, showDialog, posts, setPosts } = usePost()
 
   useEffect(() => {
-    if (loading) {
-      async function getData() {
-        try {
-          const resPosts = await getAllSomething("post");
-          if (resPosts?.length > 0) setPosts(resPosts);
-          setLoading(false);
-        } catch (error) {
-          setPosts([]);
-          setLoading(false);
-        }
-      }
-      getData();
-    }
-  }, [loading]);
+    getPosts();
+  }, []);
 
-  const onDelete = async (id) => {
-    try {
-      const res = await deleteSomething(id, "post");
+  const handleActionDialog = async (accept) => {
+    if (!accept) return handleDialog(null)
+
+    if (postToDelete){
+      const res = await deletePost(postToDelete);
       if (res?.status === 200) {
-        setPosts(posts.filter((post) => post.id!== id));
-        toast.success("Aviso eliminado");
+        const newObjects = posts.filter(obj => obj.id!== postToDelete);
+        setPosts(newObjects);
+        handleDialog(null);
       }
-      handleClickDelete("");
-    } catch (error) {
-      handleClickDelete("");
-      toast.error("Error al eliminar el post. Por favor, intente nuevamente.");
     }
   };
-
-  const handleDelete = (choose) => {
-    if (!choose) return handleClickDelete("");
-    setShowLoading("true");
-    onDelete(postToDelete);
-  }
-
-  const handleClickDelete = (id) => {
-    setPostToDelete(id);
-    setShowLoading("");
-    setShowDialog((prev) => !prev);
-  }
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -81,7 +50,7 @@ function Posts() {
                   exit={{ opacity: 0, y: -10 }}
                   layout
                 >
-                  <PostComponent data={post} handleDelete={handleClickDelete} />
+                  <PostComponent data={post} handleDelete={handleDialog} />
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -94,8 +63,7 @@ function Posts() {
             title="Eliminar aviso"
             textAccept="Eliminar"
             message="¿Está seguro de eliminar el aviso?"
-            handleAction={handleDelete}
-            showLoading={showLoading}
+            handleAction={handleActionDialog}
             addCancel
           />
         )}

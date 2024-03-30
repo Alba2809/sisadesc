@@ -24,7 +24,7 @@ function EditGrades() {
     subjects,
     students,
     updateGrades,
-    subjectSelected
+    subjectSelected,
   } = useGrade({ setValue });
 
   const onSubmit = handleSubmit(async (data) => {
@@ -207,11 +207,7 @@ function EditGrades() {
                             })}
                             className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                             onChange={(e) =>
-                              handleChangeInput(
-                                e,
-                                "" + student.id,
-                                "number"
-                              )
+                              handleChangeInput(e, "" + student.id, "number")
                             }
                             min={0}
                           />
@@ -228,11 +224,7 @@ function EditGrades() {
                             })}
                             className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                             onChange={(e) =>
-                              handleChangeInput(
-                                e,
-                                "" + student.id,
-                                "number"
-                              )
+                              handleChangeInput(e, "" + student.id, "number")
                             }
                             min={0}
                           />
@@ -249,11 +241,7 @@ function EditGrades() {
                             })}
                             className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                             onChange={(e) =>
-                              handleChangeInput(
-                                e,
-                                "" + student.id,
-                                "number"
-                              )
+                              handleChangeInput(e, "" + student.id, "number")
                             }
                             min={0}
                           />

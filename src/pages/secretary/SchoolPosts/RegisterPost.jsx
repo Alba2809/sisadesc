@@ -1,41 +1,22 @@
-import { useSecretary } from "@context/SecretaryContext";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import AlertMessage from "@components/AlertMessage";
-import Dialog from "@components/Dialog";
+import AlertMessage from "../../../components/AlertMessage";
+import { usePost } from "../../../hooks/usePost";
 
 function RegisterPost() {
-  const { registerSomething, errors: registerErrors } = useSecretary();
-  const [showDialog, setShowDialog] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
   const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const { registerPost, errors: registerErrors } = usePost();
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      handleDialog();
-      const res = await registerSomething(data, "post");
-      handleDialog();
-      if (res?.statusText === "OK") {
-        toast.success("Registro exitoso");
-        navigate("/secretary/posts");
-      }
-    } catch (error) {
-      handleDialog();
-    }
+    const res = await registerPost(data);
+    if (res?.statusText === "OK") navigate("/secretary/posts");
   });
-
-  const handleDialog = () => {
-    setShowLoading((prev) => (prev === "" ? "true" : ""));
-    setShowDialog((prev) => !prev);
-  };
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -128,16 +109,6 @@ function RegisterPost() {
           </section>
         </form>
       </section>
-      <AnimatePresence>
-        {showDialog && (
-          <Dialog
-            title="Realizando registro"
-            textAccept="Registrando"
-            message=""
-            showLoading={showLoading}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

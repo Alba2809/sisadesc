@@ -1,27 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-import { formatDateShort } from "@constants/functions";
-import { useAcademic } from "@context/AcademicContext";
-import { set, useForm } from "react-hook-form";
+import { useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaSquarePlus } from "react-icons/fa6";
 import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import AlertMessage from "@components/AlertMessage";
-import toast from "react-hot-toast";
+import { useEventCalendar } from "../../../hooks/useEventCalendar";
+import AlertMessage from "../../../components/AlertMessage";
 import Calendar from "react-calendar";
 import "@styles/calendar.css";
+import { formatDateShort } from "../../../constants/functions";
 
 function Events() {
-  const {
-    getAllSomething,
-    registerSomething,
-    updateSomething,
-    deleteSomething,
-    errors: eventErrors,
-  } = useAcademic();
-  const [loading, setLoading] = useState(true);
-  const [events, setEvents] = useState([]);
-  const [eventsSelect, setEventsSelect] = useState([]);
   const {
     register,
     formState: { errors },
@@ -29,6 +18,20 @@ function Events() {
     getValues,
   } = useForm();
   const calendarRef = useRef();
+  const {
+    events,
+    eventsSelect,
+    getEvents,
+    handleAddEvent,
+    handleDeleteEvent,
+    handleEditEvent,
+    handleSelectDay,
+    loading,
+  } = useEventCalendar({ setValue, getValues });
+
+  useEffect(() => {
+    getEvents()
+  }, []);
 
   const tileContent = ({ date, view }) => {
     if (view === "month") {
@@ -59,90 +62,6 @@ function Events() {
     return "";
   };
 
-  const onClickDay = (date) => {
-    const haveEvents = events?.some(
-      (event) => formatDateShort(event.date) === formatDateShort(date)
-    );
-    if (haveEvents) {
-      const eventsFound = events?.filter(
-        (event) => formatDateShort(event.date) === formatDateShort(date)
-      );
-      setEventsSelect(eventsFound);
-    } else {
-      setEventsSelect([]);
-    }
-    setValue("date", formatDateShort(date));
-  };
-
-  const handleAddEvent = async () => {
-    const eventsLength = eventsSelect?.length;
-    if (eventsLength === 5) {
-      toast.error("No se puede agregar mas eventos a la misma fecha.");
-      return;
-    }
-    try {
-      const dataEvent = {
-        date: getValues("date"),
-        description: getValues("newDescription"),
-        start_time: getValues("newStart_time"),
-        end_time: getValues("newEnd_time"),
-      };
-      const res = await registerSomething(dataEvent, "events");
-      if (res?.statusText === "OK") {
-        toast.success("Evento registrado correctamente.");
-        const newEvents = [...events, res.data];
-        setEvents(newEvents);
-        setEventsSelect([...eventsSelect, res.data]);
-        setValue("newDescription", "");
-        setValue("newStart_time", "");
-        setValue("newEnd_time", "");
-      }
-    } catch (error) {
-      toast.error("No se pudo registrar el evento intentelo de nuevo.");
-    }
-  };
-
-  const handleEditEvent = async (id) => {
-    try {
-      const dataEvent = {
-        date: getValues("date"),
-        description: getValues("description" + id),
-        start_time: getValues("start_time" + id),
-        end_time: getValues("end_time" + id),
-      };
-      const res = await updateSomething(id, dataEvent, "events");
-      if (res?.statusText === "OK") {
-        toast.success("Evento actualizado correctamente.");
-      }
-    } catch (error) {
-      toast.error("No se pudo actualizar el evento intentelo de nuevo.");
-    }
-  };
-
-  const handleDeleteEvent = async (id) => {
-    try {
-      const res = await deleteSomething(id, "events");
-      if (res?.statusText === "OK") {
-        toast.success("Evento eliminado correctamente.");
-        const newEvents = events.filter((event) => event.id !== id);
-        setEvents(newEvents);
-        const newEventsSelect = eventsSelect.filter((event) => event.id !== id);
-        setEventsSelect(newEventsSelect);
-      }
-    } catch (error) {
-      toast.error("No se pudo eliminar el evento intentelo de nuevo.");
-    }
-  };
-
-  useEffect(() => {
-    async function getEvents() {
-      const eventsData = await getAllSomething("events");
-      setEvents(eventsData);
-      setLoading(false);
-    }
-    if (loading) getEvents();
-  }, [loading]);
-
   return (
     <div className="w-full h-full flex flex-col">
       <header className="h-[50px]">
@@ -160,24 +79,13 @@ function Events() {
         ) : (
           <>
             <Calendar
-              onChange={onClickDay}
+              onChange={handleSelectDay}
               tileContent={tileContent}
               tileClassName={tileClassName}
-              className={`w-full ${eventErrors.length > 0 && "mb-2"}`}
+              className={`w-full`}
               inputRef={calendarRef}
             />
             <AnimatePresence mode="sync">
-              {eventErrors.map((error, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ height: 0, y: -10, opacity: 0 }}
-                  animate={{ height: 48, y: 0, opacity: 1 }}
-                  exit={{ height: 0, y: -10, opacity: 0 }}
-                  transition={{ type: "spring", delay: i * 0.2 }}
-                >
-                  <AlertMessage key={i} message={error} />
-                </motion.div>
-              ))}
               {Object.keys(errors).map((fieldName, i) => (
                 <motion.div
                   key={fieldName}
