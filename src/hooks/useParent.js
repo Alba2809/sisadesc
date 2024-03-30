@@ -132,8 +132,8 @@ export function useParent({ setValue } = {}) {
     }
   };
 
-  const handleDialog = (user) => {
-    setParentToDelete(user);
+  const handleDialog = (object) => {
+    setParentToDelete(object);
     setShowDialog((prev) => !prev);
   };
 

@@ -1,78 +1,42 @@
-import { useViceprincipal } from "@context/ViceprincipalContext";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { genders } from "@constants/constants";
-import InputSelect from "@components/InputSelect";
-import Dialog from "@components/Dialog";
-import AlertMessage from "@components/AlertMessage";
+import { genders } from "../../../constants/constants";
+import { useAddress } from "../../../hooks/useAddress";
+import { useTeacher } from "../../../hooks/useTeacher";
+import InputSelect from "../../../components/InputSelect";
+import Dialog from "../../../components/Dialog";
+import AlertMessage from "../../../components/AlertMessage";
 
 function RegisterTeacher() {
-  const { registerSomething, getAllSomething, errors: registerErrors } = useViceprincipal();
   const dateInputRef = useRef(null);
-  const [showDialog, setShowDialog] = useState(false);
-  const [suggestions, setSuggestions] = useState([]);
-  const [addresses, setAddresses] = useState([]);
-  const [showLoading, setShowLoading] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
   } = useForm();
+  const { handleChangeCP, handleSelectAddress, suggestions } = useAddress({
+    setValue,
+  });
+  const {
+    handleChangeInput,
+    registerTeacher,
+    errors: registerErrors,
+    handleChangeGender
+  } = useTeacher({ setValue });
   const navigate = useNavigate();
 
   useEffect(() => {
     setValue("gender", genders[0]);
-    async function getAddresses() {
-      const addressesData = await getAllSomething("address");
-      setAddresses(addressesData);
-    }
-    getAddresses();
   }, []);
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      handleDialog();
-      const res = await registerSomething(data, "teacher");
-      handleDialog();
-      if (res?.statusText === "OK") navigate("/viceprincipal/teachers");
-    } catch (error) {
-      handleDialog();
-    }
+    const res = await registerTeacher(data);
+    if (res?.statusText === "OK") navigate("/viceprincipal/teachers");
   });
 
-  const handleDialog = () => {
-    setShowLoading((prev) => (prev === "" ? "true" : ""));
-    setShowDialog((prev) => !prev);
-  };
-
-  const handleChangeGender = (value) => {
-    setValue("gender", value);
-  };
-
-  const handleChangeInput = (e, name, type) => {
-    let value = null;
-    if (type === "number") value = e.target.value.replace(/[^0-9]/g, "");
-    setValue(name, value ?? e.target.value);
-    if (name === "postalcode") {
-      if (value.length === 5) {
-        const matchingAddresses = addresses.filter((address) =>
-          address.CP.includes(value)
-        );
-        setSuggestions(matchingAddresses);
-      }
-    }
-  };
-
-  const handleSelectAddress = (address) => {
-    setValue("colony", address.asentamiento);
-    setValue("postalcode", address.CP);
-    setValue("addressid", address.id);
-    setSuggestions([]);
-  };
-  
   return (
     <div className="w-full h-full flex flex-col">
       <header className="h-[50px]">
@@ -287,7 +251,7 @@ function RegisterTeacher() {
                 },
               })}
               className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-              onChange={(e) => handleChangeInput(e, "postalcode", "number")}
+              onChange={handleChangeCP}
               min={0}
             />
             {suggestions.length > 0 && (
@@ -345,16 +309,6 @@ function RegisterTeacher() {
           </section>
         </form>
       </section>
-      <AnimatePresence>
-        {showDialog && (
-          <Dialog
-            title="Realizando registro"
-            textAccept="Registrando"
-            message=""
-            showLoading={showLoading}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

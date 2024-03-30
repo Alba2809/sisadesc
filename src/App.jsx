@@ -1,8 +1,6 @@
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { AdminProvider } from "./context/AdminContext";
 import { TeacherProvider } from "./context/TeacherContext";
 import { SecretaryProvider } from "./context/SecretaryContext";
-import { ViceprincipalProvider } from "./context/ViceprincipalContext";
 import { PrincipalProvider } from "./context/PrincipalContext";
 import { AcademicProvider } from "./context/AcademicContext";
 import Dashboard from "./pages/Dashboard";
@@ -72,7 +70,7 @@ function App() {
           <Route path="/schedule" element={<EventsG />} />
 
           <Route element={<RolValidator rolRoute="admin" />}>
-            <Route path="/admin/*" element={<AdminProvider />}>
+            <Route path="/admin/*">
               <Route path="users/*">
                 <Route path="" element={<Users />} />
                 <Route path="edit/:id" element={<EditUser />} />
@@ -157,7 +155,7 @@ function App() {
           </Route>
 
           <Route element={<RolValidator rolRoute="tutor" />}>
-            <Route path="/tutor/*" element={<AdminProvider />}>
+            <Route path="/tutor/*">
               {" "}
               {/* Cambiar el context */}
               <Route path="*" element={<Navigate to="/" />} />
@@ -175,7 +173,7 @@ function App() {
           </Route>
 
           <Route element={<RolValidator rolRoute="viceprincipal" />}>
-            <Route path="/viceprincipal/*" element={<ViceprincipalProvider />}>
+            <Route path="/viceprincipal/*">
               <Route path="teachers/*">
                 <Route path="" element={<TeachersVP />} />
                 <Route path="edit/:id" element={<EditTeacherVP />} />

@@ -7,7 +7,6 @@ import { genders } from "../../../constants/constants";
 import { useAddress } from "../../../hooks/useAddress";
 import { useTeacher } from "../../../hooks/useTeacher";
 import InputSelect from "../../../components/InputSelect";
-import Dialog from "../../../components/Dialog";
 import AlertMessage from "../../../components/AlertMessage";
 
 function EditTeacher() {

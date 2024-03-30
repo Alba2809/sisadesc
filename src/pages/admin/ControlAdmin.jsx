@@ -1,23 +1,16 @@
-import { useAdmin } from "@context/AdminContext";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { IoMenu } from "react-icons/io5";
+import { useStudent } from "../../hooks/useStudent";
 import UserIcon from "@images-icons/user-icon.svg";
 import AwardIcon1 from "@images-icons/award-icon1.svg";
 import AwardIcon2 from "@images-icons/award-icon2.svg";
 
 function ControlAdmin() {
-  const { getAllSomething } = useAdmin();
-  const [students, setStudents] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { getStudents, students } = useStudent();
 
   useEffect(() => {
-    async function getTotalStudents() {
-      const res = await getAllSomething("student");
-      setStudents(res);
-      setLoading(false);
-    }
-    if (loading) getTotalStudents();
-  }, [loading]);
+    getStudents();
+  }, []);
 
   return (
     <div className="overflow-y-auto">

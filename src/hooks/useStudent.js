@@ -50,8 +50,8 @@ export function useStudent({ setValue, unregister } = {}) {
   const getStudents = async () => {
     try {
       setLoading(true);
-
       const res = await getStudentsRequest();
+      setStudents(res.data);
       return res.data
     } catch (error) {
       console.log(error);

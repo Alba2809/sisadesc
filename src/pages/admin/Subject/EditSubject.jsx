@@ -1,15 +1,13 @@
-import { useAdmin } from "@context/AdminContext";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState, Fragment } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { FaCheck } from "react-icons/fa";
-import Dialog from "@components/Dialog";
-import AlertMessage from "@components/AlertMessage";
-import InputSelect from "@components/InputSelect";
 import { useSubject } from "../../../hooks/useSubject";
 import { useGroupTable } from "../../../hooks/useGroupTable";
 import { useStudent } from "../../../hooks/useStudent";
+import AlertMessage from "../../../components/AlertMessage";
+import InputSelect from "../../../components/InputSelect";
 
 function EditSubject({ type }) {
   const params = useParams();
@@ -22,7 +20,13 @@ function EditSubject({ type }) {
     getValues,
   } = useForm();
   const navigate = useNavigate();
-  const { getSubject, updateSubject, loading, subjectSelected: subject, errors: updateErrors } = useSubject();
+  const {
+    getSubject,
+    updateSubject,
+    loading,
+    subjectSelected: subject,
+    errors: updateErrors,
+  } = useSubject();
   const {
     allObjects,
     setDataWithoutFilter,
@@ -35,7 +39,7 @@ function EditSubject({ type }) {
     endRecord,
     totalRecords,
     handleSearch,
-    setFilterStatus
+    setFilterStatus,
   } = useGroupTable();
   const { getStudents, loading: loadingStudents } = useStudent();
 
@@ -44,7 +48,7 @@ function EditSubject({ type }) {
       const objectData = await getSubject(params.id);
       const resStudents = await getStudents();
       setDataWithoutFilter(resStudents);
-      setFilterStatus("Ambos")
+      setFilterStatus("Ambos");
       setValue("name", objectData.name);
       setValue("code", objectData.code);
       setValue("group", objectData.group);
@@ -62,13 +66,9 @@ function EditSubject({ type }) {
   }, []);
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      if (data.students.length === 0) data.students = null;
-      const res = await updateSubject(subject.id, data);
-      if (res?.statusText === "OK") navigate("/admin/subjects");
-    } catch (error) {
-      console.log(error);
-    }
+    if (data.students.length === 0) data.students = null;
+    const res = await updateSubject(subject.id, data);
+    if (res?.statusText === "OK") navigate("/admin/subjects");
   });
 
   const handleAddStudent = (student) => {
@@ -307,11 +307,11 @@ function EditSubject({ type }) {
                           </td>
                         </tr>
                       ) : objects.length < 1 ? (
-                          <tr className="border-t text-gray-500">
-                            <td colSpan="17" className="p-2">
-                              No se encontraron estudiantes.
-                            </td>
-                          </tr>
+                        <tr className="border-t text-gray-500">
+                          <td colSpan="17" className="p-2">
+                            No se encontraron estudiantes.
+                          </td>
+                        </tr>
                       ) : (
                         <>
                           {objects

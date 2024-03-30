@@ -1,171 +1,55 @@
-import { useViceprincipal } from "@context/ViceprincipalContext";
 import { Fragment, useEffect, useState } from "react";
 import { FaEye, FaChalkboardTeacher, FaRegCalendarCheck } from "react-icons/fa";
 import { BsMortarboardFill } from "react-icons/bs";
 import { AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { formatDateLong } from "@constants/functions";
-import InputSelect from "@components/InputSelect";
-import Dialog from "@components/Dialog";
+import { formatDateLong } from "../../../constants/functions";
+import { useGroupTable } from "../../../hooks/useGroupTable";
+import { useSubject } from "../../../hooks/useSubject";
+import InputSelect from "../../../components/InputSelect";
+import Dialog from "../../../components/Dialog";
 
 function Subjects() {
-  const { getOneSomething, getAllSomething, updateSomething } =
-    useViceprincipal();
-  const [loading, setLoading] = useState(true);
-  const [loadingTable, setLoadingTable] = useState(false);
-  const [allObjects, setAllObjects] = useState([]);
-  const [objects, setObjects] = useState([]);
-  const [groupSize, setGroupsSize] = useState(5);
-  const [groupIndex, setGroupIndex] = useState(0);
-  const [isHoverEditTeacher, setIsHoverEditTeacher] = useState(0);
+  const {
+    loading,
+    showDialogStatus,
+    showDialogView,
+    students,
+    teacher,
+    counselor,
+    getSubjects,
+    handleDialogStatus,
+    handleDialogView,
+    handleActionStatus,
+    handleCloseView,
+  } = useSubject();
+  const {
+    allObjects,
+    setData,
+    objects,
+    groupIndex,
+    handleOptionGroup,
+    handleOptionStatus,
+    handleNext,
+    handleBack,
+    startRecord,
+    endRecord,
+    totalRecords,
+    handleSearch,
+  } = useGroupTable();
   const [isHoverEditStudents, setIsHoverEditStudents] = useState(0);
-  const [isHoverStatus, setIsHoverStatus] = useState(0);
+  const [isHoverEditTeacher, setIsHoverEditTeacher] = useState(0);
   const [isHoverView, setIsHoverView] = useState(0);
+  const [isHoverStatus, setIsHoverStatus] = useState(0);
   const [isHoverRow, setIsHoverRow] = useState(0);
-  const [showDialogStatus, setShowDialogStatus] = useState(false);
-  const [showDialogView, setShowDialogView] = useState(false);
-  const [showLoading, setShowLoading] = useState("");
-  const [objectSelected, setObjectSelected] = useState(null);
-  const [students, setStudents] = useState([]);
-  const [teacher, setTeacher] = useState(null);
-  const [filterStatus, setFilterStatus] = useState("Activo");
 
   useEffect(() => {
-    if (loading) {
-      async function getObjects() {
-        try {
-          const res = await getAllSomething("subject");
-          if (res) {
-            setAllObjects(res);
-            setObjects(
-              groupObjects(
-                res.filter((object) =>
-                  filterStatus === "Ambos"
-                    ? true
-                    : object.status === filterStatus
-                )
-              )
-            );
-          }
-          setLoading(false);
-        } catch (error) {
-          setAllObjects([]);
-        }
-      }
-      getObjects();
+    async function getData() {
+      const res = await getSubjects();
+      setData(res);
     }
-  }, [loading]);
-
-  useEffect(() => {
-    if (loadingTable) {
-      setObjects(
-        groupObjects(
-          allObjects.filter((object) =>
-            filterStatus === "Ambos" ? true : object.status === filterStatus
-          )
-        )
-      );
-      setLoadingTable(false);
-    }
-  }, [loadingTable]);
-
-  const groupObjects = (value) => {
-    const organizedValue = Array.from(
-      { length: Math.ceil(value.length / groupSize) },
-      (_, index) => value.slice(index * groupSize, (index + 1) * groupSize)
-    );
-
-    return organizedValue;
-  };
-
-  const onOptionChange = (value, type) => {
-    if (type === "showNumber") {
-      setGroupsSize(Number.parseInt(value));
-      setGroupIndex(0);
-    }
-    if (type === "status") {
-      setFilterStatus(value);
-    }
-    setLoadingTable(true);
-  };
-
-  const handleNext = () => {
-    setGroupIndex((prevIndex) => Math.min(prevIndex + 1, objects.length - 1));
-  };
-
-  const handleBack = () => {
-    setGroupIndex((prevIndex) => Math.max(prevIndex - 1, 0));
-  };
-
-  const startRecord = groupIndex * groupSize + 1;
-  const endRecord = Math.min((groupIndex + 1) * groupSize, allObjects.length);
-  const totalRecords = allObjects.length;
-
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      if (e.target.value === "") setLoading(true);
-
-      const filteredObjects = allObjects.filter((user) =>
-        Object.entries(user).some(
-          ([key, value]) =>
-            key !== "_id" &&
-            key !== "createdAt" &&
-            key !== "updatedAt" &&
-            (typeof value === "string" || typeof value === "number") &&
-            value
-              .toString()
-              .toLowerCase()
-              .includes(e.target.value.toLowerCase())
-        )
-      );
-
-      setObjects(groupObjects(filteredObjects));
-    }
-  };
-
-  const handleStatusObject = async () => {
-    try {
-      if (objectSelected)
-        await updateSomething(null, "statusSubject", objectSelected);
-      handleDialogStatus("");
-      setLoading(true);
-    } catch (error) {
-      handleDialogStatus("");
-    }
-  };
-
-  const handleDialogStatus = (object) => {
-    setShowDialogView(false);
-    setObjectSelected(object);
-    setShowLoading("");
-    setShowDialogStatus((prev) => !prev);
-  };
-
-  const handleDialogView = (object) => {
-    setShowDialogStatus(false);
-    setShowDialogView((prev) => !prev);
-    async function getSubjectData() {
-      setShowLoading("true");
-      const resStudents = await getOneSomething(object.id, "subjectstudents");
-      setStudents(resStudents);
-      if (object.teacher_id) {
-        const resTeacher = await getOneSomething(object.teacher_id, "teacher");
-        setTeacher(resTeacher);
-      }
-      setShowLoading("false");
-    }
-    if (object) getSubjectData();
-  };
-
-  const handleStatus = (accept) => {
-    if (!accept) return handleDialogStatus(null);
-    setShowLoading("true");
-    handleStatusObject();
-  };
-
-  const handleCloseView = (close) => {
-    handleDialogView(null);
-  };
+    getData();
+  }, []);
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -179,7 +63,7 @@ function Subjects() {
             <div className="w-[70px]">
               <InputSelect
                 options={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
-                onOptionChange={onOptionChange}
+                onOptionChange={handleOptionGroup}
                 defaultValue="5"
                 object="showNumber"
               />
@@ -191,7 +75,7 @@ function Subjects() {
             <div className="w-[150px]">
               <InputSelect
                 options={["Activo", "Finalizado", "Ambos"]}
-                onOptionChange={onOptionChange}
+                onOptionChange={handleOptionStatus}
                 object="status"
                 defaultValue="Activo"
               />
@@ -219,6 +103,7 @@ function Subjects() {
                 </th>
                 <th className="text-start px-2 min-w-[100px]">Estado</th>
                 <th className="text-start px-2 min-w-[200px]">Docente</th>
+                <th className="text-start px-2 min-w-[200px]">Asesor</th>
                 <th className="text-center px-2 min-w-[150px]">
                   Estudiantes asignados
                 </th>
@@ -231,7 +116,7 @@ function Subjects() {
               </tr>
             </thead>
             <tbody>
-              {loading || loadingTable ? (
+              {loading ? (
                 <tr className="border-t text-gray-500">
                   <td className="p-2">Loading...</td>
                 </tr>
@@ -275,7 +160,10 @@ function Subjects() {
                             >
                               {object.status}
                             </td>
-                            <td className="p-2">{object.curp}</td>
+                            <td className="p-2">{object.teacher_curp}</td>
+                            <td className="p-2">
+                              {object.counselor_curp ?? "Sin asesor asignado."}
+                            </td>
                             <td className="p-2 text-center">
                               {object.students_total}
                             </td>
@@ -428,8 +316,7 @@ function Subjects() {
             title="Cambiar estado"
             textAccept="Cambiar"
             message="¿Está seguro de cambiar el estado de la materia a finalizado?"
-            handleAction={handleStatus}
-            showLoading={showLoading}
+            handleAction={handleActionStatus}
             addCancel
           />
         )}
@@ -465,21 +352,39 @@ function Subjects() {
                     </tbody>
                   </table>
                 </div>
-                <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                  <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                    Nombre del docente
-                  </label>
-                  <input
-                    type="text"
-                    maxLength={20}
-                    className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                    defaultValue={
-                      teacher
-                        ? `${teacher?.firstname} ${teacher?.lastnamepaternal} ${teacher?.lastnamematernal}`
-                        : ""
-                    }
-                    readOnly
-                  />
+                <div className="flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%] flex flex-col gap-5">
+                  <div className="relative w-full">
+                    <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                      Nombre del docente
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={20}
+                      className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                      defaultValue={
+                        teacher
+                          ? `${teacher?.firstname} ${teacher?.lastnamepaternal} ${teacher?.lastnamematernal}`
+                          : ""
+                      }
+                      readOnly
+                    />
+                  </div>
+                  <div className="relative w-full">
+                    <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
+                      Nombre del asesor
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={20}
+                      className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                      defaultValue={
+                        counselor
+                          ? `${counselor?.firstname} ${counselor?.lastnamepaternal} ${counselor?.lastnamematernal}`
+                          : ""
+                      }
+                      readOnly
+                    />
+                  </div>
                 </div>
               </div>
             }

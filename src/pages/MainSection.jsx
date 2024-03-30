@@ -1,6 +1,5 @@
 import { useAuth } from "@context/AuthContext";
 import { useEffect, useState } from "react";
-import { AdminProvider } from "@context/AdminContext";
 import ControlAdmin from "@pages/admin/ControlAdmin";
 
 function WelcomeSection() {
@@ -25,9 +24,7 @@ function WelcomeSection() {
       {!loading && (
         <>
           {user.role.name === "admin" ? (
-            <AdminProvider>
-              <ControlAdmin />
-            </AdminProvider>
+            <ControlAdmin />
           ) : (
             console.log("No es un administrador:", user.role.name)
           )}

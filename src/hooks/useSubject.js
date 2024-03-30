@@ -48,7 +48,6 @@ export function useSubject() {
       const res = await getSubjectsRequest();
       return res.data;
     } catch (error) {
-      console.log(error);
       toast.error("Error al obtener las materias");
     } finally {
       setLoading(false);
@@ -62,7 +61,6 @@ export function useSubject() {
       setSubjectSelected(res.data);
       return res.data
     } catch (error) {
-      console.log(error);
       toast.error("Error al obtener la materia");
     } finally {
       setLoading(false);
@@ -77,7 +75,6 @@ export function useSubject() {
         setStudents(res.data);
       }
     } catch (error) {
-      console.log(error);
       toast.error("Error al obtener los estudiantes");
     } finally {
       setLoading(false);
@@ -94,7 +91,6 @@ export function useSubject() {
       });
       return res
     } catch (error) {
-      console.log(error);
       if (typeof error.response.data === "object" && error.response.data) {
         const array = Object.values(error.response.data);
         setErrors(array);
@@ -123,7 +119,6 @@ export function useSubject() {
 
       setSubjectSelected(null);
     } catch (error) {
-      console.log(error);
     } finally {
       setShowDialogStatus(false);
     }
@@ -168,6 +163,8 @@ export function useSubject() {
 
   const handleCloseView = (close) => {
     setShowDialogView(false);
+    setCounselor(null);
+    setTeacher(null);
   };
 
   useEffect(() => {
