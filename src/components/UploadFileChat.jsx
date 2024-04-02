@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import toast from "react-hot-toast";
 import { LuFileUp } from "react-icons/lu";
 
 function UploadFileChat({ onFileChange, cancelFile }) {
@@ -7,6 +8,13 @@ function UploadFileChat({ onFileChange, cancelFile }) {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 15 * 1024 * 1024) {
+        toast.error(
+          "El archivo es demasiado grande. Se permite un máximo de 15MB."
+        );
+        e.target.value = "";
+        return;
+      }
       onFileChange(file);
     }
   };

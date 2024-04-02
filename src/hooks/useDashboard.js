@@ -3,13 +3,13 @@ import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
     adminOptions,
-    studentOptions,
     teacherOptions,
-    tutorOptions,
+    counselorOptions,
     secretaryOptions,
     principalOptions,
     viceprincipalOptions,
     academicCoorOptions,
+    parentOptions
   } from "../constants/SideMenu";
 
 export function useDashboard() {
@@ -21,12 +21,10 @@ export function useDashboard() {
   const userRole =
     user.role.name === "admin"
       ? "Administrador"
-      : user.role.name === "student"
-      ? "Estudiante"
       : user.role.name === "teacher"
       ? "Profesor"
-      : user.role.name === "tutor"
-      ? "Tutor/Padre"
+      : user.role.name === "parent"
+      ? "Padre"
       : user.role.name === "secretary"
       ? "Secretaria"
       : user.role.name === "principal"
@@ -64,12 +62,12 @@ export function useDashboard() {
     const matchingOption = (
       user.role.name === "admin"
         ? adminOptions
-        : user.role.name === "student"
-        ? studentOptions
         : user.role.name === "teacher"
         ? teacherOptions
-        : user.role.name === "tutor"
-        ? tutorOptions
+        : user.role.name === "counselor"
+        ? counselorOptions
+        : user.role.name === "parent"
+        ? parentOptions
         : user.role.name === "secretary"
         ? secretaryOptions
         : user.role.name === "principal"

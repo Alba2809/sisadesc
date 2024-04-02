@@ -1,15 +1,15 @@
-import { useChat } from "@context/ChatContext";
-import { useAuth } from "@context/AuthContext";
+import { useChat } from "../../context/ChatContext";
+import { useAuth } from "../../context/AuthContext";
 import { useEffect, useRef, useState } from "react";
 import { IoIosSend } from "react-icons/io";
 import { AiOutlineLoading } from "react-icons/ai";
 import { LuFileCheck } from "react-icons/lu";
-import { get, useForm } from "react-hook-form";
-import { blobToBase64, base64ToPDF } from "@constants/functions";
-import Conversation from "@components/Chat/Conversation";
-import Message from "@components/Chat/Message";
+import { useForm } from "react-hook-form";
+import { blobToBase64, base64ToPDF } from "../../constants/functions";
+import Conversation from "../../components/Chat/Conversation";
+import Message from "../../components/Chat/Message";
 import TextareaAutosize from "react-textarea-autosize";
-import UploadFileChat from "@components/UploadFileChat";
+import UploadFileChat from "../../components/UploadFileChat";
 
 function Chats() {
   const {
@@ -30,7 +30,7 @@ function Chats() {
   const [conversations, setConversations] = useState([]);
   const [userSelected, setUserSelected] = useState(null);
   const lastMessageRef = useRef(null);
-  const { register, handleSubmit, setValue, unregister, getValues } = useForm();
+  const { register, handleSubmit, setValue, unregister } = useForm();
 
   useEffect(() => {
     const time = setTimeout(() => {

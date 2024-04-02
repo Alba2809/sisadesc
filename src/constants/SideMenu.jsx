@@ -6,14 +6,14 @@ import { RiParentLine } from "react-icons/ri";
 import { MdOutlineFilter9Plus } from "react-icons/md";
 
 export const adminOptions = [
-  {
+  /* {
     mainOption: {
       name: "Mensajes",
       icon: <IoIosChatbubbles color="gray" size="1.5em" />,
       iconS: <IoIosChatbubbles color="blue" size="1.5em" />,
       to: "/chats",
     },
-  },
+  }, */
   {
     mainOption: {
       name: "Avisos",
@@ -130,19 +130,15 @@ export const adminOptions = [
   },
 ];
 
-export const studentOptions = [
-  
-];
-
 export const teacherOptions = [
-  {
+  /* {
     mainOption: {
       name: "Mensajes",
       icon: <IoIosChatbubbles color="gray" size="1.5em" />,
       iconS: <IoIosChatbubbles color="blue" size="1.5em" />,
       to: "/chats",
     },
-  },
+  }, */
   {
     mainOption: {
       name: "Avisos",
@@ -167,9 +163,69 @@ export const teacherOptions = [
       to: "/teacher/grades",
     },
   },
+  {
+    mainOption: {
+      name: "Horario académico",
+      icon: <FaRegCalendarAlt color="gray" size="1.5em" />,
+      iconS: <FaRegCalendarAlt color="blue" size="1.5em" />,
+      to: "/schedule",
+    },
+  },
 ];
 
-export const tutorOptions = [];
+export const counselorOptions = [
+  {
+    mainOption: {
+      name: "Mensajes",
+      icon: <IoIosChatbubbles color="gray" size="1.5em" />,
+      iconS: <IoIosChatbubbles color="blue" size="1.5em" />,
+      to: "/chats",
+    },
+  },
+  {
+    mainOption: {
+      name: "Avisos",
+      icon: <BiSolidBellRing color="gray" size="1.5em" />,
+      iconS: <BiSolidBellRing color="blue" size="1.5em" />,
+      to: "/posts",
+    },
+  },
+  {
+    mainOption: {
+      name: "Horario académico",
+      icon: <FaRegCalendarAlt color="gray" size="1.5em" />,
+      iconS: <FaRegCalendarAlt color="blue" size="1.5em" />,
+      to: "/schedule",
+    },
+  },
+];
+
+export const parentOptions = [
+  {
+    mainOption: {
+      name: "Mensajes",
+      icon: <IoIosChatbubbles color="gray" size="1.5em" />,
+      iconS: <IoIosChatbubbles color="blue" size="1.5em" />,
+      to: "/chats",
+    },
+  },
+  {
+    mainOption: {
+      name: "Avisos",
+      icon: <BiSolidBellRing color="gray" size="1.5em" />,
+      iconS: <BiSolidBellRing color="blue" size="1.5em" />,
+      to: "/posts",
+    },
+  },
+  {
+    mainOption: {
+      name: "Horario académico",
+      icon: <FaRegCalendarAlt color="gray" size="1.5em" />,
+      iconS: <FaRegCalendarAlt color="blue" size="1.5em" />,
+      to: "/schedule",
+    },
+  },
+];
 
 export const secretaryOptions = [
   {

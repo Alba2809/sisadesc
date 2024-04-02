@@ -11,13 +11,13 @@ import { Toaster } from "react-hot-toast";
 import { useDashboard } from "../hooks/useDashboard";
 import {
   adminOptions,
-  studentOptions,
   teacherOptions,
-  tutorOptions,
+  counselorOptions,
   secretaryOptions,
   principalOptions,
   viceprincipalOptions,
-  academicCoorOptions,
+  academicCoorOptions, 
+  parentOptions 
 } from "../constants/SideMenu";
 import Logo from "../assets/logos/logo-escudo.png";
 
@@ -127,12 +127,12 @@ function Dashboard() {
               </section>
               {(user.role.name === "admin"
                 ? adminOptions
-                : user.role.name === "student"
-                ? studentOptions
                 : user.role.name === "teacher"
                 ? teacherOptions
-                : user.role.name === "tutor"
-                ? tutorOptions
+                : user.role.name === "counselor"
+                ? counselorOptions
+                : user.role.name === "parent"
+                ? parentOptions
                 : user.role.name === "secretary"
                 ? secretaryOptions
                 : user.role.name === "principal"

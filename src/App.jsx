@@ -59,7 +59,9 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/perfile" element={<Perfile />} />
 
-          <Route path="/chats" element={<Chats />} />
+          <Route element={<RolValidator rolRoute={["counselor", "parent"]} />}>
+            <Route path="/chats" element={<Chats />} />
+          </Route>
 
           <Route path="/" element={<MainSection />} />
           <Route path="/posts" element={<PostsPage />} />
