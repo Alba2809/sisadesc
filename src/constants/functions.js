@@ -62,14 +62,24 @@ export const blobToBase64 = (blob) => {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
     reader.onloadend = () => {
-      resolve(reader.result.split(",")[1]);
+      resolve(reader.result);
       // "data:image/jpg;base64,    =sdCXDSAsadsadsa"
     };
   });
 };
 
+export const readImageInBase64 = async (file) => {
+  const fileReader = new FileReader();
+  fileReader.readAsDataURL(file);
+  return new Promise((resolve, reject) => {
+    fileReader.onload = () => {
+      resolve(fileReader.result);
+    };
+  });
+};
+
 export const base64ToPDF = async (base64, fileName) => {
-  const decodedData = atob(base64);
+  const decodedData = atob(base64.split("base64,")[1]);
 
   const arrayBuffer = new ArrayBuffer(decodedData.length);
   const uint8Array = new Uint8Array(arrayBuffer);

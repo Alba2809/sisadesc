@@ -9,7 +9,7 @@ import {
 import { formatDateShort } from "../constants/functions";
 import toast from "react-hot-toast";
 
-export function useUser() {
+export function useUser({ setValue } = {}) {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -59,7 +59,7 @@ export function useUser() {
     try {
       setLoading(true);
       const res = await getUserRequest(id);
-      const userData = res.data
+      const userData = res.data;
       if (setValue) {
         setUser(userData);
         setValue("firstname", userData.firstname);
@@ -140,6 +140,30 @@ export function useUser() {
     setShowDialog(false);
   };
 
+  const handleFileChange = (file) => {
+    setValue("imageperfile", file);
+  };
+
+  const handleChange = (e) => {
+    const date = e.target.value;
+    setValue("birthdate", date.toString());
+  };
+
+  const handleChangeStatus = (value) => {
+    setValue("status", value);
+  };
+
+  const handleInputNumber = (e) => {
+    const { value } = e.target;
+
+    const regex = /^\d*$/;
+    if (regex.test(value)) {
+      setValue("phonenumber", value);
+    } else {
+      e.target.value = e.target.value.replace(/\D/g, "");
+    }
+  };
+
   useEffect(() => {
     if (errors.length > 0) {
       const timer = setTimeout(() => {
@@ -164,5 +188,9 @@ export function useUser() {
     handleShowDialog,
     showDialog,
     handleActionDialog,
+    handleFileChange,
+    handleChange,
+    handleChangeStatus,
+    handleInputNumber,
   };
 }

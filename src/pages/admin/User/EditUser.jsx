@@ -2,7 +2,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
-import { formatDateShort, formatDateTime } from "../../../constants/functions";
+import {
+  blobToBase64,
+  formatDateShort,
+  formatDateTime,
+} from "../../../constants/functions";
 import { useRole } from "../../../hooks/useRole";
 import { useUser } from "../../../hooks/useUser";
 import { useAddress } from "../../../hooks/useAddress";
@@ -26,11 +30,16 @@ function EditUser() {
     loading,
     user,
     errors: updateErrors,
-  } = useUser();
+    handleFileChange,
+    handleChange,
+    handleChangeStatus,
+    handleInputNumber,
+  } = useUser({ setValue });
   const { handleChangeCP, handleSelectAddress, suggestions } = useAddress({
     setValue,
   });
   const navigate = useNavigate();
+  const dateInputRef = useRef(null);
 
   useEffect(() => {
     async function getData() {
@@ -41,50 +50,14 @@ function EditUser() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const formData = new FormData();
-      formData.append("firstname", data.firstname);
-      formData.append("lastnamepaternal", data.lastnamepaternal);
-      formData.append("lastnamematernal", data.lastnamematernal);
-      formData.append("curp", data.curp);
-      formData.append("rfc", data.rfc);
-      formData.append("addressid", +data.addressid);
-      formData.append("street", data.street);
-      formData.append("phonenumber", data.phonenumber);
-      formData.append("birthdate", data.birthdate);
-      formData.append("status", data.status);
-      formData.append("email", data.email);
-      formData.append("role", +data.role);
-      formData.append("imageperfile", data.imageperfile);
-      const res = await updateUser(user.id, formData);
+      const imagenBase64 = await blobToBase64(data.imageperfile);
+
+      data.imageperfile = imagenBase64;
+
+      const res = await updateUser(user.id, data);
       if (res?.statusText === "OK") navigate("/admin/users");
     } catch (error) {}
   });
-
-  const dateInputRef = useRef(null);
-
-  const handleChange = (e) => {
-    const date = e.target.value;
-    setValue("birthdate", date.toString());
-  };
-
-  const handleChangeStatus = (value) => {
-    setValue("status", value);
-  };
-
-  const handleFileChange = (file) => {
-    setValue("imageperfile", file);
-  };
-
-  const handleInputNumber = (e) => {
-    const { value } = e.target;
-
-    const regex = /^\d*$/;
-    if (regex.test(value)) {
-      setValue("phonenumber", value);
-    } else {
-      e.target.value = e.target.value.replace(/\D/g, "");
-    }
-  };
 
   return (
     <div className="w-full h-full flex flex-col">

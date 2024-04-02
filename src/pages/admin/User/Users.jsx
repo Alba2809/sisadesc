@@ -8,6 +8,7 @@ import { useUser } from "../../../hooks/useUser";
 import { useGroupTable } from "../../../hooks/useGroupTable";
 import InputSelect from "../../../components/InputSelect";
 import Dialog from "../../../components/Dialog";
+import UserDefault from "../../../assets/icons/avatar_default.jpg";
 
 function Users() {
   const {
@@ -15,7 +16,7 @@ function Users() {
     getUsers,
     handleActionDialog,
     handleShowDialog,
-    showDialog
+    showDialog,
   } = useUser();
   const {
     allObjects: allUsers,
@@ -137,20 +138,12 @@ function Users() {
                           >
                             <td className="p-2">{user.id}</td>
                             <td className="p-2">
-                              {user.imageperfile ? (
-                                <img
-                                  src={user.imageperfile}
-                                  alt={"Imagen de perfil - " + user.id}
-                                  className="min-w-10 min-h-10 max-w-10 max-h-10 rounded-full"
-                                  loading="lazy"
-                                />
-                              ) : (
-                                <img
-                                  src="https://firebasestorage.googleapis.com/v0/b/sisadesc-ca669.appspot.com/o/avatar%2Favatar_default.jpg?alt=media&token=e4d14e18-f4ae-4777-b35d-d64f0084c0e6"
-                                  alt={"Imagen de perfil default"}
-                                  className="min-w-12 min-h-12 max-w-12 max-h-12 rounded-full"
-                                />
-                              )}
+                              <img
+                                src={user.imageperfile ?? UserDefault}
+                                alt={"Imagen de perfil - " + user.id}
+                                className="min-w-10 min-h-10 max-w-10 max-h-10 rounded-full"
+                                loading="lazy"
+                              />
                             </td>
                             <td className="p-2">{user.firstname}</td>
                             <td className="p-2">{user.lastnamepaternal}</td>
