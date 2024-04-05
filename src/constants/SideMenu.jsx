@@ -32,19 +32,6 @@ export const adminOptions = [
   }, */
   {
     mainOption: {
-      name: "Panel de control",
-      icon: <IoIosSpeedometer color="gray" size="1.5em" />,
-      iconS: <IoIosSpeedometer color="blue" size="1.5em" />,
-    },
-    subOptions: [
-      {
-        name: "Menú Admin",
-        to: "/",
-      },
-    ],
-  },
-  {
-    mainOption: {
       name: "Gestión de usuarios",
       icon: <FaShieldAlt color="gray" size="1.5em" />,
       iconS: <FaShieldAlt color="blue" size="1.5em" />,

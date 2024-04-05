@@ -1,6 +1,5 @@
 import { useAuth } from "@context/AuthContext";
 import { useEffect, useState } from "react";
-import ControlAdmin from "@pages/admin/ControlAdmin";
 
 function WelcomeSection() {
   const { getUser, user } = useAuth();
@@ -21,15 +20,6 @@ function WelcomeSection() {
           Bienvenido {user?.firstname}!
         </h1>
       </header>
-      {!loading && (
-        <>
-          {user.role.name === "admin" ? (
-            <ControlAdmin />
-          ) : (
-            console.log("No es un administrador:", user.role.name)
-          )}
-        </>
-      )}
     </>
   );
 }

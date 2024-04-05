@@ -64,7 +64,22 @@ function App() {
           </Route>
 
           <Route path="/" element={<MainSection />} />
-          <Route path="/posts" element={<PostsPage />} />
+          <Route
+            element={
+              <RolValidator
+                rolRoute={[
+                  "counselor",
+                  "parent",
+                  "teacher",
+                  "admin",
+                  "principal",
+                  "academiccoor",
+                ]}
+              />
+            }
+          >
+            <Route path="/posts" element={<PostsPage />} />
+          </Route>
           <Route path="/schedule" element={<EventsG />} />
 
           <Route element={<RolValidator rolRoute="admin" />}>
