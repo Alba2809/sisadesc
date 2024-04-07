@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { deleteStudentRequest, getStudentRequest, getStudentsRequest, registerStudentRequest, updateStudentRequest } from "../api/student";
 import toast from "react-hot-toast";
-import { formatDateShort } from "../constants/functions";
+import { formatDateShort } from "../utils/functions";
 
 export function useStudent({ setValue, unregister } = {}) {
   const [loading, setLoading] = useState(true);

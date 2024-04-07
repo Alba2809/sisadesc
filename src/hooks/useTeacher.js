@@ -7,7 +7,7 @@ import {
   updateTeacherRequest,
 } from "../api/teacher";
 import toast from "react-hot-toast";
-import { formatDateShort } from "../constants/functions";
+import { formatDateShort } from "../utils/functions";
 
 export function useTeacher({ setValue } = {}) {
   const [loading, setLoading] = useState(true);

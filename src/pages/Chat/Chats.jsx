@@ -5,7 +5,7 @@ import { IoIosSend } from "react-icons/io";
 import { AiOutlineLoading } from "react-icons/ai";
 import { LuFileCheck } from "react-icons/lu";
 import { useForm } from "react-hook-form";
-import { blobToBase64, base64ToPDF } from "../../constants/functions";
+import { blobToBase64, base64ToPDF } from "../../utils/functions";
 import Conversation from "../../components/Chat/Conversation";
 import Message from "../../components/Chat/Message";
 import TextareaAutosize from "react-textarea-autosize";

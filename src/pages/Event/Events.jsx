@@ -1,6 +1,6 @@
-import { useEvent } from "@context/EventContext";
-import { useEffect, useLayoutEffect, useState } from "react";
-import { formatDateShort } from "@constants/functions";
+import { useEvent } from "../../context/EventContext";
+import { useEffect, useState } from "react";
+import { formatDateShort } from "../../utils/functions";
 import { AnimatePresence, motion } from "framer-motion";
 import Calendar from "react-calendar";
 import "@styles/calendar.css";

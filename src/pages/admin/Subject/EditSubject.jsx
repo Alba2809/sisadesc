@@ -53,7 +53,6 @@ function EditSubject({ type }) {
       setValue("code", objectData.code);
       setValue("group", objectData.group);
       setValue("teacher", objectData.teacher_curp);
-      setValue("counselor", objectData.counselor_curp);
       setValue(
         "students",
         objectData.students?.map((student) => student.student_id)
@@ -195,29 +194,6 @@ function EditSubject({ type }) {
                           value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
                           message:
                             "CURP del maestro inválido. Verifique el formato y que las letras sean mayúsculas.",
-                        },
-                      })}
-                      className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                    />
-                  </div>
-                  <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
-                    <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                      CURP del asesor
-                    </label>
-                    <input
-                      type="text"
-                      maxLength={18}
-                      {...register("counselor", {
-                        required: false,
-                        maxLength: {
-                          value: 18,
-                          message:
-                            "La CURP del asesor no debe exceder los 18 caracteres",
-                        },
-                        pattern: {
-                          value: /^[A-ZÑ]{4}[0-9]{6}[A-ZÑ]{6,7}[0-9]{1,2}$/,
-                          message:
-                            "CURP del asesor inválido. Verifique el formato y que las letras sean mayúsculas.",
                         },
                       })}
                       className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"

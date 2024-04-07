@@ -10,7 +10,7 @@ import {
   updateParentRequest,
 } from "../api/parent";
 import toast from "react-hot-toast";
-import { formatDateShort } from "../constants/functions";
+import { formatDateShort } from "../utils/functions";
 
 export function useParent({ setValue } = {}) {
   const [loading, setLoading] = useState(true);

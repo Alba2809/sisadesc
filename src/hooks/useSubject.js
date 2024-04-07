@@ -2,14 +2,12 @@ import { useEffect, useState } from "react";
 import {
   getSubjectRequest,
   getSubjectStudentsRequest,
-  getSubjectsOfTeacherRequest,
   getSubjectsRequest,
   registerSubjectRequest,
   updateStatusSubjectRequest,
   updateSubjectRequest,
 } from "../api/subject";
 import toast from "react-hot-toast";
-import { groupArray } from "../constants/functions";
 import { getTeacherRequest } from "../api/teacher";
 import { getUserRequest } from "../api/user";
 
@@ -20,7 +18,6 @@ export function useSubject() {
   const [subjectSelected, setSubjectSelected] = useState(null);
   const [students, setStudents] = useState([]);
   const [teacher, setTeacher] = useState(null);
-  const [counselor, setCounselor] = useState(null);
   const [errors, setErrors] = useState([]);
 
   const registerSubject = async (data) => {
@@ -139,16 +136,6 @@ export function useSubject() {
         const resTeacher = await getTeacherRequest(object.teacher_id);
         setTeacher(resTeacher?.data);
       }
-      if (object.counselor_id) {
-        const resCounselor = await getUserRequest(object.counselor_id);
-        const counselor = {
-          firstname: resCounselor?.data?.firstname,
-          lastnamepaternal: resCounselor?.data?.lastnamepaternal,
-          lastnamematernal: resCounselor?.data?.lastnamematernal,
-          curp: resCounselor?.data?.curp,
-        };
-        setCounselor(counselor);
-      }
     }
     if (object) getSubjectData();
   };
@@ -164,7 +151,6 @@ export function useSubject() {
 
   const handleCloseView = (close) => {
     setShowDialogView(false);
-    setCounselor(null);
     setTeacher(null);
   };
 
@@ -184,7 +170,6 @@ export function useSubject() {
     subjectSelected,
     students,
     teacher,
-    counselor,
     getSubject,
     getSubjectStudents,
     getSubjects,

@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { genders, vitalStatus, grades, groups } from "@constants/constants";
+import { genders, vitalStatus, grades, groups } from "../../../utils/constants";
 import { FaCheck } from "react-icons/fa";
 import { useAddress } from "../../../hooks/useAddress";
 import { useStudent } from "../../../hooks/useStudent";

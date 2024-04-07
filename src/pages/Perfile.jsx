@@ -1,12 +1,12 @@
-import { useAuth } from "@context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaUserCircle, FaMapMarkerAlt, FaRegEdit } from "react-icons/fa";
-import { formatDateShort } from "@constants/functions";
+import { formatDateShort } from "../utils/functions";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
-import AlertMessage from "@components/AlertMessage"
-import Dialog from "@components/Dialog"
+import AlertMessage from "../components/AlertMessage"
+import Dialog from "../components/Dialog"
 
 const skills = [
   "Html5",

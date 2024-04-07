@@ -3,7 +3,7 @@ import { FaEye, FaChalkboardTeacher, FaRegCalendarCheck } from "react-icons/fa";
 import { BsMortarboardFill } from "react-icons/bs";
 import { AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { formatDateLong } from "../../../constants/functions";
+import { formatDateLong } from "../../../utils/functions";
 import { useGroupTable } from "../../../hooks/useGroupTable";
 import { useSubject } from "../../../hooks/useSubject";
 import InputSelect from "../../../components/InputSelect";
@@ -16,7 +16,6 @@ function Subjects() {
     showDialogView,
     students,
     teacher,
-    counselor,
     getSubjects,
     handleDialogStatus,
     handleDialogView,
@@ -103,7 +102,6 @@ function Subjects() {
                 </th>
                 <th className="text-start px-2 min-w-[100px]">Estado</th>
                 <th className="text-start px-2 min-w-[200px]">Docente</th>
-                <th className="text-start px-2 min-w-[200px]">Asesor</th>
                 <th className="text-center px-2 min-w-[150px]">
                   Estudiantes asignados
                 </th>
@@ -161,9 +159,6 @@ function Subjects() {
                               {object.status}
                             </td>
                             <td className="p-2">{object.teacher_curp}</td>
-                            <td className="p-2">
-                              {object.counselor_curp ?? "Sin asesor asignado."}
-                            </td>
                             <td className="p-2 text-center">
                               {object.students_total}
                             </td>
@@ -364,22 +359,6 @@ function Subjects() {
                       defaultValue={
                         teacher
                           ? `${teacher?.firstname} ${teacher?.lastnamepaternal} ${teacher?.lastnamematernal}`
-                          : ""
-                      }
-                      readOnly
-                    />
-                  </div>
-                  <div className="relative w-full">
-                    <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
-                      Nombre del asesor
-                    </label>
-                    <input
-                      type="text"
-                      maxLength={20}
-                      className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
-                      defaultValue={
-                        counselor
-                          ? `${counselor?.firstname} ${counselor?.lastnamepaternal} ${counselor?.lastnamematernal}`
                           : ""
                       }
                       readOnly

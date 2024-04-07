@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { groupArray } from "../constants/functions";
+import { groupArray } from "../utils/functions";
 
 export function useGroupTable() {
   const [allObjects, setAllObjects] = useState([]);

@@ -8,7 +8,7 @@ import { useEventCalendar } from "../../../hooks/useEventCalendar";
 import AlertMessage from "../../../components/AlertMessage";
 import Calendar from "react-calendar";
 import "@styles/calendar.css";
-import { formatDateShort } from "../../../constants/functions";
+import { formatDateShort } from "../../../utils/functions";
 
 function Events() {
   const {

@@ -10,7 +10,7 @@ import {
     viceprincipalOptions,
     academicCoorOptions,
     parentOptions
-  } from "../constants/SideMenu";
+  } from "../utils/SideMenu";
 
 export function useDashboard() {
   const { user, logout, getUser } = useAuth();

@@ -2,13 +2,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { formatDateShort } from "../../../constants/functions";
+import { formatDateShort } from "../../../utils/functions";
 import {
   genders,
   vitalStatus,
   expCurp,
   expRfc,
-} from "../../../constants/constants";
+} from "../../../utils/constants";
 import { useAddress } from "../../../hooks/useAddress";
 import { useParent } from "../../../hooks/useParent";
 import InputSelect from "../../../components/InputSelect";

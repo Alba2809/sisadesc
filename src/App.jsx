@@ -48,6 +48,10 @@ import EditSubjectVP from "./pages/viceprincipal/Subject/EditSubject";
 import GradesP from "./pages/principal/SchoolGrades/Grades";
 import EventsAC from "./pages/academicCoor/Events/Events";
 import EventsG from "./pages/Event/Events";
+import CounselorsA from "./pages/admin/Counselor/Counselors";
+import RegisterCounselorA from "./pages/admin/Counselor/RegisterCounselor";
+import CounselorsV from "./pages/viceprincipal/Counselor/Counselors";
+import RegisterCounselorV from "./pages/viceprincipal/Counselor/RegisterCounselor";
 
 function App() {
   const location = useLocation();
@@ -57,7 +61,7 @@ function App() {
       <Route element={<AuthValidator />}>
         <Route element={<Dashboard />}>
           <Route path="/settings" element={<Settings />} />
-          <Route path="/perfile" element={<Perfile />} />
+          {/* <Route path="/perfile" element={<Perfile />} /> */}
 
           <Route element={<RolValidator rolRoute={["counselor", "parent"]} />}>
             <Route path="/chats" element={<Chats />} />
@@ -120,6 +124,12 @@ function App() {
                 />
                 <Route path="register" element={<RegisterSubject />} />
                 <Route path="*" element={<Navigate to="/admin/subjects" />} />
+              </Route>
+              <Route path="counselors/*">
+                <Route path="" element={<CounselorsA />} />
+                {/* <Route path="edit/:id" element={<EditCounselorA />} /> */}
+                <Route path="register" element={<RegisterCounselorA />} />
+                <Route path="*" element={<Navigate to="/admin/counselors" />} />
               </Route>
               <Route path="*" element={<Navigate to="/" />} />
             </Route>
@@ -225,6 +235,12 @@ function App() {
                   element={<EditSubjectVP type="teacher" />}
                 />
                 <Route path="*" element={<Navigate to="/admin/subjects" />} />
+              </Route>
+              <Route path="counselors/*">
+                <Route path="" element={<CounselorsV />} />
+                {/* <Route path="edit/:id" element={<EditCounselorA />} /> */}
+                <Route path="register" element={<RegisterCounselorV />} />
+                <Route path="*" element={<Navigate to="/admin/counselors" />} />
               </Route>
               <Route path="*" element={<Navigate to="/" />} />
             </Route>

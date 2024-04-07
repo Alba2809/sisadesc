@@ -6,7 +6,7 @@ import {
 } from "../api/grade";
 import { useState } from "react";
 import { useSubject } from "./useSubject";
-import { evaluationNumbers } from "../constants/constants";
+import { evaluationNumbers } from "../utils/constants";
 import { getSubjectsOfTeacherRequest } from "../api/subject";
 
 export function useGrade({ setValue } = {}) {

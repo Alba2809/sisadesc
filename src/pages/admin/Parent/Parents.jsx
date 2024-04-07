@@ -3,7 +3,7 @@ import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { formatDateLong } from "../../../constants/functions";
+import { formatDateLong } from "../../../utils/functions";
 import { useGroupTable } from "../../../hooks/useGroupTable";
 import { useParent } from "../../../hooks/useParent";
 import InputSelect from "../../../components/InputSelect";

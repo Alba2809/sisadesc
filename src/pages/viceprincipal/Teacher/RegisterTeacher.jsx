@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { genders } from "../../../constants/constants";
+import { genders } from "../../../utils/constants";
 import { useAddress } from "../../../hooks/useAddress";
 import { useTeacher } from "../../../hooks/useTeacher";
 import InputSelect from "../../../components/InputSelect";

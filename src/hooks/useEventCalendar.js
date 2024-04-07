@@ -6,7 +6,7 @@ import {
   updateEventRequest,
 } from "../api/event";
 import toast from "react-hot-toast";
-import { formatDateShort } from "../constants/functions";
+import { formatDateShort } from "../utils/functions";
 
 export function useEventCalendar({ setValue, getValues }) {
   const [loading, setLoading] = useState();

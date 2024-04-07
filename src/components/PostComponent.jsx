@@ -1,8 +1,8 @@
 import { BiSolidBellRing } from "react-icons/bi";
 import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { formatDateLong } from "@constants/functions";
-import { useAuth } from "@context/AuthContext";
+import { formatDateLong } from "../utils/functions";
+import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
 function PostComponent({ data, handleDelete }) {

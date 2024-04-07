@@ -6,7 +6,7 @@ import {
   registerUserRequest,
   updateUserRequest,
 } from "../api/user";
-import { formatDateShort } from "../constants/functions";
+import { formatDateShort } from "../utils/functions";
 import toast from "react-hot-toast";
 
 export function useUser({ setValue } = {}) {

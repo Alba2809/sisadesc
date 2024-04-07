@@ -1,9 +1,10 @@
 import { FaShieldAlt, FaChalkboardTeacher, FaUserCheck, FaRegCalendarAlt } from "react-icons/fa";
-import { IoIosSpeedometer, IoIosChatbubbles } from "react-icons/io";
+import { IoIosChatbubbles } from "react-icons/io";
 import { BsMortarboardFill } from "react-icons/bs";
 import { BiBookReader, BiSolidBellRing } from "react-icons/bi";
 import { RiParentLine } from "react-icons/ri";
 import { MdOutlineFilter9Plus } from "react-icons/md";
+import { LiaChalkboardTeacherSolid } from "react-icons/lia";
 
 export const adminOptions = [
   /* {
@@ -112,6 +113,23 @@ export const adminOptions = [
       {
         name: "Agregar materia",
         to: "/admin/subjects/register",
+      },
+    ],
+  },
+  {
+    mainOption: {
+      name: "Asesores",
+      icon: <LiaChalkboardTeacherSolid color="gray" size="1.5em" />,
+      iconS: <LiaChalkboardTeacherSolid color="blue" size="1.5em" />,
+    },
+    subOptions: [
+      {
+        name: "Lista de asesores",
+        to: "/admin/counselors",
+      },
+      {
+        name: "Asignar asesor",
+        to: "/admin/counselors/register",
       },
     ],
   },
@@ -352,6 +370,23 @@ export const viceprincipalOptions = [
       {
         name: "Registrar aviso",
         to: "/viceprincipal/posts/register",
+      },
+    ],
+  },
+  {
+    mainOption: {
+      name: "Asesores",
+      icon: <LiaChalkboardTeacherSolid color="gray" size="1.5em" />,
+      iconS: <LiaChalkboardTeacherSolid color="blue" size="1.5em" />,
+    },
+    subOptions: [
+      {
+        name: "Lista de asesores",
+        to: "/viceprincipal/counselors",
+      },
+      {
+        name: "Asignar asesor",
+        to: "/viceprincipal/counselors/register",
       },
     ],
   },
