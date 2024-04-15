@@ -132,7 +132,7 @@ function InputSelect({
                 <motion.li
                   key={i}
                   onClick={() => handleSelect(option)}
-                  className="cursor-pointer hover:bg-[#718bf3] hover:text-white pl-3 py-1 rounded-sm"
+                  className={`cursor-pointer hover:bg-[#718bf3] hover:text-white pl-3 py-1 rounded-sm ${selectedOption === option? "bg-[#718bf3] text-white" : "bg-white text-gray-600"}`}
                 >
                   {option}
                 </motion.li>

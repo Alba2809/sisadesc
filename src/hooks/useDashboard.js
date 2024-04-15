@@ -18,7 +18,7 @@ export function useDashboard() {
   const [showSideBar, setShowSideBar] = useState(true);
   const [subMenuSelect, setSubMenuSelect] = useState("");
   const [subOptionSelect, setSubOptionSelect] = useState("");
-  const userRole =
+  /* const userRole =
     user.role.name === "admin"
       ? "Administrador"
       : user.role.name === "teacher"
@@ -35,7 +35,7 @@ export function useDashboard() {
       ? "Coordinador"
       : user.role.name === "counselor"
       ? "Asesor"
-      : "Invitado";
+      : "Invitado"; */
   const menuRef = useRef(null);
   const location = useLocation();
 
@@ -120,7 +120,6 @@ export function useDashboard() {
 
   return {
     user,
-    userRole,
     showMenuUser,
     showSideBar,
     subMenuSelect,

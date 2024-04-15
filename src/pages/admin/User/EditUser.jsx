@@ -338,10 +338,10 @@ function EditUser() {
                   Rol<span className="text-red-500">*</span>
                 </label>
                 <InputSelect
-                  options={roles.map((rol) => rol.name)}
+                  options={roles.map((rol) => rol.name_spanish)}
                   onOptionChange={handleChangeRole}
                   defaultValue={
-                    roles.find((rol) => rol.id === user.role.id).name ?? ""
+                    roles.find((rol) => rol.id === user.role.id).name_spanish ?? ""
                   }
                   style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                 />

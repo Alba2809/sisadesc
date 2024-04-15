@@ -165,7 +165,7 @@ function Users() {
                                 {formatDateLong(user.createdAt)}
                               </time>
                             </td>
-                            <td className="p-2">{user.role.name}</td>
+                            <td className="p-2">{user.role.name_spanish}</td>
                             <td className="p-2">{user.status}</td>
                             <td
                               className={`p-2 sticky -right-[1px] ${

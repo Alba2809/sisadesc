@@ -33,7 +33,6 @@ function Dashboard() {
     showSideBar,
     subMenuSelect,
     subOptionSelect,
-    userRole,
     user,
   } = useDashboard();
 
@@ -71,7 +70,7 @@ function Dashboard() {
           )}
           <section className="flex flex-col">
             <h1 className="font-semibold font-sans">{user.firstname}</h1>
-            <h2 className="text-[#5855ff] text-sm">{userRole}</h2>
+            <h2 className="text-[#5855ff] text-sm">{user.role.name_spanish}</h2>
           </section>
           <IoIosArrowDown
             onClick={() => setShowMenuUser((prev) => !prev)}

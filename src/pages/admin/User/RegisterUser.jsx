@@ -190,7 +190,7 @@ function RegisterUser() {
                   Rol<span className="text-red-500">*</span>
                 </label>
                 <InputSelect
-                  options={roles.map((rol) => rol.name)}
+                  options={roles.map((rol) => rol.name_spanish)}
                   onOptionChange={handleChangeRole}
                   style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                 />

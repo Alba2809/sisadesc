@@ -21,7 +21,7 @@ export function useRole({ setValue } = {}) {
   };
   
   const handleChangeRole = (value) => {
-    const rol = roles.find((role) => role.name === value);
+    const rol = roles.find((role) => role.name_spanish === value);
     if (rol) return setValue("role", rol.id);
     setValue("role", null);
   };
