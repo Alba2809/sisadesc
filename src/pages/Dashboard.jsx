@@ -85,14 +85,14 @@ function Dashboard() {
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: 50, opacity: 0 }}
               >
-                {/* <li className="flex">
+                <li className="flex">
                   <Link
                     to="/perfile"
                     className="p-1 w-full hover:bg-blue-300 hover:text-white cursor-pointer rounded-md"
                   >
                     Perfil
                   </Link>
-                </li> */}
+                </li>
                 <li className="hover:bg-blue-300 hover:text-white cursor-pointer p-1 rounded-md">
                   <button
                     className="w-full h-full text-start"

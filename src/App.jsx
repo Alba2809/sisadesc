@@ -61,7 +61,7 @@ function App() {
       <Route element={<AuthValidator />}>
         <Route element={<Dashboard />}>
           <Route path="/settings" element={<Settings />} />
-          {/* <Route path="/perfile" element={<Perfile />} /> */}
+          <Route path="/perfile" element={<Perfile />} />
 
           <Route element={<RolValidator rolRoute={["counselor", "parent"]} />}>
             <Route path="/chats" element={<Chats />} />

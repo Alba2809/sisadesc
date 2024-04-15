@@ -4,6 +4,7 @@ import {
   verifyTokenRequest,
   getUserRequest,
   updatePasswordRequest,
+  updateImageRequest,
 } from "../api/auth";
 import Cookies from "js-cookie";
 
@@ -54,6 +55,20 @@ export const AuthProvider = ({ children }) => {
       setUser(res.data)
       return res.data;
     } catch (error) {}
+  };
+
+  const updateImage = async (data) => {
+    try {
+      const res = await updateImageRequest(data);
+      setUser(res.data)
+      return res;
+    } catch (error) {
+      if(typeof error.response.data === "object" && error.response.data){
+        const array = Object.values(error.response.data)
+        setErrors(array);
+      }
+      else setErrors(error.response.data);
+    }
   };
 
   const logout = () => {
@@ -122,6 +137,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         getUser,
         updatePassword,
+        updateImage,
         loading,
         user,
         isAuthenticated,
