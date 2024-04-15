@@ -78,40 +78,58 @@ function Events() {
               tileClassName={tileClassName}
               className={`w-full`}
             />
-            <section className="w-full flex flex-col justify-around drop-shadow-md rounded-md p-y-3 gap-y-4 mt-4">
-              <AnimatePresence mode="layaout">
-                {eventsSelect?.map((event) => (
-                  <motion.div
-                    layout
-                    key={event.id}
-                    className="w-full flex flex-row gap-3"
-                    initial={{ height: 0, y: -10, opacity: 0 }}
-                    animate={{ height: 48, y: 0, opacity: 1 }}
-                    exit={{ height: 0, y: -10, opacity: 0 }}
-                  >
-                    <input
-                      type="text"
-                      className="w-full max-w-[500px] text-black px-4 py-3 rounded-md border border-gray-300 resize-none bg-white focus:border-blue-400 focus:border focus:outline-none"
-                      defaultValue={event.description}
-                      readOnly
-                    />
-                    <input
-                      type="time"
-                      className="w-[150px] text-black px-4 py-3 rounded-md border border-gray
-                    -300 text-center bg-white"
-                      defaultValue={event.start_time}
-                      disabled
-                    />
-                    <input
-                      type="time"
-                      className="w-[150px] text-black px-4 py-3 rounded-md border border-gray
-                    -300 text-center bg-white"
-                      defaultValue={event.end_time}
-                      disabled
-                    />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+            <section className="w-full drop-shadow-md rounded-md mt-4">
+              <table className="table-auto max-w-[1000px] w-full">
+                <thead>
+                  <tr>
+                    {eventsSelect?.length > 0 && (
+                      <>
+                        <th className="text-left">Descripción</th>
+                        <th className="text-center">Hora de inicio</th>
+                        <th className="text-center">Hora de finalización</th>
+                      </>
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence mode="layaout">
+                    {eventsSelect?.map((event) => (
+                      <motion.tr
+                        layout
+                        key={event.id}
+                        initial={{ height: 0, y: -10, opacity: 0 }}
+                        animate={{ height: 48, y: 0, opacity: 1 }}
+                        exit={{ height: 0, y: -10, opacity: 0 }}
+                      >
+                        <td className="w-full max-w-[500px] pr-5 py-3">
+                          <input
+                            type="text"
+                            className="w-full text-black px-4 py-3 rounded-md border border-gray-300 resize-none bg-white focus:border-blue-400 focus:border focus:outline-none"
+                            defaultValue={event.description}
+                            readOnly
+                          />
+                        </td>
+                        <td className="w-[200px] px-3">
+                          <input
+                            type="time"
+                            className="w-full text-black px-4 py-3 rounded-md border border-gray-300 text-center bg-white"
+                            defaultValue={event.start_time}
+                            disabled
+                          />
+                        </td>
+                        <td className="w-[200px] px-3">
+                          <input
+                            type="time"
+                            className="w-full text-black px-4 py-3 rounded-md border border-gray-300 text-center bg-white"
+                            defaultValue={event.end_time}
+                            disabled
+                          />
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
             </section>
           </>
         )}

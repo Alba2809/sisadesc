@@ -5,10 +5,10 @@ import { FaSquarePlus } from "react-icons/fa6";
 import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useEventCalendar } from "../../../hooks/useEventCalendar";
+import { formatDateShort } from "../../../utils/functions";
 import AlertMessage from "../../../components/AlertMessage";
 import Calendar from "react-calendar";
 import "@styles/calendar.css";
-import { formatDateShort } from "../../../utils/functions";
 
 function Events() {
   const {
@@ -30,7 +30,7 @@ function Events() {
   } = useEventCalendar({ setValue, getValues });
 
   useEffect(() => {
-    getEvents()
+    getEvents();
   }, []);
 
   const tileContent = ({ date, view }) => {
@@ -154,60 +154,81 @@ function Events() {
                   <FaSquarePlus size="2em" color="green" />
                 </button>
               </div>
-              <section className="w-full flex flex-col justify-around drop-shadow-md rounded-md p-y-3 gap-y-4 mt-4">
-                <AnimatePresence mode="layaout">
-                  {eventsSelect?.map((event) => (
-                    <motion.div
-                      layout
-                      key={event.id}
-                      className="w-full flex flex-row gap-3"
-                      initial={{ height: 0, y: -10, opacity: 0 }}
-                      animate={{ height: 48, y: 0, opacity: 1 }}
-                      exit={{ height: 0, y: -10, opacity: 0 }}
-                    >
-                      <input
-                        type="text"
-                        {...register("description" + event.id, {
-                          required: "Se requiere la descripción",
-                        })}
-                        className="w-full max-w-[500px] text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none resize-none"
-                        defaultValue={event.description}
-                      />
-                      <input
-                        type="time"
-                        {...register("start_time" + event.id, {
-                          required: "Se requiere la hora de inicio",
-                        })}
-                        className="w-[200px] text-black px-4 py-3 rounded-md border border-gray
-                    -300 focus:border-blue-400 focus:border focus:outline-none resize-none"
-                        defaultValue={event.start_time}
-                      />
-                      <input
-                        type="time"
-                        {...register("end_time" + event.id, {
-                          required: "Se requiere la hora de finalización",
-                        })}
-                        className="w-[200px] text-black px-4 py-3 rounded-md border border-gray
-                    -300 focus:border-blue-400 focus:border focus:outline-none resize-none"
-                        defaultValue={event.end_time}
-                      />
-                      <div className="flex flex-row gap-5">
-                        <button
-                          type="button"
-                          onClick={() => handleEditEvent(event.id)}
+              <section className="w-full drop-shadow-md rounded-md mt-4">
+                <table className="table-auto max-w-[1000px] w-full">
+                  <thead>
+                    <tr>
+                      {eventsSelect?.length > 0 && (
+                        <>
+                          <th className="text-left">Descripción</th>
+                          <th className="text-center">Hora de inicio</th>
+                          <th className="text-center">Hora de finalización</th>
+                          <th className="text-center">Acciones</th>
+                        </>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <AnimatePresence mode="layaout">
+                      {eventsSelect?.map((event) => (
+                        <motion.tr
+                          layout
+                          key={event.id}
+                          initial={{ height: 0, y: -10, opacity: 0 }}
+                          animate={{ height: 48, y: 0, opacity: 1 }}
+                          exit={{ height: 0, y: -10, opacity: 0 }}
                         >
-                          <FiEdit2 size="1.5em" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteEvent(event.id)}
-                        >
-                          <RiDeleteBin6Line size="1.5em" />
-                        </button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
+                          <td className="w-full max-w-[500px] pr-5 py-3">
+                            <input
+                              type="text"
+                              {...register("description" + event.id, {
+                                required: "Se requiere la descripción",
+                              })}
+                              className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none resize-none"
+                              defaultValue={event.description}
+                            />
+                          </td>
+                          <td className="w-[200px] px-3">
+                            <input
+                              type="time"
+                              {...register("start_time" + event.id, {
+                                required: "Se requiere la hora de inicio",
+                              })}
+                              className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none resize-none"
+                              defaultValue={event.start_time}
+                            />
+                          </td>
+                          <td className="w-[200px] px-3">
+                            <input
+                              type="time"
+                              {...register("end_time" + event.id, {
+                                required: "Se requiere la hora de finalización",
+                              })}
+                              className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none resize-none"
+                              defaultValue={event.end_time}
+                            />
+                          </td>
+                          <td className="w-full px-1">
+                            <div className="flex flex-row gap-5">
+                              <button
+                                type="button"
+                                onClick={() => handleEditEvent(event.id)}
+                              >
+                                <FiEdit2 size="1.5em" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteEvent(event.id)}
+                              >
+                                <RiDeleteBin6Line size="1.5em" />
+                              </button>
+                            </div>
+                          </td>
+                        </motion.tr>
+                      ))}
+                    </AnimatePresence>
+                  </tbody>
+                </table>
               </section>
             </form>
           </>
