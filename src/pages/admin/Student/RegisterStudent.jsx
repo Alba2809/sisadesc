@@ -432,7 +432,7 @@ function RegisterStudent() {
                   onClick={handleClickRegister}
                 />
                 <span className="font-normal font-serif text-base">
-                  Si, buscar a los padres/tutor existentes
+                  Si, ingresar CURP de los padres/tutor existentes
                 </span>
               </label>
               <label className="flex items-center gap-2">

@@ -101,6 +101,7 @@ function Counselors() {
           title={"Eliminar asesor"}
           message={"¿Está seguro de eliminar este asesor?"}
           handleAction={handleActionDelete}
+          addCancel
         />
       )}
     </div>
