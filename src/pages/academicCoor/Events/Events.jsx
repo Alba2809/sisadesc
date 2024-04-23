@@ -150,8 +150,9 @@ function Events() {
                     className="w-full max-w-[170px] text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none resize-none"
                   />
                 </div>
-                <button type="button" onClick={handleAddEvent}>
+                <button type="button" onClick={handleAddEvent} className="flex flex-row items-center gap-2 font-bold text-green-700">
                   <FaSquarePlus size="2em" color="green" />
+                  <p className="text-lg">Registrar</p>
                 </button>
               </div>
               <section className="w-full drop-shadow-md rounded-md mt-4">
