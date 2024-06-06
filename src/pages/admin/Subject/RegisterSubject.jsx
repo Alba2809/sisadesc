@@ -36,7 +36,7 @@ function RegisterSubject() {
   return (
     <div className="w-full flex flex-col">
       <header className="h-[50px]">
-        <h1 className="font-medium font-serif text-2xl">Agregar materia</h1>
+        <h1 className="font-medium font-serif text-2xl">Registro de una nueva materia</h1>
       </header>
       <section
         className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto min-h-[500px]"

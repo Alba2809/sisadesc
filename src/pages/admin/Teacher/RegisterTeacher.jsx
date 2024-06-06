@@ -39,7 +39,7 @@ function RegisterTeacher() {
   return (
     <div className="w-full h-full flex flex-col">
       <header className="h-[50px]">
-        <h1 className="font-medium font-serif text-2xl">Registrar usuario</h1>
+        <h1 className="font-medium font-serif text-2xl">Registrar docente</h1>
       </header>
       <section className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
         <AnimatePresence mode="sync">
