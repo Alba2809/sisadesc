@@ -50,13 +50,21 @@ function EditUser() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const imagenBase64 = await blobToBase64(data.imageperfile);
+      let imagenBase64 = null;
+      if(user.imageperfile !== data.imageperfile){
+        imagenBase64 = await blobToBase64(data.imageperfile);
+      }
+      else {
+        imagenBase64 = user.imageperfile;
+      }
 
       data.imageperfile = imagenBase64;
 
       const res = await updateUser(user.id, data);
       if (res?.statusText === "OK") navigate("/admin/users");
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   });
 
   return (
