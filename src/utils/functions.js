@@ -27,9 +27,9 @@ export const formatDateLong = (dateString, utc) => {
 export const formatDateShort = (date) => {
   if (date === "" || !date) return "";
   const newDate = new Date(date);
-  const year = newDate.getFullYear();
-  let month = newDate.getMonth() + 1;
-  let day = newDate.getDate();
+  const year = newDate.getUTCFullYear();
+  let month = newDate.getUTCMonth() + 1;
+  let day = newDate.getUTCDate();
 
   if (month < 10) {
     month = `0${month}`;
