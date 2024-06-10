@@ -9,7 +9,7 @@ import {
 import { formatDateShort } from "../utils/functions";
 import toast from "react-hot-toast";
 
-export function useUser({ setValue } = {}) {
+export function useUser({ setValue, restartTable } = {}) {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -92,7 +92,6 @@ export function useUser({ setValue } = {}) {
       const res = await getUsersRequest();
       return res.data;
     } catch (error) {
-      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -112,7 +111,10 @@ export function useUser({ setValue } = {}) {
         error: "¡Error al eliminar el usuario!",
       });
 
-      if (res.status === 200) getUsers();
+      if (res?.status === 200 && restartTable) {
+        const res = await getUsers()
+        restartTable(res)
+      }
 
       setUserToDelete(null);
     } catch (error) {

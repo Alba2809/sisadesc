@@ -12,13 +12,6 @@ import UserDefault from "../../../assets/icons/avatar_default.jpg";
 
 function Users() {
   const {
-    loading,
-    getUsers,
-    handleActionDialog,
-    handleShowDialog,
-    showDialog,
-  } = useUser();
-  const {
     allObjects: allUsers,
     setDataWithoutFilter,
     objects: users,
@@ -31,6 +24,13 @@ function Users() {
     totalRecords,
     handleSearch,
   } = useGroupTable();
+  const {
+    loading,
+    getUsers,
+    handleActionDialog,
+    handleShowDialog,
+    showDialog,
+  } = useUser({ restartTable: setDataWithoutFilter });
   const [isHoverEdit, setIsHoverEdit] = useState(0);
   const [isHoverDelete, setIsHoverDelete] = useState(0);
   const [isHoverRow, setIsHoverRow] = useState(0);
