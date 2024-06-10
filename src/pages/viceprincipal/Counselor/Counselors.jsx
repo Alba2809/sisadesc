@@ -22,7 +22,7 @@ function Counselors() {
   return (
     <div className="w-full h-full flex flex-col">
       <header className="h-[50px]">
-        <h1 className="font-medium font-serif text-2xl">Lista de asesores</h1>
+        <h1 className="font-medium font-serif text-2xl">Lista de asesores asignados</h1>
       </header>
       <section className="flex-1 flex flex-col p-5 bg-white rounded-lg overflow-y-auto">
         <div className="flex-1 w-full overflow-x-auto mt-5 border border-gray-300">

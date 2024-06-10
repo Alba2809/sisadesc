@@ -167,6 +167,9 @@ export function useGrade({ setValue } = {}) {
       setLoading(true);
       const resSubjects = await getSubjects();
       setSubjects(resSubjects);
+
+      if(resSubjects.length < 1) return
+
       const res = await getGradesSubjectRequest(resSubjects[0]?.id);
       const resGrades = res.data;
       setSubjectSelected(resSubjects[0]);
@@ -193,6 +196,9 @@ export function useGrade({ setValue } = {}) {
       setLoading(true);
       const resSubjects = await getSubjects();
       setSubjects(resSubjects);
+
+      if(resSubjects.length < 1) return
+
       const res = await getGradesSubjectRequest(resSubjects[0]?.id);
       const resGrades = res.data;
       setStudents(resGrades);

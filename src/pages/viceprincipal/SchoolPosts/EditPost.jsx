@@ -28,7 +28,7 @@ function EditPost() {
   return (
     <div className="w-full h-full flex flex-col">
       <header className="h-[50px]">
-        <h1 className="font-medium font-serif text-2xl">Registrar aviso</h1>
+        <h1 className="font-medium font-serif text-2xl">Editar aviso</h1>
       </header>
       <section
         className="flex-1 flex flex-col p-10 bg-white rounded-lg overflow-y-auto"

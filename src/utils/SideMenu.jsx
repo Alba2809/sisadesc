@@ -124,7 +124,7 @@ export const adminOptions = [
     },
     subOptions: [
       {
-        name: "Lista de asesores",
+        name: "Lista de asesores asignados",
         to: "/admin/counselors",
       },
       {
@@ -381,7 +381,7 @@ export const viceprincipalOptions = [
     },
     subOptions: [
       {
-        name: "Lista de asesores",
+        name: "Lista de asesores asignados",
         to: "/viceprincipal/counselors",
       },
       {

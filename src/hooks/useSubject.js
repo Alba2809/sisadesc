@@ -9,9 +9,8 @@ import {
 } from "../api/subject";
 import toast from "react-hot-toast";
 import { getTeacherRequest } from "../api/teacher";
-import { getUserRequest } from "../api/user";
 
-export function useSubject() {
+export function useSubject({ restartTable } = {}) {
   const [loading, setLoading] = useState(true);
   const [showDialogStatus, setShowDialogStatus] = useState(false);
   const [showDialogView, setShowDialogView] = useState(false);
@@ -113,7 +112,10 @@ export function useSubject() {
         }
       );
 
-      if (res?.status === 200) getSubjects();
+      if (res?.status === 200 && restartTable){
+        const res = await getSubjectsRequest();
+        restartTable(res.data)
+      }
 
       setSubjectSelected(null);
     } catch (error) {

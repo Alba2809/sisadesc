@@ -5,19 +5,28 @@ import PostComponent from "../../../components/PostComponent";
 import Dialog from "../../../components/Dialog";
 
 function Posts() {
-  const { deletePost, getPosts, handleDialog, loading, postToDelete, showDialog, posts, setPosts } = usePost()
+  const {
+    deletePost,
+    getPosts,
+    handleDialog,
+    loading,
+    postToDelete,
+    showDialog,
+    posts,
+    setPosts,
+  } = usePost();
 
   useEffect(() => {
     getPosts();
   }, []);
 
   const handleActionDialog = async (accept) => {
-    if (!accept) return handleDialog(null)
+    if (!accept) return handleDialog(null);
 
-    if (postToDelete){
+    if (postToDelete) {
       const res = await deletePost(postToDelete);
       if (res?.status === 200) {
-        const newObjects = posts.filter(obj => obj.id!== postToDelete);
+        const newObjects = posts.filter((obj) => obj.id !== postToDelete);
         setPosts(newObjects);
         handleDialog(null);
       }
@@ -40,6 +49,9 @@ function Posts() {
           <p>Loading...</p>
         ) : (
           <>
+            {posts.length === 0 && (
+              <p className="text-center">No hay avisos.</p>
+            )}
             <AnimatePresence mode="popLayout">
               {posts.map((post, i) => (
                 <motion.div

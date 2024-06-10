@@ -11,18 +11,6 @@ import Dialog from "../../../components/Dialog";
 
 function Subjects() {
   const {
-    loading,
-    showDialogStatus,
-    showDialogView,
-    students,
-    teacher,
-    getSubjects,
-    handleDialogStatus,
-    handleDialogView,
-    handleActionStatus,
-    handleCloseView,
-  } = useSubject();
-  const {
     allObjects,
     setData,
     objects,
@@ -36,6 +24,18 @@ function Subjects() {
     totalRecords,
     handleSearch,
   } = useGroupTable();
+  const {
+    loading,
+    showDialogStatus,
+    showDialogView,
+    students,
+    teacher,
+    getSubjects,
+    handleDialogStatus,
+    handleDialogView,
+    handleActionStatus,
+    handleCloseView,
+  } = useSubject({ restartTable: setData });
   const [isHoverEditStudents, setIsHoverEditStudents] = useState(0);
   const [isHoverEditTeacher, setIsHoverEditTeacher] = useState(0);
   const [isHoverView, setIsHoverView] = useState(0);

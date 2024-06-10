@@ -103,9 +103,6 @@ export default function Parents() {
                 <th className="text-start px-2 min-w-[250px]">Colonia</th>
                 <th className="text-start px-2 min-w-[150px]">Código postal</th>
                 <th className="text-start px-2 min-w-[100px]">Estado</th>
-                <th className="text-start px-2 min-w-[150px]">
-                  Tipo de registro
-                </th>
                 <th className="text-start px-2 min-w-[210px]">
                   Fecha de registro
                 </th>
@@ -169,7 +166,6 @@ export default function Parents() {
                             <td className="p-2">{object.address.settlement}</td>
                             <td className="p-2">{object.address.postalcode}</td>
                             <td className="p-2">{object.status}</td>
-                            <td className="p-2">{object.type}</td>
                             <td className="p-2">
                               {formatDateLong(object.createdAt)}
                             </td>

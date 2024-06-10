@@ -61,7 +61,13 @@ function Assists() {
           )}
         </header>
         <div className="flex-1 w-full overflow-x-auto mt-5 border border-gray-300">
-          <h1 className="flex-1 py-1 text-center border-b font-medium text-xl">{`${subjectSelected?.name} - ${subjectSelected?.grade}${subjectSelected?.group}`}</h1>
+          {subjectSelected ? (
+            <h1 className="flex-1 py-1 text-center border-b font-medium text-xl">{`${subjectSelected?.name} - ${subjectSelected?.grade}${subjectSelected?.group}`}</h1>
+          ) : (
+            <h1 className="flex-1 py-1 text-center border-b font-medium text-xl">
+              Sin materia seleccionada
+            </h1>
+          )}
           <table className="table-auto w-full min-w-[800px] relative">
             <thead className="h-[50px] bg-[#f8f9fb] font-serif font-semibold">
               <tr>

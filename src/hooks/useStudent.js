@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { deleteStudentRequest, getStudentRequest, getStudentsRequest, registerStudentRequest, updateStudentRequest } from "../api/student";
 import toast from "react-hot-toast";
 import { formatDateShort } from "../utils/functions";
+import { vitalStatus } from "../utils/constants";
 
 export function useStudent({ setValue, unregister } = {}) {
   const [loading, setLoading] = useState(true);
@@ -164,6 +165,9 @@ export function useStudent({ setValue, unregister } = {}) {
         "father_street",
       ]);
     }
+    if(showFormFather){
+      setValue("father_status", vitalStatus[0])
+    }
     if (!showFormMother) {
       unregister([
         "mother_firstname",
@@ -181,6 +185,9 @@ export function useStudent({ setValue, unregister } = {}) {
         "mother_street",
       ]);
     }
+    if(showFormMother){
+      setValue("mother_status", vitalStatus[0])
+    }
     if (!showFormTutor) {
       unregister([
         "tutor_firstname",
@@ -197,6 +204,9 @@ export function useStudent({ setValue, unregister } = {}) {
         "tutor_status",
         "tutor_street",
       ]);
+    }
+    if(showFormTutor){
+      setValue("tutor_status", vitalStatus[0])
     }
     if (showFormFather && !showFormMother && !showFormTutor)
       setValue("isTutor", "Padre");

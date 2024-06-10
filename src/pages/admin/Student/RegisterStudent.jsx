@@ -104,8 +104,16 @@ function RegisterStudent() {
   });
 
   useEffect(() => {
-    if (Object.keys(errors).length > 0) toast.error("Hay errores en el formulario.");
+    Object.keys(errors).map((fieldName, i) => toast.error(errors[fieldName].message))
   }, [errors]);
+
+  useEffect(() => {
+    errorsStudent.map(errorMessage => toast.error(errorMessage))
+  }, [errorsStudent]);
+
+  useEffect(() => {
+    errorsParent.map(errorMessage => toast.error(errorMessage))
+  }, [errorsParent]);
 
   return (
     <div className="w-full h-full flex flex-col">

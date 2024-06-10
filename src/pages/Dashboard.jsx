@@ -227,7 +227,7 @@ function Dashboard() {
                   )}
                 </Fragment>
               ))}
-              <footer className="h-[50px] w-fit absolute bottom-0 text-gray-600 flex justify-center items-end">
+              <footer className="h-[50px] w-fit absolute bottom-0 text-gray-600 flex justify-center items-end font-sans">
                 <p>COPYRIGHT © 2024 SISADESC.</p>
               </footer>
             </motion.div>

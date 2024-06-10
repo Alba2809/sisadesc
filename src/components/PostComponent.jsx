@@ -13,7 +13,7 @@ function PostComponent({ data, handleDelete }) {
   };
 
   return (
-    <article className="flex flex-col w-full h-full bg-white drop-shadow-md p-3">
+    <article className="flex flex-col w-full h-full bg-white drop-shadow-md p-3 rounded-md">
       <header className="mb-2">
         <div className="flex flex-wrap gap-2 items-center">
           <BiSolidBellRing size="3em" />

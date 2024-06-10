@@ -10,8 +10,8 @@ function PostsPage() {
   useEffect(() => {
     if (loading) {
       async function getData() {
-        await getPosts()
-        setLoading(false)
+        await getPosts();
+        setLoading(false);
       }
       getData();
     }
@@ -33,6 +33,9 @@ function PostsPage() {
           <p>Loading...</p>
         ) : (
           <>
+            {posts.length === 0 && (
+              <p className="text-center">No hay avisos.</p>
+            )}
             <AnimatePresence mode="popLayout">
               {posts.map((post, i) => (
                 <motion.div

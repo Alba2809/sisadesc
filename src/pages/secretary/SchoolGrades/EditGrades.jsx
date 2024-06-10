@@ -24,7 +24,7 @@ function EditGrades() {
     subjects,
     students,
     updateGrades,
-    subjectSelected
+    subjectSelected,
   } = useGrade({ setValue });
 
   const onSubmit = handleSubmit(async (data) => {
@@ -44,7 +44,7 @@ function EditGrades() {
   useEffect(() => {
     getDataToUpdateForm();
   }, []);
-  
+
   return (
     <div className="w-full h-full flex flex-col">
       <header className="h-[50px]">
@@ -98,7 +98,7 @@ function EditGrades() {
             <section className="flex flex-wrap gap-10 items-center">
               <div className="relative flex-1 min-w-[200px]">
                 <div className="w-[200px]">
-                {!loading && (
+                  {!loading && (
                     <>
                       <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
                         Materia
@@ -118,7 +118,7 @@ function EditGrades() {
                 </div>
               </div>
               <div className="relative flex-1 w-[205px]">
-              {!loading &&
+                {!loading &&
                   (validEvaluations.length > 0 ? (
                     <>
                       <label className="absolute -top-3 left-5 text-sm text-center bg-white text-gray-500 z-10">
@@ -158,7 +158,13 @@ function EditGrades() {
               scrollbarColor: "#a5a5a5 transparent",
             }}
           >
-            <h1 className="flex-1 py-1 text-center border-b font-medium text-xl">{`${subjectSelected?.name} - ${subjectSelected?.grade}${subjectSelected?.group}`}</h1>
+            {subjectSelected ? (
+              <h1 className="flex-1 py-1 text-center border-b font-medium text-xl">{`${subjectSelected?.name} - ${subjectSelected?.grade}${subjectSelected?.group}`}</h1>
+            ) : (
+              <h1 className="flex-1 py-1 text-center border-b font-medium text-xl">
+                Sin materia seleccionada
+              </h1>
+            )}
             <table className="table-auto w-full relative">
               <thead className="h-[50px] bg-[#f8f9fb] font-serif font-semibold">
                 <tr>
@@ -207,11 +213,7 @@ function EditGrades() {
                             })}
                             className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                             onChange={(e) =>
-                              handleChangeInput(
-                                e,
-                                "" + student.id,
-                                "number"
-                              )
+                              handleChangeInput(e, "" + student.id, "number")
                             }
                             min={0}
                           />
@@ -228,11 +230,7 @@ function EditGrades() {
                             })}
                             className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                             onChange={(e) =>
-                              handleChangeInput(
-                                e,
-                                "" + student.id,
-                                "number"
-                              )
+                              handleChangeInput(e, "" + student.id, "number")
                             }
                             min={0}
                           />
@@ -249,11 +247,7 @@ function EditGrades() {
                             })}
                             className="w-full text-black px-4 py-3 rounded-md border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
                             onChange={(e) =>
-                              handleChangeInput(
-                                e,
-                                "" + student.id,
-                                "number"
-                              )
+                              handleChangeInput(e, "" + student.id, "number")
                             }
                             min={0}
                           />

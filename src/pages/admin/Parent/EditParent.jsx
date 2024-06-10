@@ -262,6 +262,7 @@ function EditParent() {
                     onOptionChange={handleChangeSelect}
                     object="status"
                     style="px-4 py-3 border border-gray-300 focus:border-blue-400 focus:border focus:outline-none"
+                    defaultValue={object?.status}
                   />
                 </div>
                 <div className="relative flex-1 lg:min-w-[30%] sm:min-w-[48%] md:min-w-[48%]">
