@@ -90,10 +90,10 @@ export function useEventCalendar({ setValue, getValues }) {
         end_time: getValues("end_time" + id),
       };
 
-      if(dataEvent.description === "" || dataEvent.start_time === "" || dataEvent.end_time === "") return toast.error("Faltam campos por rellenar.")
+      if(dataEvent.description === "" || dataEvent.start_time === "" || dataEvent.end_time === "") return toast.error("Faltan campos por rellenar.")
 
       const res = await updateEventRequest(id, dataEvent);
-      if (res?.statusText === "OK") {
+      if (res?.status === 200) {
         toast.success("Evento actualizado correctamente.");
       }
     } catch (error) {
