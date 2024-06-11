@@ -72,11 +72,11 @@ function Chats() {
         data.fileName = data.file.name;
       }
       const res = await sendMessage(data, userSelected.id);
-        setValue("message", "");
-        setTextAreaValue("");
-        setMessages([...messages, res.data]);
-        unregister("file");
-        setFile(null);
+      setValue("message", "");
+      setTextAreaValue("");
+      if (res.data) setMessages([...messages, res.data]);
+      unregister("file");
+      setFile(null);
       setSending(false);
     } catch (error) {
       toast.error("Error al enviar mensaje");
