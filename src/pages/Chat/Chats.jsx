@@ -10,6 +10,7 @@ import Conversation from "../../components/Chat/Conversation";
 import Message from "../../components/Chat/Message";
 import TextareaAutosize from "react-textarea-autosize";
 import UploadFileChat from "../../components/UploadFileChat";
+import toast from "react-hot-toast";
 
 function Chats() {
   const {
@@ -71,16 +72,14 @@ function Chats() {
         data.fileName = data.file.name;
       }
       const res = await sendMessage(data, userSelected.id);
-      if (res?.statusText === "OK") {
         setValue("message", "");
         setTextAreaValue("");
         setMessages([...messages, res.data]);
         unregister("file");
         setFile(null);
-      }
       setSending(false);
     } catch (error) {
-      console.log(error);
+      toast.error("Error al enviar mensaje");
       setSending(false);
     }
   });
