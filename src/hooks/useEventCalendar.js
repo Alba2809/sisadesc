@@ -56,18 +56,22 @@ export function useEventCalendar({ setValue, getValues }) {
         end_time: getValues("newEnd_time"),
       };
 
-      if(dataEvent.description === "" || dataEvent.start_time === "" || dataEvent.end_time === "") return toast.error("Faltam campos por rellenar.")
+      if (
+        dataEvent.description === "" ||
+        dataEvent.start_time === "" ||
+        dataEvent.end_time === ""
+      )
+        return toast.error("Faltam campos por llenar.");
 
       const res = await registerEventRequest(dataEvent);
-      if (res?.statusText === "OK") {
-        toast.success("Evento registrado correctamente.");
-        const newEvents = [...events, res.data];
-        setEvents(newEvents);
-        setEventsSelect([...eventsSelect, res.data]);
-        setValue("newDescription", "");
-        setValue("newStart_time", "");
-        setValue("newEnd_time", "");
-      }
+
+      toast.success("Evento registrado correctamente.");
+      const newEvents = [...events, res.data];
+      setEvents(newEvents);
+      setEventsSelect([...eventsSelect, res.data]);
+      setValue("newDescription", "");
+      setValue("newStart_time", "");
+      setValue("newEnd_time", "");
     } catch (error) {
       toast.error("No se pudo registrar el evento intentelo de nuevo.");
       if (typeof error.response.data === "object" && error.response.data) {
@@ -90,12 +94,18 @@ export function useEventCalendar({ setValue, getValues }) {
         end_time: getValues("end_time" + id),
       };
 
-      if(dataEvent.description === "" || dataEvent.start_time === "" || dataEvent.end_time === "") return toast.error("Faltan campos por rellenar.")
+      if (
+        dataEvent.description === "" ||
+        dataEvent.start_time === "" ||
+        dataEvent.end_time === ""
+      )
+        return toast.error("Faltan campos por rellenar.");
 
-      const res = await updateEventRequest(id, dataEvent);
-      if (res?.status === 200) {
-        toast.success("Evento actualizado correctamente.");
-      }
+      const res = await toast.promise(updateEventRequest(id, dataEvent), {
+        loading: "Actualizando evento...",
+        success: "¡Evento actualizado!",
+        error: "¡Error al actualizar!",
+      });
     } catch (error) {
       toast.error("No se pudo actualizar el evento intentelo de nuevo.");
       if (typeof error.response.data === "object" && error.response.data) {
@@ -112,13 +122,12 @@ export function useEventCalendar({ setValue, getValues }) {
   const handleDeleteEvent = async (id) => {
     try {
       const res = await deleteEventRequest(id);
-      if (res?.statusText === "OK") {
-        toast.success("Evento eliminado correctamente.");
-        const newEvents = events.filter((event) => event.id !== id);
-        setEvents(newEvents);
-        const newEventsSelect = eventsSelect.filter((event) => event.id !== id);
-        setEventsSelect(newEventsSelect);
-      }
+
+      toast.success("Evento eliminado correctamente.");
+      const newEvents = events.filter((event) => event.id !== id);
+      setEvents(newEvents);
+      const newEventsSelect = eventsSelect.filter((event) => event.id !== id);
+      setEventsSelect(newEventsSelect);
     } catch (error) {
       toast.error("No se pudo eliminar el evento intentelo de nuevo.");
     }
