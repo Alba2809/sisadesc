@@ -40,6 +40,22 @@ export const formatDateShort = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+export const formatDateShortNormal = (date) => {
+  if (date === "" || !date) return "";
+  const newDate = new Date(date);
+  const year = newDate.getFullYear();
+  let month = newDate.getMonth() + 1;
+  let day = newDate.getDate();
+
+  if (month < 10) {
+    month = `0${month}`;
+  }
+  if (day < 10) {
+    day = `0${day}`;
+  }
+  return `${year}-${month}-${day}`;
+};
+
 export const formatDateTime = (date) => {
   const newDate = new Date(date).toLocaleString("es-MX", {
     year: "numeric",

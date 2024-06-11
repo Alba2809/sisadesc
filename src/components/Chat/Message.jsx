@@ -1,4 +1,4 @@
-import { formatDateShort, extractTime } from "../../utils/functions";
+import { formatDateShort, extractTime, formatDateShortNormal } from "../../utils/functions";
 import { useState } from "react";
 import { LuFileDown } from "react-icons/lu";
 
@@ -56,7 +56,7 @@ function Message({ message, userLogged, onClickFile }) {
             message.sender_id === userLogged ? "text-end" : "text-start"
           }`}
         >
-          {formatDateShort(message.createdAt)} {extractTime(message.createdAt)}
+          {formatDateShortNormal(message.createdAt)} {extractTime(message.createdAt)}
         </p>
       </div>
     </div>
