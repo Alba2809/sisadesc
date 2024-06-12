@@ -138,12 +138,14 @@ function Users() {
                           >
                             <td className="p-2">{user.id}</td>
                             <td className="p-2">
-                              <img
-                                src={user.imageperfile ?? UserDefault}
-                                alt={"Imagen de perfil - " + user.id}
-                                className="min-w-10 min-h-10 max-w-10 max-h-10 rounded-full"
-                                loading="lazy"
-                              />
+                              <div className="min-w-10 min-h-10 max-w-10 max-h-10 rounded-full overflow-hidden">
+                                <img
+                                  src={user.imageperfile ?? UserDefault}
+                                  alt={"Imagen de perfil - " + user.id}
+                                  className="size-full"
+                                  loading="lazy"
+                                />
+                              </div>
                             </td>
                             <td className="p-2">{user.firstname}</td>
                             <td className="p-2">{user.lastnamepaternal}</td>

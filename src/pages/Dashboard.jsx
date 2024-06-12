@@ -16,8 +16,8 @@ import {
   secretaryOptions,
   principalOptions,
   viceprincipalOptions,
-  academicCoorOptions, 
-  parentOptions 
+  academicCoorOptions,
+  parentOptions,
 } from "../utils/SideMenu";
 import Logo from "../assets/logos/logo-escudo.png";
 
@@ -47,21 +47,23 @@ function Dashboard() {
     <div className="w-full h-full overflow-hidden relative">
       <Toaster position="top-right" reverseOrder={false} />
       <header className="bg-white h-[70px] flex flex-row p-2 w-full justify-between">
-        <div className="flex flex-row items-center gap-3">
+        <Link className="flex flex-row items-center gap-3" to="/">
           <img src={Logo} alt="Logo del sistema" className="h-full" />
           <h1 className="font-bold text-3xl">SISADESC</h1>
-        </div>
+        </Link>
         <section
           className="flex flex-row items-center gap-3 relative mr-5"
           ref={menuRef}
         >
           {user.imageperfile ? (
             <div className="rounded-full border-2 border-gray-300 p-1">
-              <img
-                src={user.imageperfile}
-                alt="Image del perfil del usuario"
-                className="min-w-10 min-h-10 max-w-10 max-h-10 rounded-full"
-              />
+              <div className="min-w-10 min-h-10 max-w-10 max-h-10 rounded-full overflow-hidden">
+                <img
+                  src={user.imageperfile}
+                  alt="Image del perfil del usuario"
+                  className="size-full"
+                />
+              </div>
             </div>
           ) : (
             <div className="rounded-full border-2 border-gray-300 p-2">

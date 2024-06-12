@@ -19,11 +19,13 @@ function WelcomeSection() {
       <section className="size-full flex flex-col items-center justify-center gap-y-6">
         {user.imageperfile ? (
           <div className="rounded-full border-2 border-gray-300 p-1">
-            <img
-              src={user.imageperfile}
-              alt="Image del perfil del usuario"
-              className="min-w-[280px] min-h-[280px] max-w-[280px] max-h-[280px] rounded-full"
-            />
+            <div className="min-w-[280px] min-h-[280px] max-w-[280px] max-h-[280px] rounded-full overflow-hidden">
+              <img
+                src={user.imageperfile}
+                alt="Image del perfil del usuario"
+                className="size-full"
+              />
+            </div>
           </div>
         ) : (
           <div className="rounded-full border-2 border-gray-300 p-1">

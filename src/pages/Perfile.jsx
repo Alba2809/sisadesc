@@ -16,11 +16,13 @@ function Perfile() {
         <div className="bg-[#f5f5f5] p-5 flex flex-row gap-5 items-center">
           {user?.imageperfile ? (
             <div className="rounded-full bg-white p-4 w-fit h-fit">
-              <img
-                src={user?.imageperfile}
-                alt="Image del perfil del usuario"
-                className="min-w-20 min-h-20 max-w-20 max-h-20 rounded-full"
-              />
+              <div className="min-w-20 min-h-20 max-w-20 max-h-20 rounded-full overflow-hidden">
+                <img
+                  src={user?.imageperfile}
+                  alt="Image del perfil del usuario"
+                  className="size-full"
+                />
+              </div>
             </div>
           ) : (
             <div className="rounded-full border-2 border-gray-300 p-2">
