@@ -153,7 +153,7 @@ function Users() {
                             <td className="p-2">{user.email}</td>
                             <td className="p-2">
                               <time dateTime={user.birthdate}>
-                                {formatDateLong(user.birthdate)}
+                                {formatDateLong(user.birthdate, "utc")}
                               </time>
                             </td>
                             <td className="p-2">{user.address.street}</td>
@@ -162,7 +162,7 @@ function Users() {
                             <td className="p-2">{user.phonenumber}</td>
                             <td className="p-2">
                               <time dateTime={user.createdAt}>
-                                {formatDateLong(user.createdAt)}
+                                {formatDateLong(user.createdAt, "utc")}
                               </time>
                             </td>
                             <td className="p-2">{user.role.name_spanish}</td>
